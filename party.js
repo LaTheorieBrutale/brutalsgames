@@ -9,13 +9,13 @@ const GAMES = { qd: ['quoridor.html', 'Quoridor'], df: ['differences.html', '7 D
 const STR = {
   fr: { title: 'Groupe d’amis', sub: 'Rejoignez le même groupe une seule fois : quand quelqu’un lance une partie, tout le monde est invité automatiquement.', create: 'Créer un groupe', join: 'Rejoindre', codePh: 'CODE', leave: 'Quitter le groupe',
     code: 'Code du groupe', members: 'Dans le groupe', auto: 'Rejoindre les parties automatiquement', launches: '<b>{n}</b> lance <b>{g}</b> !', go: 'Rejoindre', later: 'Plus tard', inSec: 'dans {s} s…', nobody: 'Personne d’autre pour l’instant',
-    denied: 'Le groupe a besoin des règles Firebase « rooms ».', offline: 'Connexion au groupe impossible pour l’instant, nouvelle tentative…', bad: 'Entre un code à 5 caractères.', copy: 'Copier', copied: 'Copié !', you: 'toi', pill: 'Groupe {c} · {n}' },
+    denied: 'Le groupe a besoin des règles Firebase « rooms ».', offline: 'Connexion au groupe impossible pour l’instant, nouvelle tentative…', bad: 'Entre un code à 5 caractères.', copy: 'Copier', copied: 'Copié !', you: 'toi', pill: 'Groupe {c} · {n}', rcHost: 'Tout le monde est prêt ?', rcWait: 'On attend que chacun clique sur « Prêt »', rcForce: 'Lancer sans attendre', rcCancel: 'Annuler', rcAsk: '<b>{n}</b> veut lancer la partie !', rcReady: 'Prêt !', rcDone: 'Prêt ✓ — on attend les autres…' },
   en: { title: 'Friends group', sub: 'Join the same group once: whenever someone starts a game, everyone gets invited automatically.', create: 'Create a group', join: 'Join', codePh: 'CODE', leave: 'Leave the group',
     code: 'Group code', members: 'In the group', auto: 'Join games automatically', launches: '<b>{n}</b> is starting <b>{g}</b>!', go: 'Join', later: 'Later', inSec: 'in {s} s…', nobody: 'Nobody else yet',
-    denied: 'The group needs the Firebase “rooms” rules.', offline: 'Can’t reach the group right now, retrying…', bad: 'Enter a 5-character code.', copy: 'Copy', copied: 'Copied!', you: 'you', pill: 'Group {c} · {n}' },
+    denied: 'The group needs the Firebase “rooms” rules.', offline: 'Can’t reach the group right now, retrying…', bad: 'Enter a 5-character code.', copy: 'Copy', copied: 'Copied!', you: 'you', pill: 'Group {c} · {n}', rcHost: 'Is everyone ready?', rcWait: 'Waiting for everyone to tap “Ready”', rcForce: 'Start anyway', rcCancel: 'Cancel', rcAsk: '<b>{n}</b> wants to start the game!', rcReady: 'Ready!', rcDone: 'Ready ✓ — waiting for the others…' },
   cs: { title: 'Skupina přátel', sub: 'Připojte se do stejné skupiny jen jednou: když někdo spustí hru, všichni dostanou pozvánku automaticky.', create: 'Vytvořit skupinu', join: 'Připojit', codePh: 'KÓD', leave: 'Opustit skupinu',
     code: 'Kód skupiny', members: 'Ve skupině', auto: 'Připojovat se ke hrám automaticky', launches: '<b>{n}</b> spouští <b>{g}</b>!', go: 'Připojit', later: 'Později', inSec: 'za {s} s…', nobody: 'Zatím nikdo další',
-    denied: 'Skupina potřebuje pravidla Firebase „rooms“.', offline: 'Ke skupině se teď nelze připojit, zkouším znovu…', bad: 'Zadej 5místný kód.', copy: 'Kopírovat', copied: 'Zkopírováno!', you: 'ty', pill: 'Skupina {c} · {n}' }
+    denied: 'Skupina potřebuje pravidla Firebase „rooms“.', offline: 'Ke skupině se teď nelze připojit, zkouším znovu…', bad: 'Zadej 5místný kód.', copy: 'Kopírovat', copied: 'Zkopírováno!', you: 'ty', pill: 'Skupina {c} · {n}', rcHost: 'Jsou všichni připraveni?', rcWait: 'Čekáme, až každý klepne na „Připraven“', rcForce: 'Spustit hned', rcCancel: 'Zrušit', rcAsk: '<b>{n}</b> chce spustit hru!', rcReady: 'Připraven!', rcDone: 'Připraven ✓ — čekáme na ostatní…' }
 };
 const get = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } };
 const set = (k, v) => { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} };
@@ -46,15 +46,22 @@ async function req(path, method, body) {
 /* ---------- Styles (s'adaptent au thème de chaque page) ---------- */
 const st = document.createElement('style');
 st.textContent = `
-.pty-inv{position:fixed;z-index:60;left:50%;top:calc(env(safe-area-inset-top,0px) + 10px);transform:translateX(-50%);width:min(440px,calc(100% - 20px));display:flex;flex-direction:column;gap:8px;padding:12px 14px;
+.pty-dim{position:fixed;inset:0;z-index:59;background:rgba(5,3,12,.62);animation:ptyFade .2s}
+@keyframes ptyFade{from{opacity:0}}
+.pty-inv{position:fixed;z-index:60;left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,calc(100% - 28px));display:flex;flex-direction:column;align-items:stretch;text-align:center;gap:14px;padding:22px 20px 18px;font-size:21px!important;line-height:1.3;
   background:#1d1636;color:#f6efe0;border:4px solid #0b0816;border-radius:18px;box-shadow:0 6px 0 #0b0816,0 10px 30px rgba(0,0,0,.4);font-family:inherit;font-size:16px;animation:ptyIn .35s cubic-bezier(.2,1.5,.4,1)}
-@keyframes ptyIn{from{transform:translate(-50%,-30px);opacity:0}}
+@keyframes ptyIn{from{transform:translate(-50%,-50%) scale(.7);opacity:0}}
+.pty-inv .big{font-size:44px;line-height:1}
+.pty-inv .lst{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;font-size:15px}
+.pty-inv .lst span{padding:4px 10px;border-radius:999px;background:rgba(0,0,0,.35)}
+.pty-inv .lst span.ok{background:#3f8f3a}
+.pty-inv .sub{font-size:14px;opacity:.75}
 .pty-inv b{color:#ffcf3f}
 .pty-inv .row{display:flex;gap:8px;align-items:center}
-.pty-inv button{font:inherit;font-weight:800;font-size:15px;border:3px solid #0b0816;border-radius:12px;padding:8px 12px;cursor:pointer;box-shadow:0 3px 0 #0b0816}
+.pty-inv button{font:inherit;font-weight:800;font-size:18px;border:3px solid #0b0816;border-radius:14px;padding:12px 14px;cursor:pointer;box-shadow:0 4px 0 #0b0816}
 .pty-inv .go{flex:1;background:linear-gradient(180deg,#fff0b0,#ffcf3f 55%,#f0a92a);color:#1a1020}
 .pty-inv .no{background:#3a3160;color:#f6efe0}
-.pty-inv small{opacity:.75;font-size:13px}
+.pty-inv small{opacity:.75;font-size:15px;display:block;margin-top:4px}
 .pty-panel{display:flex;flex-direction:column;gap:10px}
 .pty-panel .pty-sub{margin:0;font-size:13.5px;opacity:.75;line-height:1.4}
 .pty-panel .pty-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -121,11 +128,12 @@ function handleCur(cur) {
   if (inviteEl && inviteEl.dataset.key === key) return;                      // invitation déjà affichée (relecture régulière)
   showInvite(cur, key);
 }
-function hideInvite() { clearInterval(countT); if (inviteEl) { inviteEl.remove(); inviteEl = null; } }
+function hideInvite() { clearInterval(countT); if (inviteEl) { if (inviteEl._dim) inviteEl._dim.remove(); inviteEl.remove(); inviteEl = null; } }
 function showInvite(cur, key) {
   hideInvite();
   const el = inviteEl = document.createElement('div'); el.className = 'pty-inv'; el.dataset.key = key; el.setAttribute('role', 'alert');
-  el.innerHTML = `<div>👥 ${tr('launches', { n: esc(cur.n || '?'), g: esc(GAMES[cur.g][1]) })} <small class="cd"></small></div><div class="row"><button class="go">${tr('go')}</button><button class="no">${tr('later')}</button></div>`;
+  el.innerHTML = `<div class="big">👥</div><div>${tr('launches', { n: esc(cur.n || '?'), g: esc(GAMES[cur.g][1]) })} <small class="cd"></small></div><div class="row"><button class="go">${tr('go')}</button><button class="no">${tr('later')}</button></div>`;
+  const dim = document.createElement('div'); dim.className = 'pty-dim'; el._dim = dim; document.body.appendChild(dim);
   document.body.appendChild(el);
   try { window.P && P.sfx && P.sfx('chat'); navigator.vibrate && navigator.vibrate([30, 60, 30]); } catch (e) {}
   const go = () => { hideInvite(); sset(seenKey(), key); joinGame(cur.g, cur.c); };
@@ -148,6 +156,48 @@ Party.announce = (g, c) => {
   sset(seenKey(), g + c);
   req(`/rooms/party_${Party.code}/cur`, 'PUT', { g, c, n: myName() || '?', id: myId, t: SV }).catch(() => {});
 };
+/* ---------- « Prêt ? » avant de lancer une partie (seulement dans un groupe) ----------
+   Le bouton « Lancer » d'un jeu porte data-pstart : on intercepte le clic, chaque membre du groupe présent
+   dans ce jeu doit cliquer « Prêt », puis le vrai lancement a lieu. /rooms/party_X/rc = { g, id, n, k, r: { id: true } } */
+let rcHostEl = null, rcGuestEl = null, rcPoll = 0, rcBypass = false;
+const rcBase = () => '/rooms/party_' + Party.code + '/rc';
+function overlay(html) { const dim = document.createElement('div'); dim.className = 'pty-dim'; const el = document.createElement('div'); el.className = 'pty-inv'; el.innerHTML = html; el._dim = dim; document.body.appendChild(dim); document.body.appendChild(el); return el; }
+const dropOv = el => { if (el) { el._dim && el._dim.remove(); el.remove(); } };
+function rcStop() { clearInterval(rcPoll); rcPoll = 0; dropOv(rcHostEl); rcHostEl = null; }
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-pstart]'); if (!b || b.disabled || rcBypass || !Party.code) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  const go = () => { rcStop(); req(rcBase(), 'DELETE').catch(() => {}); rcBypass = true; try { b.click(); } finally { rcBypass = false; } };
+  req(`/rooms/party_${Party.code}/m`).then(d => {
+    const n0 = now(), who = Object.entries(d || {}).filter(([k, v]) => k !== myId && v && typeof v.t === 'number' && n0 - v.t < 70000 && v.g === Party.game).map(([k, v]) => ({ id: k, n: String(v.n || '?').slice(0, 14) }));
+    if (!who.length) return go();
+    const k = Math.random().toString(36).slice(2, 8);
+    req(rcBase(), 'PUT', { g: Party.game, id: myId, n: myName() || '?', k, t: SV, r: { [myId]: true } }).catch(() => {});
+    rcStop();
+    rcHostEl = overlay(`<div class="big">✋</div><div><b>${tr('rcHost')}</b><small>${tr('rcWait')}</small></div><div class="lst"></div><div class="row"><button class="go">${tr('rcForce')}</button><button class="no">${tr('rcCancel')}</button></div>`);
+    const lst = rcHostEl.querySelector('.lst');
+    const draw = r => { lst.innerHTML = who.map(m => `<span class="${r[m.id] ? 'ok' : ''}">${r[m.id] ? '✓' : '…'} ${esc(m.n)}</span>`).join(''); };
+    draw({});
+    rcHostEl.querySelector('.go').onclick = go;
+    rcHostEl.querySelector('.no').onclick = () => { rcStop(); req(rcBase(), 'DELETE').catch(() => {}); };
+    rcPoll = setInterval(() => { req(rcBase() + '/r').then(r => { r = r || {}; draw(r); if (who.every(m => r[m.id])) go(); }).catch(() => {}); }, 1000);
+  }).catch(go);
+}, true);
+// côté des autres membres : la demande « Prêt ? » apparaît en grand
+function rcCheck() {
+  if (!Party.code || !Party.game) return;
+  req(rcBase()).then(rc => {
+    const live = rc && rc.g === Party.game && rc.id !== myId && (!skewOk || typeof rc.t !== 'number' || now() - rc.t < 120000);
+    if (!live) { dropOv(rcGuestEl); rcGuestEl = null; return; }
+    if (rcGuestEl && rcGuestEl.dataset.k === rc.k) { if (rc.r && rc.r[myId]) rcGuestEl.querySelector('.row').innerHTML = `<p class="sub">${tr('rcDone')}</p>`; return; }
+    dropOv(rcGuestEl);
+    rcGuestEl = overlay(`<div class="big">✋</div><div>${tr('rcAsk', { n: esc(rc.n || '?') })}</div><div class="row"><button class="go">${tr('rcReady')}</button></div>`);
+    rcGuestEl.dataset.k = rc.k;
+    try { window.P && P.sfx && P.sfx('hint'); navigator.vibrate && navigator.vibrate([40, 60, 40]); } catch (e) {}
+    rcGuestEl.querySelector('.go').onclick = () => { req(rcBase() + '/r/' + myId, 'PUT', true).catch(() => {}); rcGuestEl.querySelector('.row').innerHTML = `<p class="sub">${tr('rcDone')}</p>`; try { window.P && P.sfx && P.sfx('click'); } catch (e) {} };
+  }).catch(() => {});
+}
+setInterval(() => { if (!document.hidden) rcCheck(); }, 1500);
 // Code de partie passé dans l'adresse (?join=ABCDE) : la page le récupère une fois
 Party.takeJoin = () => {
   const m = location.search.match(/[?&]join=([A-Z0-9]{5})/i);

@@ -133,13 +133,19 @@ P.pushMatch = async m => {
   const rec = { t: m.t, p: m.p, w: m.w, b: m.b, g: m.g }; if (Array.isArray(m.wa) && m.wa.length > 1) rec.wa = m.wa;
   try { await P.fbReq(`/matches/${m.id}`, 'PUT', rec); } catch (e) {}
 };
+// Pseudos regroupés (même joueur sous plusieurs noms) : clé simplifiée -> nom affiché
+const NAME_ALIAS = { ihatekiki: 'Eli', eli: 'Eli', eliihatekiki: 'Eli' };
+const aliasOf = n => { const k = String(n || '').toLowerCase().replace(/[^a-z0-9à-ÿ]/g, ''); return NAME_ALIAS[k] || n; };
+P.aliasOf = aliasOf;
 // Classement : victoires, parties, pourcentage
 P.ranking = (matches, game) => {
   const tab = new Map();
   for (const m of matches) {
     if (game && m.g !== game) continue;
-    m.p.forEach((n, i) => {
-      const k = n.toLowerCase(), r = tab.get(k) || { name: n, w: 0, g: 0, ai: false, hu: 0 };
+    const inMatch = new Set();
+    m.p.forEach((n0, i) => {
+      const n = aliasOf(n0), k = n.toLowerCase(); if (inMatch.has(k)) return; inMatch.add(k);
+      const r = tab.get(k) || { name: n, w: 0, g: 0, ai: false, hu: 0 };
       r.name = n; r.g++; if (winnersArr(m).includes(i)) r.w++; if (m.b && m.b[i]) r.ai = !r.hu; else { r.hu++; r.ai = false; } tab.set(k, r); // « IA » seulement si ce nom n'a jamais joué en humain
     });
   }

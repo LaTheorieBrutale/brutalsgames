@@ -124,7 +124,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 /* places des joueurs, posées sur l'arc */
 .spot{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:3px;z-index:2;--cw:clamp(34px,8.6vw,56px);transition:left .4s,top .4s}
 .spot.me{--cw:clamp(50px,13vw,78px);z-index:3}
-@media (max-aspect-ratio:3/4){.spot{--cw:clamp(28px,8vw,56px)}.spot .tag{font-size:11.5px;max-width:110px}.spot .bc .lb{display:none}.spot .tag{margin-top:2px}}
+@media (max-aspect-ratio:3/4){.spot{--cw:clamp(28px,8vw,56px)}.spot .tag{font-size:11.5px;max-width:110px}.spot .tag{margin-top:2px}}
 .spot .hands{display:flex;gap:8px;align-items:flex-end}
 .spot .hand{display:flex;flex-direction:column;align-items:center;gap:3px;padding:3px;border-radius:12px;border:3px solid transparent}
 .spot .hand.act{border-color:var(--gold);background:rgba(242,193,78,.12);box-shadow:0 0 18px rgba(242,193,78,.45)}
@@ -133,7 +133,8 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .circles{display:flex;align-items:center;gap:4px}
 .bc{position:relative;display:grid;place-items:center;width:calc(var(--cw) * .95);height:calc(var(--cw) * .95);border-radius:50%;border:2.5px solid rgba(255,255,255,.75);background:rgba(0,0,0,.12)}
 .bc.sm{width:calc(var(--cw) * .62);height:calc(var(--cw) * .62);border-color:rgba(242,168,62,.85)}
-.bc .lb{position:absolute;bottom:-13px;font-size:8.5px;letter-spacing:.06em;color:rgba(255,255,255,.75);white-space:nowrap;text-transform:uppercase}
+.bc .lb{position:absolute;top:100%;margin-top:1px;font-size:8.5px;line-height:1;letter-spacing:.04em;color:rgba(255,255,255,.8);white-space:nowrap;text-transform:uppercase;text-align:center;font-weight:900}
+.circles{margin-bottom:16px}
 .bc .chip{width:86%;height:86%;font-size:calc(var(--cw) * .2)}
 .spot.turn .bc:not(.sm){border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,193,78,.4),0 0 16px rgba(242,193,78,.6)}
 .tag{display:flex;align-items:center;gap:4px;margin-top:9px;font-size:12.5px;background:rgba(10,8,6,.72);border:2px solid var(--ink);border-radius:999px;padding:1px 8px 1px 2px;max-width:130px;white-space:nowrap}
@@ -174,6 +175,11 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .paytab b{display:block;color:var(--gold);margin-bottom:3px}
 .paytab span{display:flex;justify-content:space-between;gap:6px}
 
+/* ---------- Bulle d'aide (survol à la souris, appui long au doigt) ---------- */
+#tip{position:fixed;z-index:50;max-width:min(300px,calc(100vw - 20px));background:#1a120c;color:var(--text);border:3px solid var(--gold);border-radius:12px;padding:8px 11px;font-size:13.5px;line-height:1.4;box-shadow:0 5px 0 var(--ink),0 10px 24px rgba(0,0,0,.5);pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s}
+#tip.show{opacity:1;transform:none}
+[data-tip]{cursor:help}
+.tgts button[data-tip],.acts .btn[data-tip]{cursor:pointer}
 /* ---------- Fin ---------- */
 .banner{font-family:var(--f-title);font-size:clamp(30px,9vw,48px);text-align:center;line-height:1.05;color:var(--gold);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink);transform:rotate(-2deg);animation:drop .6s cubic-bezier(.2,1.5,.4,1) both}
 .ranks{display:flex;flex-direction:column;gap:5px}
@@ -283,7 +289,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
       <div class="setrow">
         <span class="lbl" data-i18n="rounds">Manches</span><div class="nseg" id="segRounds"></div>
       </div>
-      <button class="btn wide gold" id="bStart" data-i18n="start">Distribuer les cartes</button>
+      <button class="btn wide gold" id="bStart" data-pstart data-i18n="start">Distribuer les cartes</button>
       <p class="wait-txt" id="waitTxt"></p>
       <button class="frame chatbar" id="bChatL"><span class="cb-ico">💬</span><span class="cb-txt"></span><span class="badge"></span></button>
       <button class="btn sm" id="bLeave" data-i18n="leave">Quitter</button>
@@ -348,6 +354,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
   <div class="rules" data-i18n-html="rulesTxt"></div>
 </div>
 <div id="toast" role="status"></div>
+<div id="tip" role="tooltip"></div>
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
@@ -370,7 +377,7 @@ P.addStrings({
     round: 'Manche {n}/{m}', roundInf: 'Manche {n}', dealer: 'Croupier', placeBets: 'Faites vos jeux !', yourBet: 'Ta mise', bet: 'Miser', clear: 'Effacer', sitOut: 'Passer', minBet: 'Mise minimum : 10',
     waitBets: 'Les autres misent…', yourTurn: 'À toi de jouer !', turnOf: 'Au tour de {name}', dealerTurn: 'Le croupier joue…', results: 'Résultats', watching: 'Tu regardes cette manche.',
     hit: 'Tirer', stand: 'Rester', double: 'Doubler', split: 'Séparer', hitS: '+1 carte', standS: 'je garde', doubleS: 'mise ×2', splitS: '2 mains',
-    mainBet: 'Mise', upTo: 'jusqu’à', sideBets: 'Paris annexes', k_pp: 'Paires', k_t3: '21+3', r_perfect: 'Paire parfaite', r_colored: 'Paire couleur', r_mixed: 'Paire mixte', r_suitedTrips: 'Brelan assorti', r_straightFlush: 'Quinte flush', r_trips: 'Brelan', r_straight: 'Suite', r_flush: 'Couleur', insQ: 'Assurance ?', insTxt: 'Le croupier montre un As. Assurance pour {n} jetons ? (payée 2 contre 1 s’il a Blackjack)', insYes: 'Assurer', insNo: 'Non merci', insWait: 'Les joueurs décident de s’assurer',
+    mainBet: 'Mise', upTo: 'jusqu’à', sideBets: 'Paris annexes', k_pp: 'Perfect Pairs', tipMain: 'Mise principale : bats le croupier pour gagner autant que ta mise (1:1). Un Blackjack paie 3 pour 2.', tipPP: 'Perfect Pairs (pari annexe) : tu paries que tes 2 premières cartes forment une paire. Paire mixte (couleurs différentes) 6:1, paire de même couleur 12:1, paire parfaite (même carte) 25:1. Payé dès la distribution, que tu gagnes la main ou non.', tipT3: '21+3 (pari annexe) : tes 2 cartes + la carte visible du croupier forment une main de poker. Couleur 5:1, suite 10:1, brelan 30:1, quinte flush 40:1, brelan assorti 100:1. Payé dès la distribution.', tipIns: 'Assurance : quand le croupier montre un As, tu mises la moitié de ta mise sur le fait qu’il a Blackjack. Si oui, elle paie 2:1 et compense ta main perdue.', k_t3: '21+3', r_perfect: 'Paire parfaite', r_colored: 'Paire couleur', r_mixed: 'Paire mixte', r_suitedTrips: 'Brelan assorti', r_straightFlush: 'Quinte flush', r_trips: 'Brelan', r_straight: 'Suite', r_flush: 'Couleur', insQ: 'Assurance ?', insTxt: 'Le croupier montre un As. Assurance pour {n} jetons ? (payée 2 contre 1 s’il a Blackjack)', insYes: 'Assurer', insNo: 'Non merci', insWait: 'Les joueurs décident de s’assurer',
     sideTxt: '<p><b>Perfect Pairs</b> : tes deux premières cartes forment une paire. Mixte (couleurs différentes) 6:1, même couleur 12:1, parfaite (même carte) 25:1.</p><p><b>21+3</b> : tes deux cartes + la carte visible du croupier forment une main de poker : couleur 5:1, suite 10:1, brelan 30:1, quinte flush 40:1, brelan assorti 100:1.</p><p>Choisis la case (Mise, Perfect Pairs, 21+3) puis pose tes jetons. Il faut une mise principale pour jouer les paris annexes.</p>',
     bust: 'Sauté !', bj: 'BLACKJACK !', win: 'Gagné !', lose: 'Perdu', push: 'Égalité', ready: 'Prêt ✓', betting: 'mise…', out: 'passe', broke: 'Ruiné 💸', gone: 'parti',
     winBig: '+{n} jetons !', lostN: '−{n} jetons', brokeMe: 'Plus de jetons…', rebuy: 'Recharger 500 (−500 au score final)', rebuys: 'recharges',
@@ -386,7 +393,7 @@ P.addStrings({
     round: 'Round {n}/{m}', roundInf: 'Round {n}', dealer: 'Dealer', placeBets: 'Place your bets!', yourBet: 'Your bet', bet: 'Bet', clear: 'Clear', sitOut: 'Skip', minBet: 'Minimum bet: 10',
     waitBets: 'Others are betting…', yourTurn: 'Your turn!', turnOf: '{name}’s turn', dealerTurn: 'The dealer plays…', results: 'Results', watching: 'You’re watching this round.',
     hit: 'Hit', stand: 'Stand', double: 'Double', split: 'Split', hitS: '+1 card', standS: 'keep it', doubleS: 'bet ×2', splitS: '2 hands',
-    mainBet: 'Bet', upTo: 'up to', sideBets: 'Side bets', k_pp: 'Pairs', k_t3: '21+3', r_perfect: 'Perfect pair', r_colored: 'Colored pair', r_mixed: 'Mixed pair', r_suitedTrips: 'Suited trips', r_straightFlush: 'Straight flush', r_trips: 'Three of a kind', r_straight: 'Straight', r_flush: 'Flush', insQ: 'Insurance?', insTxt: 'The dealer shows an Ace. Insurance for {n} chips? (pays 2 to 1 if the dealer has Blackjack)', insYes: 'Insure', insNo: 'No thanks', insWait: 'Players are deciding on insurance',
+    mainBet: 'Bet', upTo: 'up to', sideBets: 'Side bets', k_pp: 'Perfect Pairs', tipMain: 'Main bet: beat the dealer to win as much as you bet (1:1). A Blackjack pays 3 to 2.', tipPP: 'Perfect Pairs (side bet): you bet your first 2 cards make a pair. Mixed pair (different colours) 6:1, coloured pair 12:1, perfect pair (same card) 25:1. Paid right after the deal, whatever happens to your hand.', tipT3: '21+3 (side bet): your 2 cards + the dealer’s up card make a poker hand. Flush 5:1, straight 10:1, three of a kind 30:1, straight flush 40:1, suited trips 100:1. Paid right after the deal.', tipIns: 'Insurance: when the dealer shows an Ace, you bet half your stake that they have Blackjack. If so, it pays 2:1 and covers your lost hand.', k_t3: '21+3', r_perfect: 'Perfect pair', r_colored: 'Colored pair', r_mixed: 'Mixed pair', r_suitedTrips: 'Suited trips', r_straightFlush: 'Straight flush', r_trips: 'Three of a kind', r_straight: 'Straight', r_flush: 'Flush', insQ: 'Insurance?', insTxt: 'The dealer shows an Ace. Insurance for {n} chips? (pays 2 to 1 if the dealer has Blackjack)', insYes: 'Insure', insNo: 'No thanks', insWait: 'Players are deciding on insurance',
     sideTxt: '<p><b>Perfect Pairs</b>: your first two cards make a pair. Mixed (different colours) 6:1, coloured 12:1, perfect (same card) 25:1.</p><p><b>21+3</b>: your two cards + the dealer’s up card make a poker hand: flush 5:1, straight 10:1, three of a kind 30:1, straight flush 40:1, suited trips 100:1.</p><p>Pick the spot (Bet, Perfect Pairs, 21+3) then place chips. A main bet is required to play side bets.</p>',
     bust: 'Bust!', bj: 'BLACKJACK!', win: 'Win!', lose: 'Lose', push: 'Push', ready: 'Ready ✓', betting: 'betting…', out: 'skips', broke: 'Broke 💸', gone: 'left',
     winBig: '+{n} chips!', lostN: '−{n} chips', brokeMe: 'Out of chips…', rebuy: 'Rebuy 500 (−500 final score)', rebuys: 'rebuys',
@@ -402,7 +409,7 @@ P.addStrings({
     round: 'Kolo {n}/{m}', roundInf: 'Kolo {n}', dealer: 'Krupiér', placeBets: 'Vsaďte si!', yourBet: 'Tvoje sázka', bet: 'Vsadit', clear: 'Smazat', sitOut: 'Vynechat', minBet: 'Minimální sázka: 10',
     waitBets: 'Ostatní sázejí…', yourTurn: 'Jsi na tahu!', turnOf: 'Na tahu: {name}', dealerTurn: 'Krupiér hraje…', results: 'Výsledky', watching: 'Toto kolo jen sleduješ.',
     hit: 'Karta', stand: 'Stát', double: 'Zdvojit', split: 'Rozdělit', hitS: '+1 karta', standS: 'nechám', doubleS: 'sázka ×2', splitS: '2 ruce',
-    mainBet: 'Sázka', upTo: 'až', sideBets: 'Vedlejší sázky', k_pp: 'Páry', k_t3: '21+3', r_perfect: 'Dokonalý pár', r_colored: 'Barevný pár', r_mixed: 'Smíšený pár', r_suitedTrips: 'Trojice v barvě', r_straightFlush: 'Postupka v barvě', r_trips: 'Trojice', r_straight: 'Postupka', r_flush: 'Barva', insQ: 'Pojištění?', insTxt: 'Krupiér ukazuje eso. Pojistit za {n} žetonů? (vyplácí 2 : 1, pokud má Blackjack)', insYes: 'Pojistit', insNo: 'Ne, díky', insWait: 'Hráči se rozhodují o pojištění',
+    mainBet: 'Sázka', upTo: 'až', sideBets: 'Vedlejší sázky', k_pp: 'Perfect Pairs', tipMain: 'Hlavní sázka: poraz krupiéra a vyhraješ stejně, kolik jsi vsadil (1:1). Blackjack vyplácí 3 : 2.', tipPP: 'Perfect Pairs (vedlejší sázka): sázíš, že tvoje první 2 karty tvoří pár. Smíšený pár (různé barvy) 6:1, pár stejné barvy 12:1, dokonalý pár (stejná karta) 25:1. Vyplácí se hned po rozdání, ať ruka dopadne jakkoli.', tipT3: '21+3 (vedlejší sázka): tvoje 2 karty + krupiérova odkrytá karta tvoří pokerovou kombinaci. Barva 5:1, postupka 10:1, trojice 30:1, postupka v barvě 40:1, trojice v barvě 100:1. Vyplácí se hned po rozdání.', tipIns: 'Pojištění: když krupiér ukazuje eso, vsadíš polovinu sázky na to, že má Blackjack. Pokud ano, vyplácí 2 : 1 a vyrovná prohranou ruku.', k_t3: '21+3', r_perfect: 'Dokonalý pár', r_colored: 'Barevný pár', r_mixed: 'Smíšený pár', r_suitedTrips: 'Trojice v barvě', r_straightFlush: 'Postupka v barvě', r_trips: 'Trojice', r_straight: 'Postupka', r_flush: 'Barva', insQ: 'Pojištění?', insTxt: 'Krupiér ukazuje eso. Pojistit za {n} žetonů? (vyplácí 2 : 1, pokud má Blackjack)', insYes: 'Pojistit', insNo: 'Ne, díky', insWait: 'Hráči se rozhodují o pojištění',
     sideTxt: '<p><b>Perfect Pairs</b>: tvoje první dvě karty tvoří pár. Smíšený (různé barvy) 6:1, stejná barva 12:1, dokonalý (stejná karta) 25:1.</p><p><b>21+3</b>: tvoje dvě karty + krupiérova odkrytá karta tvoří pokerovou kombinaci: barva 5:1, postupka 10:1, trojice 30:1, postupka v barvě 40:1, trojice v barvě 100:1.</p><p>Vyber políčko (Sázka, Perfect Pairs, 21+3) a pak pokládej žetony. Pro vedlejší sázky je nutná hlavní sázka.</p>',
     bust: 'Přetaženo!', bj: 'BLACKJACK!', win: 'Výhra!', lose: 'Prohra', push: 'Remíza', ready: 'Připraven ✓', betting: 'sází…', out: 'vynechává', broke: 'Na mizině 💸', gone: 'odešel',
     winBig: '+{n} žetonů!', lostN: '−{n} žetonů', brokeMe: 'Došly ti žetony…', rebuy: 'Dobít 500 (−500 z konečného skóre)', rebuys: 'dobití',
@@ -658,7 +665,7 @@ function sync() {
 function hostAct(seat, m) {
   if (!S || !m) return;
   if (m.t === 'bet') hostBet(seat, m);
-  else if (m.t === 'rebuy') { const s = S.seats[seat]; if (s && s.broke && !s.gone && S.phase === 'bet') { s.broke = false; s.chips += 500; s.rb = (s.rb || 0) + 1; s.ready = false; s.bet = 0; s.pp = 0; s.t3 = 0; sync(); } }
+  else if (m.t === 'rebuy') { const s = S.seats[seat]; if (s && s.broke && !s.gone && S.phase !== 'end') { /* recharge possible à tout moment */ s.broke = false; s.chips += 500; s.rb = (s.rb || 0) + 1; s.ready = false; s.bet = 0; s.pp = 0; s.t3 = 0; sync(); } }
   else if (m.t === 'act') act(seat, String(m.a));
   else if (m.t === 'ins') hostIns(seat, !!m.y);
 }
@@ -853,11 +860,11 @@ function render() {
       <div class="cards">${h.cards.map((c, j) => cardHtml(c, `s${i}h${kk}c${j}`)).join('')}</div>
       <div class="hinfo">${totHtml(h.cards, h)}${h.res && (V.phase === 'result' || h.res === 'bust') ? ` <span class="res ${h.res}">${resWord(h.res)}</span>` : ''}${h.dbl ? ' <span class="tot">×2</span>' : ''}</div></div>`).join('');
     const mainBet = s.hands.length ? s.hands.reduce((a, h) => a + h.bet, 0) : s.bet;
-    const side = (s.side || []).map(x => `<span class="${x.w ? 'w' : ''}">${x.k === 'pp' ? 'PP' : '21+3'} ${x.w ? sideName(x.k, x.r) + ' +' + x.w : '✗'}</span>`).join('') + (s.ins ? `<span>🛡 ${s.ins}</span>` : '');
+    const side = (s.side || []).map(x => `<span class="${x.w ? 'w' : ''}" data-tip="${esc(t(x.k === 'pp' ? 'tipPP' : 'tipT3'))}">${x.k === 'pp' ? 'Perfect Pairs' : '21+3'} ${x.w ? sideName(x.k, x.r) + ' +' + x.w : '✗'}</span>`).join('') + (s.ins ? `<span data-tip="${esc(t('tipIns'))}">🛡 ${t('insQ').replace(' ?', '').replace('?', '')} ${s.ins}</span>` : '');
     return `<div class="spot${isMe ? ' me' : ''}${V.turn === i ? ' turn' : ''}" style="left:${p.x.toFixed(2)}%;top:${p.y.toFixed(2)}%">
       <div class="hands">${hands}</div>
       ${side ? `<div class="sideb">${side}</div>` : ''}
-      <div class="circles"><span class="bc sm">${s.pp ? chipHtml(s.pp) : ''}<span class="lb">PP</span></span><span class="bc">${mainBet ? chipHtml(mainBet) : ''}</span><span class="bc sm">${s.t3 ? chipHtml(s.t3) : ''}<span class="lb">21+3</span></span></div>
+      <div class="circles"><span class="bc sm" data-tip="${esc(t('tipPP'))}">${s.pp ? chipHtml(s.pp) : ''}<span class="lb">Perfect<br>Pairs</span></span><span class="bc" data-tip="${esc(t('tipMain'))}">${mainBet ? chipHtml(mainBet) : ''}</span><span class="bc sm" data-tip="${esc(t('tipT3'))}">${s.t3 ? chipHtml(s.t3) : ''}<span class="lb">21+3</span></span></div>
       <div class="tag">${avatar(i)}<span>${esc(s.n)}</span><small>${s.chips}</small></div>${st ? `<div class="st">${st}</div>` : ''}</div>`;
   }).join('');
   renderAction(me, myTurn);
@@ -885,18 +892,18 @@ function renderAction(me, myTurn) {
   if (V.phase === 'bet' && !me.broke && !me.gone) {
     if (betKey !== V.round + ':bet') { betKey = V.round + ':bet'; localBet = { a: me.bet || 0, pp: me.pp || 0, t3: me.t3 || 0 }; tgt = 'a'; }
     const L = localBet, sum = L.a + L.pp + L.t3, left = me.chips - sum;
-    h = `<div class="tgts">${[['a', t('mainBet'), ''], ['pp', 'Perfect Pairs', '25:1'], ['t3', '21+3', '100:1']].map(([key, lb, sub]) => `<button data-tgt="${key}" class="${tgt === key ? 'on' : ''}" ${me.ready ? 'disabled' : ''}>${lb}<b>${L[key]}</b>${sub ? `<small>${t('upTo')} ${sub}</small>` : ''}</button>`).join('')}</div>
+    h = `<div class="tgts">${[['a', t('mainBet'), '', 'tipMain'], ['pp', 'Perfect Pairs', '25:1', 'tipPP'], ['t3', '21+3', '100:1', 'tipT3']].map(([key, lb, sub, tip]) => `<button data-tgt="${key}" data-tip="${esc(t(tip))}" class="${tgt === key ? 'on' : ''}" ${me.ready ? 'disabled' : ''}>${lb}<b>${L[key]}</b>${sub ? `<small>${t('upTo')} ${sub}</small>` : ''}</button>`).join('')}</div>
       <div class="chips">${CHIPS.map(([v, c]) => `<button data-chip="${v}" ${me.ready || v > left || (tgt !== 'a' && !L.a) ? 'disabled' : ''}><span class="chip" style="--c:${c}">${v}</span></button>`).join('')}</div>
       <div class="acts" style="grid-template-columns:1fr 1fr 2fr">
         <button class="btn" id="aClear" ${me.ready ? 'disabled' : ''}>${t('clear')}</button>
         <button class="btn" id="aSkip" ${me.ready ? 'disabled' : ''}>${t('sitOut')}</button>
         <button class="btn gold" id="aBet" ${me.ready || L.a < MINB ? 'disabled' : ''}>${me.ready ? t('ready') : t('bet') + ' ' + sum}</button></div>
       ${me.ready ? `<p class="hint">${t('waitBets')}</p>` : ''}<div class="tbar"><i id="tbar"></i></div>`;
-  } else if (V.phase === 'bet' && me.broke && !me.gone) {
+  } else if (me.broke && !me.gone) {
     h = `<p class="hint">${t('brokeMe')}</p><button class="btn gold" id="aRebuy" style="align-self:center">💰 ${t('rebuy')}</button>`;
   } else if (V.phase === 'ins' && me.hands.length && !me.insAns) {
     const cost = Math.floor(me.bet / 2);
-    h = `<p class="hint">${t('insTxt', { n: cost })}</p><div class="acts" style="grid-template-columns:1fr 1fr"><button class="btn gold" data-ins="1" ${me.chips < cost ? 'disabled' : ''}>🛡 ${t('insYes')} (${cost})</button><button class="btn" data-ins="0">${t('insNo')}</button></div><div class="tbar"><i id="tbar"></i></div>`;
+    h = `<p class="hint">${t('insTxt', { n: cost })}</p><div class="acts" style="grid-template-columns:1fr 1fr"><button class="btn gold" data-ins="1" data-tip="${esc(t('tipIns'))}" ${me.chips < cost ? 'disabled' : ''}>🛡 ${t('insYes')} (${cost})</button><button class="btn" data-ins="0">${t('insNo')}</button></div><div class="tbar"><i id="tbar"></i></div>`;
   } else if (V.phase === 'ins') h = `<p class="hint dots">${t('insWait')}</p><div class="tbar"><i id="tbar"></i></div>`;
   else if (V.phase === 'play' && myTurn) {
     const hd = me.hands[me.hi] || { cards: [], bet: 0 }, two = hd.cards.length === 2;
@@ -936,6 +943,17 @@ document.addEventListener('keydown', e => {
   const m = { h: 'hit', s: 'stand', d: 'double', p: 'split' }[e.key.toLowerCase()]; if (!m) return;
   const b = document.querySelector(`[data-act="${m}"]`); if (b && !b.disabled) b.click();
 });
+// bulle d'aide
+{
+  const tip = $('#tip'); let cur = null, hideT = 0;
+  const place = el => { tip.style.left = '0px'; tip.style.top = '0px'; const r = el.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight; let x = r.left + r.width / 2 - tw / 2, y = r.top - th - 10; if (y < 8) y = r.bottom + 10; x = Math.max(10, Math.min(innerWidth - tw - 10, x)); tip.style.left = x + 'px'; tip.style.top = y + 'px'; };
+  const showTip = el => { cur = el; tip.textContent = el.dataset.tip; tip.classList.add('show'); place(el); };
+  const hideTip = () => { cur = null; tip.classList.remove('show'); };
+  document.addEventListener('mouseover', e => { const el = e.target.closest('[data-tip]'); if (el && el !== cur) showTip(el); else if (!el && cur) hideTip(); });
+  document.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') return; const el = e.target.closest('.spot [data-tip], .sideb [data-tip]'); if (!el) return; showTip(el); clearTimeout(hideT); hideT = setTimeout(hideTip, 3500); });
+  window.addEventListener('scroll', hideTip, true); window.addEventListener('resize', hideTip);
+  setInterval(() => { if (cur && !document.body.contains(cur)) hideTip(); }, 300);
+}
 // tableau des gains des paris annexes
 function renderPay() {
   $('#paytab').innerHTML = `<div><b>Perfect Pairs</b>${Object.entries(PP_PAY).map(([k, v]) => `<span>${t('r_' + k)}<i>${v}:1</i></span>`).join('')}</div><div><b>21+3</b>${Object.entries(T3_PAY).map(([k, v]) => `<span>${t('r_' + k)}<i>${v}:1</i></span>`).join('')}</div>`;

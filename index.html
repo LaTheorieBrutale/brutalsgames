@@ -357,6 +357,7 @@ const GI = {
   diff: '<svg class="gi" viewBox="0 0 40 40"><circle cx="17" cy="17" r="11" fill="rgba(220,250,255,.35)" stroke="#f3e7c9" stroke-width="4"/><path d="M25 25l10 10" stroke="#a8643a" stroke-width="6" stroke-linecap="round"/></svg>'
 };
 function histTxt(m) {
+  if (P.aliasOf) m = Object.assign({}, m, { p: m.p.map(P.aliasOf) });
   const wa = P.winnersOf(m);
   if (wa.length > 1) { const nm = wa.slice(0, 3).map(i => m.p[i]).join(', ') + (wa.length > 3 ? '…' : ''); return t('winTeam', { a: esc(nm), n: m.p.length }); }
   return m.p.length > 2 ? t('winN', { a: esc(m.p[m.w]), n: m.p.length }) : t('beat', { a: esc(m.p[m.w]), b: esc(m.p[1 - m.w]) });

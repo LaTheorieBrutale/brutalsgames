@@ -142,7 +142,8 @@ label,.lbl{font-size:13px;color:var(--muted);letter-spacing:.06em;text-transform
 .count-n{font-family:var(--f-ui);font-weight:700;font-size:min(34vw,200px);line-height:1;color:var(--sun);-webkit-text-stroke:6px var(--ink);paint-order:stroke fill;text-shadow:0 10px 0 var(--ink)}
 .count-n.pop{animation:cpop .9s cubic-bezier(.2,1.6,.4,1) both}
 @keyframes cpop{0%{transform:scale(.3);opacity:0}25%{transform:scale(1.1);opacity:1}80%{transform:scale(1);opacity:1}100%{transform:scale(.9);opacity:.2}}
-.board.veil .pic canvas{filter:blur(14px) brightness(.8)}
+.board.veil .pic canvas,html[data-ui=night] .board.veil .pic canvas.art{filter:blur(16px) brightness(.75)!important}
+.board .pic canvas{transition:filter .4s}
 .board .pic canvas{transition:filter .35s}
 .board{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:12px}
 .board.stack{flex-direction:column}
@@ -301,7 +302,7 @@ html[data-ui=night] .err{color:#ff8a8a}
         <span class="lbl" data-i18n="difficulty">Difficulté</span>
         <div class="nseg" id="lvlSeg2" style="margin-top:6px"></div>
       </div>
-      <button class="btn wide orange" id="bStart" data-i18n="start">Lancer la partie</button>
+      <button class="btn wide orange" id="bStart" data-pstart data-i18n="start">Lancer la partie</button>
       <p class="wait-txt" id="waitTxt"></p>
       <button class="btn" id="bLeave" data-i18n="leave">Quitter</button>
     </div>

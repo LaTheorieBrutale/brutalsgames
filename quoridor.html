@@ -590,8 +590,8 @@ html.overlay #top *,html.overlay #bottom *{pointer-events:none!important}
         <label data-i18n="players">Joueurs</label>
         <div class="roster" id="roster"></div>
         <div class="row" id="hostBtns">
-          <button class="btn orange" id="bStart2" style="flex:1" data-i18n="start2">Lancer à 2</button>
-          <button class="btn orange" id="bStart4" style="flex:1" data-i18n="start4">Lancer à 4</button>
+          <button class="btn orange" id="bStart2" data-pstart style="flex:1" data-i18n="start2">Lancer à 2</button>
+          <button class="btn orange" id="bStart4" data-pstart style="flex:1" data-i18n="start4">Lancer à 4</button>
         </div>
         <p id="waitTxt"></p>
         <div id="chatSlot"></div>
@@ -2978,16 +2978,19 @@ function renderDb() {
   if ($('#dbOff')) $('#dbOff').onclick = () => { SFX.wood(); setDb('', false); };
 }
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// Pseudos regroupés (même joueur sous plusieurs noms) : clé simplifiée -> nom affiché
+const NAME_ALIAS = { ihatekiki: 'Eli', eli: 'Eli', eliihatekiki: 'Eli' };
+const aliasOf = n => { const k = String(n || '').toLowerCase().replace(/[^a-z0-9à-ÿ]/g, ''); return NAME_ALIAS[k] || n; };
 let lbRanks = new Map();
 function renderLb() {
   const box = $('#lbBody'); if (!box) return;
   const tab = new Map();
-  for (const m of matches) m.p.forEach((n, i) => {
-    const k = n.toLowerCase();
+  for (const m of matches) { const inMatch = new Set(); m.p.forEach((n0, i) => {
+    const n = aliasOf(n0), k = n.toLowerCase(); if (inMatch.has(k)) return; inMatch.add(k);
     const r = tab.get(k) || { name: n, w: 0, g: 0, ai: false, hu: 0 };
     r.name = n; r.g++; if (m.wa ? m.wa.includes(i) : m.w === i) r.w++; if (m.b && m.b[i]) r.ai = !r.hu; else { r.hu++; r.ai = false; }
     tab.set(k, r);
-  });
+  }); }
   const rows = [...tab.values()].sort((a, b) => b.w - a.w || (b.w / b.g) - (a.w / a.g) || b.g - a.g || a.name.localeCompare(b.name));
   lbRanks = new Map(rows.map((r, i) => [r.name.toLowerCase(), i + 1]));
   try { renderChat(); } catch (e) {} // les médailles du chat suivent le classement
@@ -3002,6 +3005,7 @@ function renderLb() {
       <span>${r.w}</span><span>${r.g}</span><span>${Math.round(100 * r.w / r.g)}%</span></div>`).join('');
   const fmt = new Intl.DateTimeFormat(tr('locale'), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   const hist = matches.slice(-6).reverse().map(m => {
+    m = Object.assign({}, m, { p: m.p.map(aliasOf) });
     const txt = m.wa && m.wa.length > 1 ? tr('winTeam', { a: esc(m.wa.slice(0, 3).map(i => m.p[i]).join(', ') + (m.wa.length > 3 ? '…' : '')), n: m.p.length }) : m.p.length > 2 ? tr('winN', { a: esc(m.p[m.w]), n: m.p.length }) : tr('beat', { a: esc(m.p[m.w]), b: esc(m.p[1 - m.w]) });
     return `<div><span>${txt}</span><span>${fmt.format(new Date(m.t))}</span></div>`;
   }).join('');
@@ -3131,7 +3135,7 @@ function chatClean(m) {
 }
 function msgHTML(m) {
   if (m.sys) return `<div class="msg sys">${tr(m.sys === 'join' ? 'chatJoin' : 'chatLeft', { name: esc(m.name) })}</div>`;
-  const r = lbRanks.get(m.name.toLowerCase());
+  const r = lbRanks.get(aliasOf(m.name).toLowerCase());
   const medal = r ? (r <= 3 ? `<span class="medal">${['🥇', '🥈', '🥉'][r - 1]}</span>` : `<span class="rkn">#${r}</span>`) : '';
   return `<div class="msg${m.mine ? ' mine' : ''}">${medal}<b class="c${m.s}">${esc(m.name)}</b>${esc(m.text)}</div>`;
 }
