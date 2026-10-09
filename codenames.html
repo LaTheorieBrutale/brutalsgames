@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0d1030">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Brutal's Games">
+<title>Codenames</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;700;800;900&display=swap">
+<style>
+/* Codenames — « Mission galactique » : équipage Rouge contre équipage Bleu dans l'espace.
+   Écrans : accueil, en ligne (salon + équipes), partie (plateau 5×5), fin. */
+:root{
+  --bg1:#0b0e2a;--bg2:#251a4e;--ink:#0a0718;--panel:#1f2352;--panel2:#171b42;--line:#3a3f78;--text:#efeaff;--muted:#a3a6d6;
+  --red:#ff5a5f;--red2:#c93a40;--blue:#4aa3ff;--blue2:#2a74c8;--card:#cdbf9f;--card2:#b9aa88;--neutral:#8e8a7e;--gold:#ffcc4d;--black:#16121f;
+  --f-title:"Lilita One","Arial Black",system-ui,sans-serif;--f-ui:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{margin:0;color:var(--text);font-family:var(--f-ui);font-weight:700;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
+  background:radial-gradient(1.4px 1.4px at 12% 18%,#fff 50%,transparent 55%),radial-gradient(1.2px 1.2px at 32% 64%,#fff 50%,transparent 55%),radial-gradient(1.6px 1.6px at 72% 12%,#ffe9b0 50%,transparent 55%),
+    radial-gradient(1.2px 1.2px at 86% 52%,#fff 50%,transparent 55%),radial-gradient(1.3px 1.3px at 54% 86%,#cfe0ff 50%,transparent 55%),radial-gradient(1.1px 1.1px at 6% 78%,#fff 50%,transparent 55%),
+    radial-gradient(1.2px 1.2px at 44% 30%,#fff 50%,transparent 55%),radial-gradient(1.2px 1.2px at 92% 88%,#fff 50%,transparent 55%),
+    radial-gradient(ellipse at 80% 0%,rgba(140,80,255,.25),transparent 55%),radial-gradient(ellipse at 0% 100%,rgba(60,160,255,.18),transparent 55%),
+    linear-gradient(180deg,var(--bg1),var(--bg2)) fixed;background-color:var(--bg1)}
+[hidden]{display:none!important}
+#deco{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#deco svg{position:absolute}
+.frame{position:relative;background:linear-gradient(180deg,var(--panel),var(--panel2));border:4px solid var(--ink);border-radius:22px;box-shadow:0 7px 0 var(--ink)}
+.btn{position:relative;font-family:var(--f-ui);font-weight:900;font-size:17px;color:var(--ink);cursor:pointer;line-height:1.1;text-decoration:none;
+  background:linear-gradient(180deg,#cfd6ff 0,#94a0ee 55%,#7480d6 100%);border:4px solid var(--ink);border-radius:15px;padding:9px 14px 8px;
+  box-shadow:0 5px 0 var(--ink),inset 0 3px 0 rgba(255,255,255,.4);transition:transform .07s,box-shadow .07s,filter .15s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink),inset 0 3px 0 rgba(255,255,255,.4)}
+@media (hover:hover){.btn:hover{filter:brightness(1.07)}}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.gold{background:linear-gradient(180deg,#fff0b0 0,var(--gold) 55%,#f0a92a 100%)}
+.btn.red{background:linear-gradient(180deg,#ffb8ba 0,var(--red) 55%,var(--red2) 100%);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.btn.blue{background:linear-gradient(180deg,#bfe0ff 0,var(--blue) 55%,var(--blue2) 100%);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.btn.icon{padding:7px;border-radius:13px;flex:none}
+.btn.icon svg{width:24px;height:24px}
+.btn.wide{width:100%;padding:13px 14px 11px}
+.btn.sm{font-size:14px;padding:7px 10px 6px}
+.field{font-family:var(--f-ui);font-weight:800;font-size:18px;color:var(--text);background:var(--panel2);border:4px solid var(--ink);border-radius:14px;padding:9px 12px 8px;width:100%;min-width:0;outline:none;-webkit-user-select:text;user-select:text;box-shadow:inset 0 3px 0 rgba(0,0,0,.25)}
+.field::placeholder{color:var(--muted)}
+.field:focus{border-color:var(--gold)}
+.field.code{text-transform:uppercase;letter-spacing:.3em;text-align:center}
+label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-weight:900}
+.sep{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.sep::before,.sep::after{content:"";flex:1;height:3px;border-radius:2px;background:var(--line)}
+.err{margin:0;color:#ff9a9a;font-size:14px;min-height:1em}
+.nseg{display:flex;gap:6px;flex-wrap:wrap}
+.nseg .btn{flex:1;padding:8px 4px 7px;font-size:14px;background:var(--panel2);color:var(--text);box-shadow:0 3px 0 var(--ink);min-width:0}
+.nseg .btn[aria-pressed="true"]{background:linear-gradient(180deg,#fff0b0,var(--gold) 60%,#f0a92a);color:var(--ink)}
+.screen{position:fixed;inset:0;z-index:1;overflow-y:auto;display:flex;padding:16px;padding-block:calc(env(safe-area-inset-top,0px) + 14px) calc(env(safe-area-inset-bottom,0px) + 70px);animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0}}
+.col{width:100%;max-width:470px;margin:auto;display:flex;flex-direction:column;gap:14px;align-items:stretch}
+.topnav{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.panel{padding:16px;display:flex;flex-direction:column;gap:11px}
+.row{display:flex;gap:8px;align-items:center}
+.logo{display:flex;flex-direction:column;align-items:center;animation:drop .7s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes drop{from{opacity:0;transform:translateY(-40px) scale(.85)}}
+.logo svg{width:150px;height:110px;filter:drop-shadow(0 6px 0 var(--ink));animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-6px) rotate(-3deg)}}
+.logo-t{font-family:var(--f-title);font-size:clamp(46px,13vw,70px);line-height:.95;margin-top:-6px;letter-spacing:.02em;color:#fff;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:0 6px 0 var(--ink)}
+.logo-t .r{color:var(--red)}.logo-t .b{color:var(--blue)}
+.tagline{font-size:15px;margin-top:8px;background:var(--panel);border:3px solid var(--ink);border-radius:999px;padding:3px 14px 2px;box-shadow:0 3px 0 var(--ink);transform:rotate(-1.5deg)}
+.mode{display:flex;align-items:center;gap:12px;width:100%;padding:11px 14px 10px;border-radius:20px;text-align:left;justify-content:flex-start}
+.mode svg{width:42px;height:42px;flex:none}
+.mode span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mode b{font-weight:900;font-size:20px}
+.mode small{font-size:12.5px;font-weight:700;opacity:.8}
+.bigcode{font-family:var(--f-title);font-size:54px;letter-spacing:.18em;color:var(--gold);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;text-shadow:0 4px 0 var(--ink);text-align:center;padding-left:.18em;line-height:1}
+.wait-txt{margin:0;font-size:14px;color:var(--muted);text-align:center;line-height:1.45}
+.dots::after{content:"";animation:dots 1.2s steps(4) infinite}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+
+/* ---------- Équipes (salon) ---------- */
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.team{border:3px solid var(--ink);border-radius:16px;padding:8px;display:flex;flex-direction:column;gap:5px;min-height:110px}
+.team.r{background:linear-gradient(180deg,rgba(255,90,95,.32),rgba(255,90,95,.12))}
+.team.b{background:linear-gradient(180deg,rgba(74,163,255,.32),rgba(74,163,255,.12))}
+.team h4{margin:0 0 2px;font-family:var(--f-title);font-size:20px;letter-spacing:.03em;font-weight:400}
+.team.r h4{color:#ffb0b2}.team.b h4{color:#b0d8ff}
+.pl{display:flex;align-items:center;gap:6px;font-size:14.5px;background:rgba(0,0,0,.25);border-radius:10px;padding:3px 7px 3px 3px;min-width:0}
+.pl svg{width:28px;height:28px;flex:none}
+.pl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl .cap{margin-left:auto;font-size:15px}
+.unassigned{display:flex;flex-wrap:wrap;gap:5px}
+.teambtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* ---------- Partie ---------- */
+#game{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;gap:8px;padding:8px 10px;padding-block:calc(env(safe-area-inset-top,0px) + 8px) calc(env(safe-area-inset-bottom,0px) + 8px);max-width:760px;margin:0 auto}
+.hud{display:flex;align-items:center;gap:7px;padding:6px 8px}
+.score{display:flex;align-items:center;gap:5px;font-family:var(--f-title);font-size:22px;border:3px solid var(--ink);border-radius:12px;padding:1px 9px 0;box-shadow:0 3px 0 var(--ink)}
+.score.r{background:var(--red);color:#fff}.score.b{background:var(--blue);color:#fff}
+.score.on{outline:3px solid var(--gold);outline-offset:2px}
+.hud .mid{flex:1;min-width:0;text-align:center;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;line-height:1.15}
+.hud .mid b{display:block;font-family:var(--f-title);font-size:17px;letter-spacing:.03em;text-transform:none}
+.hud .mid b.r{color:#ff9a9d}.hud .mid b.b{color:#9ccfff}
+.clue{padding:8px 12px;text-align:center;font-size:16px;line-height:1.3;min-height:44px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.clue .w{font-family:var(--f-title);font-size:24px;letter-spacing:.04em;color:var(--gold)}
+.clue .n{font-family:var(--f-title);font-size:22px;background:var(--gold);color:var(--ink);border:3px solid var(--ink);border-radius:10px;padding:0 9px}
+.clue .lft{font-size:13px;color:var(--muted)}
+.board{flex:1;min-height:0;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);gap:6px}
+.card{position:relative;border:3px solid var(--ink);border-radius:12px;background:linear-gradient(180deg,var(--card),var(--card2));color:#2a2014;box-shadow:0 4px 0 var(--ink);
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:3px;font-weight:900;font-size:clamp(10px,2.7vw,17px);line-height:1.05;overflow:hidden;cursor:pointer;word-break:normal;overflow-wrap:anywhere;transition:transform .12s}
+.card.l1 span{font-size:.86em}.card.l2 span{font-size:.74em}.card.l3 span{font-size:.62em;letter-spacing:0}
+.card.rev.l1 span,.card.rev.l2 span,.card.rev.l3 span{opacity:.85}
+.card:active{transform:translateY(2px)}
+.card span{position:relative;z-index:1;text-transform:uppercase;letter-spacing:.02em}
+.card.k-r{box-shadow:inset 0 0 0 4px var(--red),0 4px 0 var(--ink);background:linear-gradient(180deg,#f3d8cf,#e2b9ad)}
+.card.k-b{box-shadow:inset 0 0 0 4px var(--blue),0 4px 0 var(--ink);background:linear-gradient(180deg,#d6e4f3,#b4c9e2)}
+.card.k-n{box-shadow:inset 0 0 0 4px #7a7568,0 4px 0 var(--ink)}
+.card.k-a{box-shadow:inset 0 0 0 4px #000,0 4px 0 var(--ink);background:linear-gradient(180deg,#8a8070,#6a6050);color:#fff}
+.card.rev{cursor:default;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.4)}
+.card.rev.r{background:linear-gradient(180deg,#ff8a8d,var(--red) 60%,var(--red2))}
+.card.rev.b{background:linear-gradient(180deg,#8cc6ff,var(--blue) 60%,var(--blue2))}
+.card.rev.n{background:linear-gradient(180deg,#a8a498,var(--neutral));color:#2a2620;text-shadow:none}
+.card.rev.a{background:radial-gradient(circle at 50% 45%,#7a3ab8 0,#2a1040 45%,var(--black) 70%);color:#e0c8ff}
+.card.rev svg.ic{position:absolute;inset:auto 4px 3px auto;width:38%;height:38%;opacity:.35}
+.card.rev span{opacity:.85;font-size:.85em}
+.card.flip{animation:flip .5s ease-out}
+@keyframes flip{0%{transform:rotateY(90deg) scale(.9)}100%{transform:none}}
+.card .props{position:absolute;left:3px;top:3px;display:flex;gap:2px;z-index:2}
+.card .props i{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink);display:block}
+.card.mine{outline:4px solid var(--gold);outline-offset:-2px}
+.card.pickable:hover{filter:brightness(1.06)}
+.crew{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.crew .pl{background:rgba(0,0,0,.28);font-size:13px;padding:2px 7px 2px 2px}
+.crew .pl svg{width:22px;height:22px}
+.crew .pl.r{box-shadow:inset 0 0 0 2px var(--red)}.crew .pl.b{box-shadow:inset 0 0 0 2px var(--blue)}
+.crew .pl.me{outline:2px solid var(--gold)}
+.action{padding:10px;display:flex;flex-direction:column;gap:8px}
+.action .hint{margin:0;font-size:13.5px;color:var(--muted);text-align:center}
+.action #aClue{min-width:0;flex:1;font-size:17px;padding:10px 12px}
+.action select{font-family:var(--f-title);font-size:20px;color:var(--ink);background:var(--gold);border:4px solid var(--ink);border-radius:14px;padding:6px 8px;flex:none}
+.log{font-size:12.5px;color:var(--muted);text-align:center;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- Fin ---------- */
+.banner{font-family:var(--f-title);font-size:clamp(28px,8vw,46px);text-align:center;line-height:1.05;color:#fff;position:relative;z-index:2;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink);transform:rotate(-2deg);animation:drop .6s cubic-bezier(.2,1.5,.4,1) both}
+.banner.r{color:var(--red)}.banner.b{color:var(--blue)}
+.endboard{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.endboard .card{font-size:clamp(9px,2.4vw,12px);overflow-wrap:normal;min-height:44px;cursor:default;box-shadow:0 2px 0 var(--ink);border-width:2px;border-radius:8px}
+
+/* ---------- Chat ---------- */
+.rchat{position:fixed;z-index:22;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);transform:translateX(-50%);width:min(460px,calc(100% - 20px));height:min(62vh,460px);display:flex;flex-direction:column;gap:8px;padding:10px;animation:fadeIn .2s}
+.rc-head{display:flex;align-items:center;justify-content:space-between;font-family:var(--f-title);font-size:24px}
+.rc-list{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:6px;border-radius:12px;background:rgba(0,0,0,.25);font-size:14.5px;line-height:1.35}
+.rc-msg{display:flex;gap:6px;align-items:flex-start;overflow-wrap:anywhere}
+.rc-msg svg{width:26px;height:26px;flex:none}
+.rc-msg b{margin-right:4px}
+.rc-msg.me{flex-direction:row-reverse;text-align:right}
+.rc-msg .bub{background:var(--panel2);border:2px solid var(--ink);border-radius:12px;padding:3px 9px;max-width:80%}
+.rc-msg.me .bub{background:rgba(255,204,77,.2)}
+.rc-msg.sys{justify-content:center;color:var(--muted);font-size:12.5px}
+.rc-empty{margin:auto;color:var(--muted);font-size:13px;text-align:center}
+.rc-form{display:flex;gap:6px}
+.rc-form .field{font-size:16px;padding:8px 10px}
+.tr{cursor:help}.tr::after{content:" 🌐";font-size:10px;opacity:.65}
+.chatbar{position:relative;display:flex;align-items:center;gap:8px;width:100%;padding:7px 12px;font:inherit;font-size:14px;color:var(--text);cursor:pointer;text-align:left;box-shadow:0 4px 0 var(--ink);border-radius:16px}
+.chatbar .cb-ico{font-size:19px;flex:none}
+.chatbar .cb-txt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chatbar .cb-txt b{margin-right:4px}
+.chatbar .cb-txt i{font-style:normal;color:var(--muted)}
+.badge{min-width:22px;height:22px;border-radius:11px;background:var(--red);color:#fff;font-size:12px;display:grid;place-items:center;border:2.5px solid var(--ink);padding:0 5px;flex:none}
+.badge:empty{display:none}
+.chatbtn{position:relative}.chatbtn .badge{position:absolute;top:-8px;right:-8px}
+@media (min-width:1150px){
+  body.netlive #rc{display:flex!important;left:auto;right:18px;top:18px;bottom:18px;height:auto;width:330px;transform:none}
+  body.netlive .chatbtn,body.netlive .chatbar,body.netlive #rcClose{display:none}
+  body.netlive #game{margin-left:max(10px,calc(50% - 560px))}
+}
+#gchatHome{height:230px}
+.sheet{position:fixed;z-index:25;left:50%;top:50%;transform:translate(-50%,-50%);width:min(390px,calc(100% - 28px));max-height:calc(100% - 40px);overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;animation:fadeIn .2s}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;font-family:var(--f-title);font-size:28px}
+.rules{font-size:14.5px;line-height:1.5}
+.rules p{margin:0 0 8px}.rules b{color:var(--gold)}
+#toast{position:fixed;z-index:40;left:50%;top:18%;transform:translate(-50%,-50%) scale(.8);background:var(--panel);color:var(--text);border:4px solid var(--ink);border-radius:16px;padding:9px 16px 8px;font-size:16px;box-shadow:0 5px 0 var(--ink);opacity:0;pointer-events:none;transition:opacity .2s,transform .25s cubic-bezier(.2,1.6,.4,1);max-width:88vw;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#toast.bad{background:var(--red);color:#fff}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:35}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="deco" aria-hidden="true">
+  <svg style="right:-40px;top:8vh;width:170px;height:170px" viewBox="0 0 100 100"><circle cx="50" cy="50" r="34" fill="#ff8a5a" stroke="#0a0718" stroke-width="4"/><path d="M22 40c18 6 38 6 56 0M20 58c20 6 40 6 60 0" stroke="#e8603a" stroke-width="5" fill="none"/><ellipse cx="50" cy="52" rx="48" ry="12" fill="none" stroke="#0a0718" stroke-width="8"/><ellipse cx="50" cy="52" rx="48" ry="12" fill="none" stroke="#ffd27a" stroke-width="4"/></svg>
+  <svg style="left:-30px;bottom:14vh;width:120px;height:120px" viewBox="0 0 100 100"><circle cx="50" cy="50" r="36" fill="#5aa8ff" stroke="#0a0718" stroke-width="4"/><circle cx="38" cy="40" r="7" fill="#3a80d8"/><circle cx="60" cy="62" r="10" fill="#3a80d8"/><circle cx="64" cy="34" r="5" fill="#3a80d8"/></svg>
+</div>
+
+<!-- ======== ACCUEIL ======== -->
+<section class="screen" id="home">
+  <div class="col">
+    <div class="topnav">
+      <a class="btn" href="index.html"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span data-i18n="games">Jeux</span></a>
+      <button class="btn icon" id="bSet" data-i18n-aria="settings"><svg viewBox="0 0 24 24"><path d="M12 2.5l2 2.6 3.2-.6.8 3.1 3 1.4-1.1 3 1.1 3-3 1.4-.8 3.1-3.2-.6-2 2.6-2-2.6-3.2.6-.8-3.1-3-1.4 1.1-3-1.1-3 3-1.4.8-3.1 3.2.6z" fill="currentColor" stroke="#0a0718" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="#0a0718" stroke-width="1.6"/></svg></button>
+    </div>
+    <div class="logo">
+      <svg viewBox="0 0 150 110">
+        <path d="M75 8c14 10 20 28 18 48l10 14-14 4H61l-14-4 10-14c-2-20 4-38 18-48z" fill="#efeaff" stroke="#0a0718" stroke-width="4.5" stroke-linejoin="round"/>
+        <circle cx="75" cy="42" r="11" fill="#5aa8ff" stroke="#0a0718" stroke-width="4"/><circle cx="71" cy="38" r="3" fill="#fff"/>
+        <path d="M47 70l-10 14 16-4M103 70l10 14-16-4" fill="#ff5a5f" stroke="#0a0718" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M66 80l9 22 9-22z" fill="#ffcc4d" stroke="#0a0718" stroke-width="4" stroke-linejoin="round"/>
+        <circle cx="22" cy="24" r="4" fill="#ffcc4d"/><circle cx="130" cy="18" r="3" fill="#fff"/><circle cx="134" cy="70" r="4" fill="#ff8a5a"/>
+      </svg>
+      <div class="logo-t"><span class="r">Code</span><span class="b">names</span></div>
+      <div class="tagline" data-i18n="tagline">Mission galactique : trouve ton équipage !</div>
+    </div>
+    <div class="frame panel">
+      <label for="inName" data-i18n="nick">Ton pseudo</label>
+      <input class="field" id="inName" maxlength="14" autocomplete="off" data-i18n-ph="namePh">
+      <button class="btn mode gold" id="mOnline">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#5aa8ff" stroke="#0a0718" stroke-width="2"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" fill="none" stroke="#0a0718" stroke-width="1.8"/></svg>
+        <span><b data-i18n="online">Jouer en ligne</b><small data-i18n="onlineSub">2 équipes, 4 à 10 joueurs</small></span>
+      </button>
+      <button class="btn" id="bRules" data-i18n="howTo">Comment jouer ?</button>
+    </div>
+    <div class="frame panel"><div id="gchatHome"></div></div>
+  </div>
+</section>
+
+<!-- ======== EN LIGNE ======== -->
+<section class="screen" id="online" hidden>
+  <div class="col">
+    <div class="topnav"><button class="btn" id="onBack"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span data-i18n="back">Retour</span></button></div>
+    <div class="frame panel" id="onForm">
+      <button class="btn wide gold" id="bHost" style="font-size:20px;padding:16px" data-i18n="create">Créer une partie</button>
+      <div class="sep" data-i18n="orJoin">ou rejoindre des amis</div>
+      <div class="row"><input class="field code" id="inCode" maxlength="5" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="btn" id="bJoin" data-i18n="join">Rejoindre</button></div>
+      <p class="err" id="onErr"></p>
+    </div>
+    <div class="frame panel" id="onWait" hidden>
+      <div id="codeBox" style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <label data-i18n="gameCode">Code de la partie</label>
+        <div class="bigcode" id="codeShow">·····</div>
+        <button class="btn sm" id="bCopy" data-i18n="copyCode">Copier le code</button>
+      </div>
+      <div class="teams" id="teams"></div>
+      <div class="unassigned" id="unassigned"></div>
+      <div class="teambtns">
+        <button class="btn red sm" id="bTeamR" data-i18n="joinRed">Équipage Rouge</button>
+        <button class="btn blue sm" id="bTeamB" data-i18n="joinBlue">Équipage Bleu</button>
+      </div>
+      <button class="btn sm" id="bCap">👑 <span data-i18n="beCap">Devenir capitaine</span></button>
+      <button class="btn sm" id="bShuffle" data-i18n="shuffle">🎲 Équipes au hasard</button>
+      <button class="btn wide gold" id="bStart" data-i18n="start">Lancer la mission</button>
+      <p class="wait-txt" id="waitTxt"></p>
+      <button class="frame chatbar" id="bChatL"><span class="cb-ico">💬</span><span class="cb-txt"></span><span class="badge"></span></button>
+      <button class="btn sm" id="bLeave" data-i18n="leave">Quitter</button>
+    </div>
+  </div>
+</section>
+
+<!-- ======== PARTIE ======== -->
+<section id="game" hidden>
+  <div class="frame hud">
+    <button class="btn icon" id="bQuit" data-i18n-aria="quit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="score r" id="scR">9</div>
+    <div class="mid" id="hTurn"></div>
+    <div class="score b" id="scB">8</div>
+    <span id="hudDock" style="display:inline-flex"></span>
+    <button class="btn icon chatbtn" id="bChat" data-i18n-aria="chat">💬<span class="badge"></span></button>
+  </div>
+  <div class="frame clue" id="clue"></div>
+  <div class="board" id="board"></div>
+  <div class="crew" id="crew"></div>
+  <p class="log" id="log"></p>
+  <button class="frame chatbar" id="chatBar"><span class="cb-ico">💬</span><span class="cb-txt"></span><span class="badge"></span></button>
+  <div class="frame action" id="action"></div>
+</section>
+
+<!-- ======== FIN ======== -->
+<section class="screen" id="end" hidden>
+  <div class="col">
+    <div class="banner" id="endTitle"></div>
+    <div class="frame panel">
+      <div class="endboard" id="endBoard"></div>
+      <div class="crew" id="endCrew"></div>
+      <button class="btn wide gold" id="bAgain" data-i18n="again">Nouvelle mission</button>
+      <p class="wait-txt" id="endWait"></p>
+      <button class="btn" id="bMenu" data-i18n="lobby">Retour au salon</button>
+    </div>
+  </div>
+</section>
+
+<div class="frame rchat" id="rc" hidden>
+  <div class="rc-head"><span>💬 <span data-i18n="chat">Chat</span></span><button class="btn icon" id="rcClose" data-i18n-aria="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="rc-list" id="rcList"></div>
+  <form class="rc-form" id="rcForm" autocomplete="off"><input class="field" id="rcIn" maxlength="160" enterkeyhint="send" data-i18n-ph="chatPh"><button class="btn gold" type="submit" data-i18n="send">Envoyer</button></form>
+</div>
+<div class="frame sheet" id="settings" hidden>
+  <div class="sheet-head"><span data-i18n="settings">Réglages</span><button class="btn icon" id="bSetClose" data-i18n-aria="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <span class="lbl" data-i18n="music">Musique</span><div class="nseg" id="musSeg"></div>
+  <span class="lbl" data-i18n="sound">Sons</span><div class="nseg" id="sndSeg"></div>
+  <span class="lbl" data-i18n="language">Langue</span><div class="nseg langseg"></div>
+</div>
+<div class="frame sheet" id="rules" hidden>
+  <div class="sheet-head"><span data-i18n="howTo">Comment jouer ?</span><button class="btn icon" id="bRulesClose" data-i18n-aria="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="rules" data-i18n-html="rulesTxt"></div>
+</div>
+<div id="toast" role="status"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+<script src="shared.js"></script>
+<script src="chat.js"></script>
+<script src="party.js" data-game="cn"></script>
+<script src="words.js"></script>
+<script>
+(() => {
+'use strict';
+const { $, esc, t } = P;
+const WORDS = window.BG_WORDS || [];
+const LI = () => ({ fr: 0, en: 1, cs: 2 }[P.lang()] ?? 0);
+const wordOf = i => WORDS[i] ? WORDS[i][LI()] : '?';
+const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/œ/g, 'oe').replace(/[^a-z0-9]/g, '');
+const rnd = () => { try { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] / 4294967296; } catch (e) { return Math.random(); } };
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+/* ---------- Textes ---------- */
+P.addStrings({
+  fr: { games: 'Jeux', tagline: 'Mission galactique : trouve ton équipage !', nick: 'Ton pseudo', online: 'Jouer en ligne', onlineSub: '2 équipes, 4 à 10 joueurs', howTo: 'Comment jouer ?',
+    create: 'Créer une partie', orJoin: 'ou rejoindre des amis', join: 'Rejoindre', gameCode: 'Code de la partie', copyCode: 'Copier le code', copied: 'Copié !', start: 'Lancer la mission', leave: 'Quitter',
+    badCode: 'Entre le code à 5 caractères.', connecting: 'Connexion…', noGame: 'Aucune partie avec ce code.', netErr: 'Connexion impossible. Réessaie.', full: 'Partie complète ou déjà commencée.', hostLeft: 'L’hôte a quitté la partie.',
+    red: 'Rouges', blue: 'Bleus', redTeam: 'Équipage Rouge', blueTeam: 'Équipage Bleu', joinRed: '🔴 Équipage Rouge', joinBlue: '🔵 Équipage Bleu', beCap: 'Devenir capitaine', notCap: 'Redevenir agent', shuffle: '🎲 Équipes au hasard',
+    noTeam: 'Sans équipe :', needTeams: 'Chaque équipage a besoin d’un capitaine 👑 et d’au moins un agent.', waitHost: 'Choisissez vos équipages. L’hôte lance la mission.', waitGuest: '<span class="dots">Choisis ton équipage, l’hôte va lancer la mission</span>', capTaken: 'Il y a déjà un capitaine dans cet équipage.',
+    turnOf: 'Tour des', capThinking: 'Le capitaine {name} cherche un indice…', youThink: '👑 À toi de trouver un indice !', yourClue: 'Tu es capitaine : donne <b>un mot</b> et <b>un nombre</b> pour faire deviner les cartes de ton équipage.', cluePh: 'Ton indice (un seul mot)', send: 'Envoyer',
+    tries: '{n} essai(s) restant(s)', triesInf: 'essais illimités', guessHint: 'Touche une carte pour la proposer, touche-la <b>encore</b> pour la révéler.', capWait: 'Ton équipage cherche… tu ne peux plus rien dire !', otherTurn: 'L’autre équipage joue.',
+    pass: 'Fin du tour', clueBad: 'Un seul mot, et pas un mot du plateau !', clueLog: '{team} : « {w} » {n}', youRed: 'Tu es dans l’équipage Rouge', youBlue: 'Tu es dans l’équipage Bleu', spectator: 'Tu regardes la partie',
+    revealed: '{name} révèle « {w} »', assassinHit: 'Le trou noir ! {team} perd la mission.', winRed: 'L’équipage Rouge gagne !', winBlue: 'L’équipage Bleu gagne !', again: 'Nouvelle mission', lobby: 'Retour au salon', hostAgain: 'L’hôte peut relancer une mission.',
+    quitQ: 'Quitter la partie ?', left: '{name} a quitté la partie', newCap: '{name} devient capitaine.', you: 'toi', cap: 'Capitaine',
+    chat: 'Chat', chatPh: 'Écris un message…', chatEmpty: 'Discutez ici !', chatInvite: 'Chat de l’équipage : touche pour écrire…', translated: 'Traduit automatiquement',
+    music: 'Musique', musOn: 'Activée', musOff: 'Coupée',
+    rulesTxt: '<p>Deux équipages s’affrontent : les <b>Rouges</b> et les <b>Bleus</b>. Chacun a un <b>capitaine</b> 👑 qui voit la carte secrète : quelles cartes appartiennent à quelle équipe, lesquelles sont neutres (astéroïdes) et où se cache le <b>trou noir</b>.</p><p>À son tour, le capitaine donne <b>un seul mot</b> et <b>un nombre</b> (ex. « Océan 2 ») pour faire deviner plusieurs cartes de son équipe.</p><p>Les agents touchent les cartes : bonne couleur, ils continuent (jusqu’au nombre + 1) ; neutre ou couleur adverse, le tour s’arrête. <b>Le trou noir fait perdre immédiatement !</b></p><p>Le premier équipage qui trouve toutes ses cartes gagne. Chaque joueur voit les mots dans sa langue.</p>' },
+  en: { games: 'Games', tagline: 'Galactic mission: find your crew!', nick: 'Your nickname', online: 'Play online', onlineSub: '2 teams, 4 to 10 players', howTo: 'How to play?',
+    create: 'Create a game', orJoin: 'or join friends', join: 'Join', gameCode: 'Game code', copyCode: 'Copy code', copied: 'Copied!', start: 'Start the mission', leave: 'Leave',
+    badCode: 'Enter the 5-character code.', connecting: 'Connecting…', noGame: 'No game with this code.', netErr: 'Can’t connect. Try again.', full: 'Game full or already started.', hostLeft: 'The host left the game.',
+    red: 'Reds', blue: 'Blues', redTeam: 'Red crew', blueTeam: 'Blue crew', joinRed: '🔴 Red crew', joinBlue: '🔵 Blue crew', beCap: 'Become captain', notCap: 'Back to agent', shuffle: '🎲 Random teams',
+    noTeam: 'No team:', needTeams: 'Each crew needs a captain 👑 and at least one agent.', waitHost: 'Pick your crews. The host starts the mission.', waitGuest: '<span class="dots">Pick your crew, the host will start the mission</span>', capTaken: 'That crew already has a captain.',
+    turnOf: 'Turn:', capThinking: 'Captain {name} is thinking of a clue…', youThink: '👑 Your turn to find a clue!', yourClue: 'You’re the captain: give <b>one word</b> and <b>a number</b> to help your crew find their cards.', cluePh: 'Your clue (one word)', send: 'Send',
+    tries: '{n} guess(es) left', triesInf: 'unlimited guesses', guessHint: 'Tap a card to suggest it, tap it <b>again</b> to reveal it.', capWait: 'Your crew is guessing… no more hints!', otherTurn: 'The other crew is playing.',
+    pass: 'End turn', clueBad: 'One word only, and not a word on the board!', clueLog: '{team}: “{w}” {n}', youRed: 'You’re in the Red crew', youBlue: 'You’re in the Blue crew', spectator: 'You’re watching',
+    revealed: '{name} reveals “{w}”', assassinHit: 'The black hole! {team} lose the mission.', winRed: 'The Red crew wins!', winBlue: 'The Blue crew wins!', again: 'New mission', lobby: 'Back to lobby', hostAgain: 'The host can start a new mission.',
+    quitQ: 'Leave the game?', left: '{name} left the game', newCap: '{name} is now captain.', you: 'you', cap: 'Captain',
+    chat: 'Chat', chatPh: 'Type a message…', chatEmpty: 'Talk here!', chatInvite: 'Crew chat: tap to write…', translated: 'Auto-translated',
+    music: 'Music', musOn: 'On', musOff: 'Off',
+    rulesTxt: '<p>Two crews compete: the <b>Reds</b> and the <b>Blues</b>. Each has a <b>captain</b> 👑 who sees the secret map: which cards belong to which team, which are neutral (asteroids) and where the <b>black hole</b> hides.</p><p>On their turn, the captain gives <b>one word</b> and <b>a number</b> (e.g. “Ocean 2”) to point at several of their team’s cards.</p><p>Agents tap cards: right colour, they keep going (up to the number + 1); neutral or enemy colour ends the turn. <b>The black hole loses the game instantly!</b></p><p>The first crew to find all its cards wins. Everyone sees the words in their own language.</p>' },
+  cs: { games: 'Hry', tagline: 'Galaktická mise: najdi svou posádku!', nick: 'Tvoje přezdívka', online: 'Hrát online', onlineSub: '2 týmy, 4 až 10 hráčů', howTo: 'Jak hrát?',
+    create: 'Vytvořit hru', orJoin: 'nebo se připoj ke kamarádům', join: 'Připojit', gameCode: 'Kód hry', copyCode: 'Kopírovat kód', copied: 'Zkopírováno!', start: 'Spustit misi', leave: 'Odejít',
+    badCode: 'Zadej 5místný kód.', connecting: 'Připojování…', noGame: 'Hra s tímto kódem neexistuje.', netErr: 'Nelze se připojit. Zkus to znovu.', full: 'Hra je plná nebo už začala.', hostLeft: 'Hostitel opustil hru.',
+    red: 'Červení', blue: 'Modří', redTeam: 'Červená posádka', blueTeam: 'Modrá posádka', joinRed: '🔴 Červená posádka', joinBlue: '🔵 Modrá posádka', beCap: 'Stát se kapitánem', notCap: 'Zpět na agenta', shuffle: '🎲 Náhodné týmy',
+    noTeam: 'Bez týmu:', needTeams: 'Každá posádka potřebuje kapitána 👑 a alespoň jednoho agenta.', waitHost: 'Vyberte si posádky. Hostitel spustí misi.', waitGuest: '<span class="dots">Vyber si posádku, hostitel brzy spustí misi</span>', capTaken: 'Tato posádka už má kapitána.',
+    turnOf: 'Na tahu:', capThinking: 'Kapitán {name} vymýšlí nápovědu…', youThink: '👑 Vymysli nápovědu!', yourClue: 'Jsi kapitán: dej <b>jedno slovo</b> a <b>číslo</b>, aby tvoje posádka našla své karty.', cluePh: 'Tvoje nápověda (jedno slovo)', send: 'Odeslat',
+    tries: 'zbývá pokusů: {n}', triesInf: 'neomezeně pokusů', guessHint: 'Klepni na kartu pro návrh, klepni <b>znovu</b> pro odkrytí.', capWait: 'Tvoje posádka hádá… už nic neříkej!', otherTurn: 'Hraje druhá posádka.',
+    pass: 'Konec tahu', clueBad: 'Jen jedno slovo a ne slovo z hrací plochy!', clueLog: '{team}: „{w}“ {n}', youRed: 'Jsi v červené posádce', youBlue: 'Jsi v modré posádce', spectator: 'Díváš se',
+    revealed: '{name} odkrývá „{w}“', assassinHit: 'Černá díra! {team} prohrávají misi.', winRed: 'Červená posádka vyhrává!', winBlue: 'Modrá posádka vyhrává!', again: 'Nová mise', lobby: 'Zpět do lobby', hostAgain: 'Hostitel může spustit novou misi.',
+    quitQ: 'Opustit hru?', left: '{name} opustil hru', newCap: '{name} je nyní kapitán.', you: 'ty', cap: 'Kapitán',
+    chat: 'Chat', chatPh: 'Napiš zprávu…', chatEmpty: 'Diskutujte tady!', chatInvite: 'Chat posádky: klepni a piš…', translated: 'Automaticky přeloženo',
+    music: 'Hudba', musOn: 'Zapnutá', musOff: 'Vypnutá',
+    rulesTxt: '<p>Soupeří dvě posádky: <b>Červení</b> a <b>Modří</b>. Každá má <b>kapitána</b> 👑, který vidí tajnou mapu: které karty patří kterému týmu, které jsou neutrální (asteroidy) a kde se skrývá <b>černá díra</b>.</p><p>Na tahu dá kapitán <b>jedno slovo</b> a <b>číslo</b> (např. „Oceán 2“), aby ukázal na několik karet svého týmu.</p><p>Agenti klepou na karty: správná barva, pokračují (až do čísla + 1); neutrální nebo soupeřova barva tah ukončí. <b>Černá díra znamená okamžitou prohru!</b></p><p>Vyhrává posádka, která první najde všechny své karty. Každý vidí slova ve svém jazyce.</p>' }
+});
+
+/* ---------- Avatars : astronautes ---------- */
+const COLORS = ['#ff8a5a', '#5ad8c8', '#ffcc4d', '#b48aff', '#ff6fb5', '#7ed957', '#4aa3ff', '#ff5a5f', '#c0c7e8', '#d89a5a'];
+const avatar = (seat, team) => {
+  const c = COLORS[seat % 10], v = team === 'r' ? '#ff5a5f' : team === 'b' ? '#4aa3ff' : '#c0c7e8', I = '#0a0718';
+  return `<svg viewBox="0 0 40 40"><path d="M6 40c1-8 6-12 14-12s13 4 14 12z" fill="${v}" stroke="${I}" stroke-width="2.5"/><circle cx="20" cy="18" r="13" fill="#efeaff" stroke="${I}" stroke-width="2.5"/><rect x="11" y="12" width="18" height="12" rx="6" fill="${c}" stroke="${I}" stroke-width="2.5"/><circle cx="16" cy="16" r="2" fill="#fff" opacity=".8"/></svg>`;
+};
+const ICONS = {
+  r: '<svg class="ic" viewBox="0 0 24 24"><path d="M12 2c3 2 4 6 4 10l2 3-3 1H9l-3-1 2-3c0-4 1-8 4-10z" fill="#fff"/></svg>',
+  b: '<svg class="ic" viewBox="0 0 24 24"><path d="M12 2c3 2 4 6 4 10l2 3-3 1H9l-3-1 2-3c0-4 1-8 4-10z" fill="#fff"/></svg>',
+  n: '<svg class="ic" viewBox="0 0 24 24"><path d="M5 9l4-5 8 1 4 6-3 8-9 2-5-6z" fill="#2a2620"/></svg>',
+  a: '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#e0c8ff" stroke-width="2.5"/><circle cx="12" cy="12" r="4" fill="#e0c8ff"/></svg>'
+};
+
+/* ---------- Écrans, réglages ---------- */
+const SCREENS = ['home', 'online', 'game', 'end'];
+const show = id => { SCREENS.forEach(s => { $('#' + s).hidden = s !== id; }); document.body.classList.toggle('ingame', id === 'game'); if (window.BGDock) BGDock.slot(id === 'game' ? $('#hudDock') : null, true); };
+let toastT;
+function toast(msg, bad) { const el = $('#toast'); el.innerHTML = msg; el.classList.toggle('bad', !!bad); el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2200); }
+function renderSnd() { $('#sndSeg').innerHTML = `<button class="btn" data-snd="1" aria-pressed="${P.soundOn()}">${t('on')}</button><button class="btn" data-snd="0" aria-pressed="${!P.soundOn()}">${t('off')}</button>`; }
+document.addEventListener('click', e => { const b = e.target.closest('[data-snd]'); if (b) { P.setSound(b.dataset.snd === '1'); renderSnd(); P.sfx('click'); } });
+$('#bSet').onclick = () => { P.unlockAudio(); P.sfx('click'); $('#settings').hidden = !$('#settings').hidden; };
+$('#bSetClose').onclick = () => { P.sfx('click'); $('#settings').hidden = true; };
+$('#bRules').onclick = () => { P.unlockAudio(); P.sfx('click'); $('#rules').hidden = false; };
+$('#bRulesClose').onclick = () => { P.sfx('click'); $('#rules').hidden = true; };
+P.bindName($('#inName'));
+const nameOk = () => { if (P.needName($('#inName'))) return true; P.sfx('bad'); return false; };
+
+/* ---------- Musique : ambiance spatiale (nappes + arpèges), générée en direct ---------- */
+const MU = { on: P.get('cn-music', '1') !== '0', ctx: null, bus: null, timer: 0, step: 0, nextT: 0, vol: 1 };
+const ST = 60 / 92 / 4; // doubles croches à 92 BPM
+const mf = m => 440 * Math.pow(2, (m - 69) / 12);
+const CHORDS = [[57, 60, 64, 67], [53, 57, 60, 64], [48, 52, 55, 59], [55, 59, 62, 66]]; // Am7 Fmaj7 Cmaj7 G
+function muInit() {
+  const ctx = P.audio(); if (!ctx || MU.ctx) return !!MU.ctx;
+  MU.ctx = ctx; MU.bus = ctx.createGain(); MU.bus.gain.value = MU.on ? MU.vol * P.musicVol() : 0;
+  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 4200; MU.bus.connect(lp); lp.connect(ctx.destination);
+  const dl = ctx.createDelay(); dl.delayTime.value = ST * 3; const fb = ctx.createGain(); fb.gain.value = 0.35; const wet = ctx.createGain(); wet.gain.value = 0.3;
+  MU.echo = ctx.createGain(); MU.echo.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(wet); wet.connect(lp);
+  return true;
+}
+function env(t, vol, a, dec, dest) { const g = MU.ctx.createGain(); g.gain.value = 0; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + dec); g.connect(dest || MU.bus); return g; }
+function osc(type, f, t, dur, g, det) { const o = MU.ctx.createOscillator(); o.type = type; o.frequency.value = f; if (det) o.detune.value = det; o.connect(g); o.start(t); o.stop(t + dur + 0.05); }
+function muStep(st, t) {
+  const bar = (st >> 4) % 4, s = st % 16, ch = CHORDS[bar], part = (st >> 6) % 4;
+  if (s === 0) ch.forEach(m => { const g = env(t, 0.045, 0.6, ST * 15); osc('triangle', mf(m), t, ST * 15, g, -6); osc('sine', mf(m), t, ST * 15, g, 6); });
+  if (s === 0 || s === 8) { osc('sine', mf(ch[0] - 24), t, 0.5, env(t, 0.22, 0.02, 0.5)); }
+  if (part > 0 && s % 2 === 0) { const m = ch[(s / 2) % 4] + 12 + (s % 8 === 6 ? 12 : 0); const g = env(t, 0.05, 0.005, 0.28); osc('square', mf(m), t, 0.28, g); const e = env(t, 0.03, 0.005, 0.28, MU.echo); osc('sine', mf(m), t, 0.28, e); }
+  if (part > 1 && (s === 4 || s === 12)) { const o = MU.ctx.createOscillator(), g = env(t, 0.12, 0.004, 0.12); o.frequency.setValueAtTime(900, t); o.frequency.exponentialRampToValueAtTime(200, t + 0.1); o.connect(g); o.start(t); o.stop(t + 0.15); }
+}
+function muTick() {
+  if (!MU.ctx) return; const now = MU.ctx.currentTime;
+  if (MU.nextT < now + 0.02) { const skip = Math.ceil((now + 0.05 - MU.nextT) / ST); MU.nextT += skip * ST; MU.step += skip; }
+  while (MU.nextT < now + 0.25) { muStep(MU.step, MU.nextT); MU.nextT += ST; MU.step++; }
+}
+const music = {
+  start() { if (!MU.on || MU.timer || !muInit()) return; MU.ctx.resume(); MU.step = 0; MU.nextT = MU.ctx.currentTime + 0.1; MU.timer = setInterval(muTick, 25); muTick(); },
+  stop() { clearInterval(MU.timer); MU.timer = 0; },
+  vol() { if (MU.bus && MU.on) MU.bus.gain.setTargetAtTime(MU.vol * P.musicVol(), MU.ctx.currentTime, 0.1); },
+  set(on) { MU.on = on; P.set('cn-music', on ? '1' : '0'); if (on && P.musicVol() < 0.05) P.set('bg-vol-music', '0.7'); if (on) { P.unlockAudio(); this.start(); this.vol(); } else { if (MU.bus) MU.bus.gain.setTargetAtTime(0, MU.ctx.currentTime, 0.1); setTimeout(() => { if (!MU.on) this.stop(); }, 400); } renderMus(); }
+};
+function renderMus() { $('#musSeg').innerHTML = `<button class="btn" data-mus="1" aria-pressed="${MU.on}">${t('musOn')}</button><button class="btn" data-mus="0" aria-pressed="${!MU.on}">${t('musOff')}</button>`; if (P.dock) P.dock.refresh(); }
+document.addEventListener('click', e => { const b = e.target.closest('[data-mus]'); if (b) { music.set(b.dataset.mus === '1'); P.sfx('click'); } });
+P.audioDock({ on: () => MU.on, set: v => music.set(v), vol: () => music.vol() });
+document.addEventListener('pointerdown', () => { P.unlockAudio(); music.start(); }, { capture: true });
+document.addEventListener('visibilitychange', () => { const c = P.audio(); if (!c) return; if (document.hidden) c.suspend(); else c.resume(); });
+
+/* ---------- Traduction (indices, chat) ---------- */
+function trHtml(text, src, mine) {
+  const tl = P.lang();
+  if (mine || !src || src === tl || !window.BGT) return esc(text);
+  const v = BGT.peek(text, tl, src);
+  if (v === undefined) { BGT.translate(text, tl, src).then(r => { if (r) { render(); renderChat(); } }); return esc(text); }
+  return v ? `<span class="tr" data-orig="${esc(text)}" title="${esc(t('translated'))}">${esc(v)}</span>` : esc(text);
+}
+document.addEventListener('click', e => { const el = e.target.closest('.tr'); if (el && !el.closest('.card')) { e.stopPropagation(); toast('🌐 ' + esc(el.dataset.orig)); } }, true);
+
+/* =====================================================================
+   MOTEUR (chez l'hôte)
+   ===================================================================== */
+const MAXP = 10, MINP = 4;
+let S = null, V = null, myKey = null;
+const net = { relay: null, role: '', code: '', roster: [], conn: null, sess: '', gameNo: 0, me: 0, lobby: [] };
+const other = tm => tm === 'r' ? 'b' : 'r';
+const teamName = tm => t(tm === 'r' ? 'red' : 'blue');
+function newGame() {
+  const players = net.roster.map(r => ({ name: r.name, team: r.team, cap: !!r.cap, lang: r.lang || P.lang() }));
+  const idx = shuffle(WORDS.map((_, i) => i)).slice(0, 25), first = rnd() < 0.5 ? 'r' : 'b';
+  const key = []; for (let i = 0; i < 9; i++) key.push(first); for (let i = 0; i < 8; i++) key.push(other(first)); for (let i = 0; i < 7; i++) key.push('n'); key.push('a');
+  shuffle(key);
+  S = { phase: 'clue', turn: first, first, words: idx, key, revealed: key.map(() => false), clue: null, left: 0, picks: {}, players, winner: null, log: [], last: null };
+  return S;
+}
+const remaining = tm => S.key.filter((k, i) => k === tm && !S.revealed[i]).length;
+function pub() {
+  const end = S.phase === 'end';
+  return { phase: S.phase, turn: S.turn, words: S.words, revealed: S.revealed, rkey: S.key.map((k, i) => end || S.revealed[i] ? k : null), clue: S.clue, left: S.left,
+    picks: S.picks, players: S.players.map(p => ({ n: p.name, team: p.team, cap: p.cap, gone: !!p.gone })), winner: S.winner, log: S.log.slice(-6), score: { r: remaining('r'), b: remaining('b') }, last: S.last };
+}
+function sync() {
+  V = pub(); render();
+  net.roster.forEach(r => { if (r.conn && r.conn.open) r.conn.send({ t: 'st', v: V }); });
+}
+function sendKeys() { S.players.forEach((p, s) => { const r = net.roster[s]; if (p.cap && r && r.conn && r.conn.open) r.conn.send({ t: 'key', key: S.key }); }); myKey = S.players[0] && S.players[0].cap ? S.key.slice() : null; }
+function giveClue(seat, w, n) {
+  const p = S.players[seat]; if (!S || S.phase !== 'clue' || !p || !p.cap || p.team !== S.turn) return;
+  w = String(w || '').trim().slice(0, 24); n = n === 'inf' ? 'inf' : Math.max(0, Math.min(9, n | 0));
+  if (!w || /\s/.test(w)) return;
+  const nw = norm(w); if (S.words.some((wi, i) => !S.revealed[i] && WORDS[wi].some(x => norm(x) === nw))) return;
+  S.clue = { w, n, l: p.lang, team: p.team, by: p.name };
+  S.left = n === 0 || n === 'inf' ? 99 : n + 1;
+  S.phase = 'guess'; S.picks = {};
+  S.log.push({ team: p.team, w, n, l: p.lang });
+  sync();
+}
+function propose(seat, i) {
+  const p = S.players[seat]; if (!S || S.phase !== 'guess' || !p || p.cap || p.team !== S.turn || S.revealed[i]) return;
+  const arr = S.picks[i] || [];
+  if (arr.includes(seat)) { reveal(seat, i); return; }
+  Object.keys(S.picks).forEach(k => { S.picks[k] = S.picks[k].filter(x => x !== seat); if (!S.picks[k].length) delete S.picks[k]; }); // une seule proposition à la fois
+  S.picks[i] = [...(S.picks[i] || []), seat];
+  sync();
+}
+function reveal(seat, i) {
+  const p = S.players[seat]; if (S.phase !== 'guess' || S.revealed[i]) return;
+  S.revealed[i] = true; S.picks = {}; const k = S.key[i];
+  S.last = { i, k, by: p.name };
+  if (k === 'a') { S.winner = other(S.turn); S.why = 'a'; return endGame(); }
+  if (remaining('r') === 0) { S.winner = 'r'; return endGame(); }
+  if (remaining('b') === 0) { S.winner = 'b'; return endGame(); }
+  if (k === S.turn) { S.left--; if (S.left <= 0) return endTurn(); return sync(); }
+  endTurn();
+}
+function endTurn() { S.turn = other(S.turn); S.phase = 'clue'; S.clue = null; S.left = 0; S.picks = {}; sync(); }
+function passTurn(seat) { const p = S.players[seat]; if (S.phase === 'guess' && p && !p.cap && p.team === S.turn) endTurn(); }
+function endGame() { S.phase = 'end'; sync(); recordMatch(); }
+function recordMatch() {
+  const w = S.players.map((p, i) => p.team === S.winner ? i : -1).filter(i => i >= 0); if (!w.length) return;
+  P.pushMatch({ id: `cn${net.code}${net.sess}${net.gameNo}`, t: Date.now(), p: S.players.map(p => p.name), w: w[0], wa: w, b: S.players.map(() => false), g: 'cn' });
+}
+function playerLeft(s) {
+  if (!S || S.phase === 'end' || !S.players[s]) return;
+  const p = S.players[s]; p.gone = true; toastAll('left', { name: esc(p.name) });
+  const mates = S.players.map((q, i) => ({ q, i })).filter(o => o.q.team === p.team && !o.q.gone);
+  if (!mates.length) { S.winner = other(p.team); return endGame(); }
+  if (p.cap) { p.cap = false; const nc = mates[0]; nc.q.cap = true; toastAll('newCap', { name: esc(nc.q.name) }); sendKeys(); }
+  Object.keys(S.picks).forEach(k => { S.picks[k] = S.picks[k].filter(x => x !== s); if (!S.picks[k].length) delete S.picks[k]; });
+  sync();
+}
+function hostAct(seat, m) {
+  if (!S || !m) return;
+  if (m.t === 'clue') giveClue(seat, m.w, m.n);
+  else if (m.t === 'prop') propose(seat, m.i | 0);
+  else if (m.t === 'pass') passTurn(seat);
+}
+function toastAll(key, vars) {
+  toast(t(key, vars), key === 'left');
+  net.roster.forEach(r => { if (r.conn && r.conn.open) r.conn.send({ t: 'toast', k: key, v: vars || null }); });
+}
+
+/* ---------- Réseau : salon ---------- */
+function leaveNet() {
+  document.body.classList.remove('netlive'); $('#rc').hidden = true; CHAT.list = []; CHAT.unread = 0; renderChat();
+  const r = net.relay; Object.assign(net, { relay: null, conn: null, roster: [], role: '', lobby: [] });
+  try { r && r.destroy(); } catch (e) {}
+}
+window.addEventListener('pagehide', leaveNet);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && net.relay) net.relay.wake(); });
+const send = m => { if (net.role === 'host') hostAct(0, m); else if (net.conn && net.conn.open) net.conn.send(m); };
+let pendingJoin = null;
+$('#mOnline').onclick = () => { P.unlockAudio(); if (!nameOk()) return; P.sfx('click'); show('online'); $('#onForm').hidden = false; $('#onWait').hidden = true; $('#onErr').textContent = ''; if (pendingJoin) { $('#inCode').value = pendingJoin; pendingJoin = null; $('#bJoin').click(); } };
+$('#onBack').onclick = () => { P.sfx('click'); leaveNet(); show('home'); };
+$('#bLeave').onclick = () => { P.sfx('click'); leaveNet(); $('#onForm').hidden = false; $('#onWait').hidden = true; };
+function backToForm(msg) { leaveNet(); S = null; V = null; show('online'); $('#onForm').hidden = false; $('#onWait').hidden = true; $('#onErr').textContent = msg || ''; }
+const lobbyList = () => net.role === 'host' ? net.roster.map(r => ({ n: r.name, team: r.team, cap: !!r.cap })) : net.lobby;
+function renderLobby() {
+  const host = net.role === 'host', L = lobbyList(), me = L[net.me] || {};
+  const pl = (p, i) => `<div class="pl">${avatar(i, p.team)}<span>${esc(p.n)}${i === net.me ? ` <small style="color:var(--muted)">(${t('you')})</small>` : ''}</span>${p.cap ? '<span class="cap">👑</span>' : ''}</div>`;
+  $('#teams').innerHTML = ['r', 'b'].map(tm => `<div class="team ${tm}"><h4>${t(tm === 'r' ? 'redTeam' : 'blueTeam')}</h4>${L.map((p, i) => p.team === tm ? pl(p, i) : '').join('')}</div>`).join('');
+  const un = L.map((p, i) => !p.team ? pl(p, i) : '').join('');
+  $('#unassigned').innerHTML = un ? `<span class="lbl" style="width:100%">${t('noTeam')}</span>${un}` : '';
+  $('#bCap').innerHTML = '👑 ' + (me.cap ? t('notCap') : t('beCap'));
+  $('#bCap').disabled = !me.team;
+  $('#codeBox').hidden = !host; $('#bShuffle').hidden = !host; $('#bStart').hidden = !host;
+  const ok = ['r', 'b'].every(tm => L.some(p => p.team === tm && p.cap) && L.some(p => p.team === tm && !p.cap));
+  $('#bStart').disabled = !ok || L.some(p => !p.team);
+  $('#waitTxt').innerHTML = host ? (ok ? t('waitHost') : t('needTeams')) : t('waitGuest');
+}
+function broadcastLobby() { const L = lobbyList(); net.roster.forEach((r, i) => { if (r.conn && r.conn.open) r.conn.send({ t: 'lobby', list: L, you: i }); }); renderLobby(); }
+function setTeam(seat, team, cap) {
+  const r = net.roster[seat]; if (!r) return;
+  if (team !== undefined) { r.team = team; if (r.cap && net.roster.some((o, i) => i !== seat && o.team === team && o.cap)) r.cap = false; }
+  if (cap !== undefined) {
+    if (cap && net.roster.some((o, i) => i !== seat && o.team === r.team && o.cap)) { if (seat === 0) toast(t('capTaken'), true); else if (r.conn) r.conn.send({ t: 'toast', k: 'capTaken' }); }
+    else r.cap = !!cap && !!r.team;
+  }
+  broadcastLobby();
+}
+$('#bTeamR').onclick = () => { P.sfx('click'); if (net.role === 'host') setTeam(0, 'r'); else send({ t: 'team', team: 'r' }); };
+$('#bTeamB').onclick = () => { P.sfx('click'); if (net.role === 'host') setTeam(0, 'b'); else send({ t: 'team', team: 'b' }); };
+$('#bCap').onclick = () => { P.sfx('click'); const me = lobbyList()[net.me] || {}; if (net.role === 'host') setTeam(0, undefined, !me.cap); else send({ t: 'team', cap: !me.cap }); };
+$('#bShuffle').onclick = () => {
+  P.sfx('click'); const idx = shuffle(net.roster.map((_, i) => i));
+  idx.forEach((s, k) => { net.roster[s].team = k % 2 ? 'b' : 'r'; net.roster[s].cap = k < 2; });
+  broadcastLobby();
+};
+$('#bHost').onclick = () => { P.sfx('click'); leaveNet(); $('#onErr').textContent = t('connecting'); openHost(0); };
+function openHost(attempt) {
+  const code = P.genCode(), relay = new P.Online('cn', code, 'host');
+  document.body.classList.add('netlive');
+  Object.assign(net, { relay, code, role: 'host', sess: Date.now().toString(36), gameNo: 0, me: 0, roster: [{ name: P.name(), conn: null, team: null, cap: false, lang: P.lang() }] });
+  relay.on('open', () => { if (window.Party) Party.announce('cn', code); $('#onErr').textContent = ''; $('#codeShow').textContent = code; $('#onForm').hidden = true; $('#onWait').hidden = false; renderLobby(); });
+  relay.on('error', e => { if (net.relay !== relay) return; if (e.type === 'taken' && attempt < 4) { leaveNet(); openHost(attempt + 1); return; } if (net.roster.length > 1) return; backToForm(t('netErr')); });
+  relay.on('connection', conn => {
+    const entry = { conn, name: '', team: null, cap: false, lang: 'fr' };
+    conn.on('data', m => hostData(entry, m));
+    conn.on('close', () => {
+      const i = net.roster.indexOf(entry); if (i < 0) return;
+      if (S && S.phase !== 'end' && !$('#game').hidden) { entry.gone = true; playerLeft(i); return; }
+      net.roster.splice(i, 1); toast(t('left', { name: esc(entry.name) }), true); broadcastLobby();
+    });
+  });
+}
+function hostData(entry, m) {
+  if (!m || typeof m !== 'object') return;
+  if (m.t === 'hello') {
+    const inGame = S && S.phase !== 'end' && !$('#game').hidden;
+    if (inGame || net.roster.length >= MAXP) { entry.conn.send({ t: 'full' }); return; }
+    let nm = String(m.name || '?').slice(0, 14); const base = nm; let k = 2; while (net.roster.some(r => r.name.toLowerCase() === nm.toLowerCase())) nm = base.slice(0, 12) + k++;
+    entry.name = nm; entry.lang = ['fr', 'en', 'cs'].includes(m.lang) ? m.lang : 'fr';
+    const nr = net.roster.filter(r => r.team === 'r').length, nb = net.roster.filter(r => r.team === 'b').length; entry.team = nr <= nb ? 'r' : 'b';
+    net.roster.push(entry); P.sfx('click'); broadcastLobby(); chatSys(t('joinedSys', { name: nm }));
+    return;
+  }
+  const s = net.roster.indexOf(entry); if (s < 1 || entry.gone) return;
+  if (m.t === 'team') { if (!S || S.phase === 'end' || $('#game').hidden) setTeam(s, m.team === 'r' || m.team === 'b' ? m.team : undefined, typeof m.cap === 'boolean' ? m.cap : undefined); return; }
+  if (m.t === 'lang' && ['fr', 'en', 'cs'].includes(m.l)) { entry.lang = m.l; if (S && S.players[s]) S.players[s].lang = m.l; return; }
+  if (m.t === 'chat') { chatIn(s, m.txt, m.l); return; }
+  hostAct(s, m);
+}
+$('#bStart').onclick = () => {
+  P.sfx('click');
+  net.roster = net.roster.filter(r => !r.gone && (r.conn === null || r.conn.open));
+  net.gameNo++; newGame();
+  net.roster.forEach((r, i) => { if (r.conn && r.conn.open) r.conn.send({ t: 'go', seat: i, sess: net.sess, game: net.gameNo }); });
+  sendKeys(); net.me = 0; lastKey = ''; sync(); show('game'); P.sfx('hint');
+};
+$('#bCopy').onclick = () => { const done = () => { $('#bCopy').textContent = t('copied'); setTimeout(() => { $('#bCopy').textContent = t('copyCode'); }, 1400); }; if (navigator.clipboard) navigator.clipboard.writeText(net.code).then(done, () => {}); };
+$('#inCode').addEventListener('input', e => { e.target.value = window.BGCode ? BGCode(e.target.value) : e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
+$('#inCode').addEventListener('keydown', e => { if (e.key === 'Enter') $('#bJoin').click(); });
+$('#bJoin').onclick = () => {
+  P.sfx('click');
+  const code = $('#inCode').value.trim().toUpperCase();
+  if (code.length !== 5) { $('#onErr').textContent = t('badCode'); return; }
+  leaveNet(); $('#onErr').textContent = t('connecting');
+  const relay = new P.Online('cn', code, 'guest');
+  document.body.classList.add('netlive');
+  Object.assign(net, { relay, code, role: 'guest', lobby: [] });
+  let linked = false;
+  const timer = setTimeout(() => { if (!linked) backToForm(t('noGame')); }, 15000);
+  relay.on('error', e => { if (net.relay !== relay) return; clearTimeout(timer); backToForm(e.type === 'nogame' ? t('noGame') : t('netErr')); });
+  relay.on('open', conn => {
+    net.conn = conn;
+    conn.on('open', () => { linked = true; clearTimeout(timer); $('#onErr').textContent = ''; conn.send({ t: 'hello', name: P.name(), lang: P.lang() }); });
+    conn.on('data', guestData);
+    conn.on('close', () => { if (net.conn === conn) { backToForm(t('hostLeft')); P.sfx('bad'); } });
+  });
+};
+function guestData(m) {
+  if (!m || typeof m !== 'object') return;
+  if (m.t === 'lobby') {
+    net.lobby = (Array.isArray(m.list) ? m.list : []).slice(0, MAXP).map(p => ({ n: String(p.n || '?').slice(0, 14), team: p.team === 'r' || p.team === 'b' ? p.team : null, cap: !!p.cap }));
+    if (Number.isInteger(m.you)) net.me = m.you;
+    if ($('#game').hidden && $('#end').hidden) { show('online'); $('#onForm').hidden = true; $('#onWait').hidden = false; }
+    renderLobby();
+  }
+  else if (m.t === 'full') backToForm(t('full'));
+  else if (m.t === 'go') { net.me = m.seat | 0; net.sess = String(m.sess || ''); net.gameNo = m.game | 0; myKey = null; V = null; lastKey = ''; P.stopConfetti(); show('game'); P.sfx('hint'); }
+  else if (m.t === 'key' && Array.isArray(m.key) && m.key.length === 25) { myKey = m.key.map(k => ['r', 'b', 'n', 'a'].includes(k) ? k : 'n'); render(); }
+  else if (m.t === 'st' && m.v) { V = m.v; render(); }
+  else if (m.t === 'chat') chatAdd(m.m);
+  else if (m.t === 'toast') toast(t(m.k, m.v || undefined), m.k === 'left' || m.k === 'capTaken');
+}
+
+/* ---------- Affichage de la partie ---------- */
+let lastKey = '';
+function render() {
+  if (!V) return;
+  if (V.phase === 'end') { renderEnd(); return; }
+  if ($('#game').hidden) show('game');
+  const me = V.players[net.me] || {}, myTeam = me.team, isCap = !!me.cap, myTurn = myTeam === V.turn;
+  $('#scR').textContent = V.score.r; $('#scB').textContent = V.score.b;
+  $('#scR').classList.toggle('on', V.turn === 'r'); $('#scB').classList.toggle('on', V.turn === 'b');
+  $('#hTurn').innerHTML = `${t('turnOf')}<b class="${V.turn}">${teamName(V.turn)}</b>`;
+  const capName = (V.players.find(p => p.team === V.turn && p.cap) || {}).n || '?';
+  // indice
+  if (V.clue) $('#clue').innerHTML = `<span class="w">${trHtml(V.clue.w, V.clue.l, isCap && myTurn)}</span><span class="n">${V.clue.n === 'inf' ? '∞' : V.clue.n}</span><span class="lft">${V.left >= 90 ? t('triesInf') : t('tries', { n: V.left })}</span>`;
+  else $('#clue').innerHTML = isCap && myTurn ? `<span>${t('youThink')}</span>` : `<span class="dots">${t('capThinking', { name: esc(capName) })}</span>`;
+  // plateau
+  const canPick = V.phase === 'guess' && myTurn && !isCap;
+  $('#board').innerHTML = V.words.map((wi, i) => {
+    const rev = V.revealed[i], k = V.rkey[i], kk = myKey ? myKey[i] : null;
+    const props = (V.picks[i] || []).map(s => `<i style="background:${COLORS[s % 10]}" title="${esc((V.players[s] || {}).n || '')}"></i>`).join('');
+    const mine = (V.picks[i] || []).includes(net.me);
+    const wl = Math.max(...String(wordOf(wi)).split(/\s+/).map(x => x.length)), lc = wl > 10 ? 'l3' : wl > 8 ? 'l2' : wl > 6 ? 'l1' : '';
+    const cls = ['card', lc, rev ? 'rev ' + k : '', !rev && kk ? 'k-' + kk : '', canPick && !rev ? 'pickable' : '', mine ? 'mine' : '', V.last && V.last.i === i && lastKey !== 'r' + i + V.log.length ? 'flip' : ''].join(' ');
+    return `<div class="${cls}" data-i="${i}">${props ? `<span class="props">${props}</span>` : ''}${rev ? ICONS[k] : ''}<span>${esc(wordOf(wi))}</span></div>`;
+  }).join('');
+  if (V.last) lastKey = 'r' + V.last.i + V.log.length;
+  // équipages
+  $('#crew').innerHTML = V.players.map((p, i) => p.gone ? '' : `<div class="pl ${p.team}${i === net.me ? ' me' : ''}">${avatar(i, p.team)}<span>${esc(p.n)}</span>${p.cap ? '<span class="cap">👑</span>' : ''}</div>`).join('');
+  $('#log').innerHTML = V.log.map(l => `<span style="color:${l.team === 'r' ? '#ff9a9d' : '#9ccfff'}">${trHtml(l.w, l.l, false)} ${l.n === 'inf' ? '∞' : l.n}</span>`).join(' · ');
+  // actions
+  const A = $('#action'); let h = '';
+  if (!myTeam) h = `<p class="hint">${t('spectator')}</p>`;
+  else if (V.phase === 'clue' && myTurn && isCap) {
+    const opts = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'inf'].map(v => `<option value="${v}">${v === 'inf' ? '∞' : v}</option>`).join('');
+    h = `<p class="hint">${t('yourClue')}</p><div class="row"><input class="field" id="aClue" maxlength="24" autocomplete="off" enterkeyhint="send" placeholder="${esc(t('cluePh'))}"><select id="aNum">${opts}</select><button class="btn gold" id="aSend">${t('send')}</button></div>`;
+  } else if (V.phase === 'clue') h = `<p class="hint">${myTurn ? t('capThinking', { name: esc(capName) }) : t('otherTurn')}</p>`;
+  else if (V.phase === 'guess' && myTurn && !isCap) h = `<p class="hint">${t('guessHint')}</p><button class="btn red sm" id="aPass" style="align-self:center">${t('pass')}</button>`;
+  else if (V.phase === 'guess' && myTurn && isCap) h = `<p class="hint">${t('capWait')}</p>`;
+  else h = `<p class="hint">${t('otherTurn')}</p>`;
+  const key = V.phase + V.turn + V.log.length;
+  if (document.activeElement && document.activeElement.id === 'aClue' && A.dataset.key === key) return;
+  A.dataset.key = key; A.innerHTML = h;
+  const ci = $('#aClue');
+  if (ci) {
+    const go = () => {
+      const w = ci.value.trim(), n = $('#aNum').value;
+      if (!w || /\s/.test(w) || V.words.some((wi, i) => !V.revealed[i] && WORDS[wi].some(x => norm(x) === norm(w)))) { toast(t('clueBad'), true); P.sfx('bad'); return; }
+      P.sfx('click'); A.dataset.key = ''; send({ t: 'clue', w, n: n === 'inf' ? 'inf' : +n });
+    };
+    $('#aSend').onclick = go; ci.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  }
+  const pb = $('#aPass'); if (pb) pb.onclick = () => { P.sfx('click'); send({ t: 'pass' }); };
+}
+let lastSfx = '';
+document.getElementById('board').addEventListener('click', e => {
+  const c = e.target.closest('.card'); if (!c || !V || V.phase !== 'guess') return;
+  const me = V.players[net.me] || {}; if (me.cap || me.team !== V.turn) return;
+  const i = +c.dataset.i; if (V.revealed[i]) return;
+  P.sfx('click'); send({ t: 'prop', i });
+});
+// sons des révélations
+const _render = render;
+function sfxFor() {
+  if (!V || !V.last) return; const k = 'l' + V.last.i + V.log.length + V.phase; if (k === lastSfx) return; lastSfx = k;
+  const me = V.players[net.me] || {};
+  if (V.last.k === 'a') P.sfx('bad'); else if (V.last.k === me.team) P.sfx('good'); else if (V.last.k === 'n') P.sfx('other'); else P.sfx('bad');
+  try { navigator.vibrate && navigator.vibrate(V.last.k === me.team ? 15 : [30, 50, 30]); } catch (e) {}
+}
+setInterval(sfxFor, 150);
+$('#bQuit').onclick = () => {
+  P.sfx('click');
+  if (Date.now() - (window.__q || 0) > 2500) { window.__q = Date.now(); toast(t('quitQ') + ' ✕'); return; }
+  leaveNet(); S = null; V = null; myKey = null; show('home');
+};
+
+/* ---------- Fin ---------- */
+function renderEnd() {
+  show('end');
+  const me = V.players[net.me] || {}, won = me.team === V.winner;
+  const tt = $('#endTitle'); tt.textContent = t(V.winner === 'r' ? 'winRed' : 'winBlue'); tt.className = 'banner ' + V.winner;
+  $('#endBoard').innerHTML = V.words.map((wi, i) => `<div class="card rev ${V.rkey[i]} ${(w => w > 10 ? 'l3' : w > 8 ? 'l2' : w > 6 ? 'l1' : '')(Math.max(...String(wordOf(wi)).split(/\s+/).map(x => x.length)))}">${ICONS[V.rkey[i]]}<span>${esc(wordOf(wi))}</span></div>`).join('');
+  $('#endCrew').innerHTML = V.players.map((p, i) => `<div class="pl ${p.team}${i === net.me ? ' me' : ''}">${avatar(i, p.team)}<span>${esc(p.n)}</span>${p.team === V.winner ? '<span class="cap">🏆</span>' : ''}</div>`).join('');
+  const guest = net.role !== 'host';
+  $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : '';
+  if (lastSfx !== 'end' + V.log.length) { lastSfx = 'end' + V.log.length; P.sfx(won ? 'win' : 'lose'); if (won) P.confetti($('#confetti')); }
+  if (V.last && V.last.k === 'a') toast(t('assassinHit', { team: teamName(other(V.winner)) }), true);
+}
+$('#bAgain').onclick = () => { P.sfx('click'); P.stopConfetti(); if (net.role === 'host') $('#bStart').click(); };
+$('#bMenu').onclick = () => {
+  P.sfx('click'); P.stopConfetti();
+  if (net.relay) { S = null; V = null; myKey = null; show('online'); $('#onForm').hidden = true; $('#onWait').hidden = false; if (net.role === 'host') { net.roster = net.roster.filter(r => !r.gone); broadcastLobby(); } else renderLobby(); return; }
+  show('home');
+};
+
+/* ---------- Chat de la partie ---------- */
+const CHAT = { list: [], unread: 0 };
+const wideChat = () => matchMedia('(min-width:1150px)').matches && document.body.classList.contains('netlive');
+const chatVisible = () => !$('#rc').hidden || wideChat();
+function chatIn(s, txt, l) {
+  txt = String(txt || '').replace(/\s+/g, ' ').trim().slice(0, 160); if (!txt) return;
+  const r = net.roster[s] || {};
+  const m = { s, n: r.name || '?', team: r.team || null, txt, l: ['fr', 'en', 'cs'].includes(l) ? l : 'fr' };
+  net.roster.forEach(o => { if (o.conn && o.conn.open) o.conn.send({ t: 'chat', m }); });
+  chatAdd(m);
+}
+function chatSys(txt) { const m = { sys: true, txt }; net.roster.forEach(o => { if (o.conn && o.conn.open) o.conn.send({ t: 'chat', m }); }); chatAdd(m); }
+function chatAdd(m) {
+  if (!m || typeof m.txt !== 'string') return;
+  CHAT.list.push({ s: m.s | 0, n: String(m.n || '?').slice(0, 14), team: m.team, txt: m.txt.slice(0, 160), l: m.l, sys: !!m.sys });
+  if (CHAT.list.length > 80) CHAT.list.shift();
+  if (!m.sys && m.s !== net.me) { if (!chatVisible()) { CHAT.unread++; toast(`💬 <b>${esc(String(m.n || '?'))}</b> : ${esc(String(m.txt).slice(0, 60))}`); } P.sfx('chat'); }
+  renderChat();
+}
+function renderChat() {
+  const L = $('#rcList');
+  L.innerHTML = CHAT.list.length ? CHAT.list.map(m => m.sys ? `<div class="rc-msg sys">${esc(m.txt)}</div>` : `<div class="rc-msg${m.s === net.me ? ' me' : ''}">${avatar(m.s, m.team)}<div class="bub"><b style="color:${m.team === 'r' ? '#ff9a9d' : m.team === 'b' ? '#9ccfff' : COLORS[m.s % 10]}">${esc(m.n)}</b>${trHtml(m.txt, m.l, m.s === net.me)}</div></div>`).join('') : `<p class="rc-empty">${t('chatEmpty')}</p>`;
+  L.scrollTop = L.scrollHeight;
+  if (chatVisible()) CHAT.unread = 0;
+  document.querySelectorAll('.badge').forEach(b => { b.textContent = CHAT.unread ? CHAT.unread : ''; });
+  const last = [...CHAT.list].reverse().find(m => !m.sys);
+  const bar = last ? `<b style="color:${last.team === 'r' ? '#ff9a9d' : last.team === 'b' ? '#9ccfff' : '#fff'}">${esc(last.n)}</b>${trHtml(last.txt, last.l, last.s === net.me)}` : `<i>${t('chatInvite')}</i>`;
+  document.querySelectorAll('.chatbar .cb-txt').forEach(el => { el.innerHTML = bar; });
+}
+function toggleChat(open) { $('#rc').hidden = !open; if (open) { CHAT.unread = 0; renderChat(); setTimeout(() => $('#rcIn').focus(), 50); } }
+$('#bChat').onclick = () => { P.sfx('click'); toggleChat($('#rc').hidden); };
+$('#chatBar').onclick = () => { P.sfx('click'); toggleChat(true); };
+$('#bChatL').onclick = () => { P.sfx('click'); toggleChat(true); };
+$('#rcClose').onclick = () => { P.sfx('click'); toggleChat(false); };
+$('#rcForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const v = $('#rcIn').value.replace(/\s+/g, ' ').trim().slice(0, 160); if (!v) return;
+  $('#rcIn').value = '';
+  if (net.role === 'host') chatIn(0, v, P.lang()); else if (net.conn && net.conn.open) net.conn.send({ t: 'chat', txt: v, l: P.lang() });
+});
+window.addEventListener('resize', renderChat);
+P.addStrings({ fr: { joinedSys: '{name} a rejoint la partie' }, en: { joinedSys: '{name} joined the game' }, cs: { joinedSys: '{name} se připojil ke hře' } });
+const gcHome = window.GChat ? GChat.mount($('#gchatHome'), { db: P.DB_URL, lang: P.lang, name: () => P.hasName() ? P.name() : '', needName: () => P.needName($('#inName')) }) : null;
+
+/* ---------- Groupe d'amis ---------- */
+function joinFromParty(c) { P.stopConfetti(); S = null; V = null; pendingJoin = c; if (!P.hasName()) { show('home'); nameOk(); return; } $('#mOnline').click(); }
+if (window.Party) { Party.busy = () => !$('#game').hidden && !!V && V.phase !== 'end'; Party.onJoinHere = (g, c) => { joinFromParty(c); return true; }; }
+
+/* ---------- Démarrage ---------- */
+P.onLang(() => {
+  if (net.role === 'guest' && net.conn && net.conn.open) net.conn.send({ t: 'lang', l: P.lang() });
+  if (net.role === 'host' && net.roster[0]) { net.roster[0].lang = P.lang(); if (S && S.players[0]) S.players[0].lang = P.lang(); }
+  renderSnd(); renderMus(); renderChat(); if (gcHome) gcHome.refresh();
+  if (!$('#onWait').hidden) renderLobby(); if (V) render();
+});
+P.applyStatic(); renderSnd(); renderMus(); renderChat();
+{ const jc = window.Party && Party.takeJoin(); if (jc) joinFromParty(jc); }
+window.__cn = { get S() { return S; }, get V() { return V; }, net, get key() { return myKey; } };
+})();
+</script>
+</body>
+</html>
