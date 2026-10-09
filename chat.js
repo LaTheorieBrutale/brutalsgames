@@ -12,6 +12,9 @@ const KEEP = 60, MAXLEN = 200;
    BGT.translate(texte, langueCible, langueSource|'auto') -> Promise<string|null> (null = même langue ou échec) */
 const BGT = window.BGT = (() => {
   const cache = new Map(), pending = new Map();
+  // les traductions déjà faites suivent l'onglet d'une page à l'autre (évite de tout retraduire à chaque retour au menu)
+  try { const saved = JSON.parse(sessionStorage.getItem('bg-tr') || '[]'); saved.forEach(([k, v]) => cache.set(k, v)); } catch (e) {}
+  let saveT = 0; const save = () => { clearTimeout(saveT); saveT = setTimeout(() => { try { sessionStorage.setItem('bg-tr', JSON.stringify([...cache].slice(-400))); } catch (e) {} }, 500); };
   const same = (a, b) => String(a).trim().toLowerCase() === String(b).trim().toLowerCase();
   async function gtx(text, tl, sl) {
     const r = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURIComponent(text)}`);
@@ -34,7 +37,7 @@ const BGT = window.BGT = (() => {
       let res = null;
       try { res = await gtx(text, tl, sl); } catch (e) { try { res = await mym(text, tl, sl); } catch (e2) { res = null; } }
       const v = res && res.out && res.src !== tl && !same(res.out, text) ? res.out : null;
-      cache.set(key, v); pending.delete(key); return v;
+      cache.set(key, v); pending.delete(key); if (res) save(); return v;
     })();
     pending.set(key, job); return job;
   }
@@ -115,10 +118,13 @@ function mount(el, o) {
       if (!r.ok) throw new Error(r.status);
       const data = await r.json();
       if (data && typeof data === 'object') Object.entries(data).forEach(([k, m]) => add(k, m));
-      trim(); state = 'on'; render(); return true;
+      trim(); const sig = [...msgs.keys()].sort().slice(-1)[0] + ':' + msgs.size;
+      if (sig !== lastSig || state !== 'on') { lastSig = sig; state = 'on'; render(); } return true;
     } catch (e) { state = 'down'; render(); return false; }
   }
-  function startPoll() { if (!poll) poll = setInterval(() => { if (alive && !document.hidden) load(); }, 4000); }
+  let lastSig = '';
+  // Pas de connexion permanente (les navigateurs en limitent le nombre par site) : on relit toutes les 4 s, seulement si le chat est visible
+  function startPoll() { if (!poll) poll = setInterval(() => { if (alive && !document.hidden && el.offsetParent !== null) load(); }, 4000); }
   function stream() {
     if (typeof EventSource === 'undefined') { startPoll(); return; }
     let opened = false;
@@ -151,7 +157,8 @@ function mount(el, o) {
     btn.disabled = false; input.focus();
   });
   texts();
-  load().then(ok => { if (state !== 'denied') stream(); });
+  load().then(ok => { if (state !== 'denied') startPoll(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && alive && el.offsetParent !== null) load(); });
   return { refresh: texts, destroy() { alive = false; if (es) es.close(); clearInterval(poll); } };
 }
 window.GChat = { mount };

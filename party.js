@@ -92,7 +92,7 @@ function startNet() {
   }).catch(() => {});
   memT = setInterval(members, 10000);
   const onCur = cur => { if (cur && typeof cur === 'object') handleCur(cur); };
-  const doPoll = () => { poll = setInterval(() => { if (!document.hidden) req(base + '/cur').then(onCur).catch(() => {}); }, 4000); req(base + '/cur').then(onCur).catch(() => {}); };
+  const doPoll = () => { poll = setInterval(() => { if (!document.hidden) req(base + '/cur').then(onCur).catch(() => {}); }, 2000); req(base + '/cur').then(onCur).catch(() => {}); };
   const listen = () => {
   if (typeof EventSource === 'undefined') { doPoll(); return; }
   let opened = false;
@@ -102,9 +102,13 @@ function startNet() {
   es.onerror = () => { if (!opened) { es.close(); es = null; doPoll(); } };
   };
   const myCode = Party.code;
-  heartbeat().finally(() => { if (Party.code !== myCode) return; members(); listen(); });
+  // relecture toutes les 3 s plutôt qu'une connexion permanente (le navigateur en limite le nombre : ça bloquait les jeux)
+  heartbeat().finally(() => { if (Party.code !== myCode) return; members(); doPoll(); });
   beat = setInterval(heartbeat, 20000);
 }
+// Retour arrière du navigateur : la page revient « gelée » depuis le cache (connexions et minuteurs coupés) → on la recharge
+window.addEventListener('pageshow', e => { if (e.persisted) location.reload(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && Party.code && !beat) startNet(); });
 window.addEventListener('pagehide', () => { if (Party.code) { try { fetch(`${DB}/rooms/party_${Party.code}/m/${myId}.json`, { method: 'DELETE', keepalive: true }); } catch (e) {} } });
 
 /* ---------- Invitations ---------- */
@@ -114,12 +118,13 @@ function handleCur(cur) {
   if (cur.id === myId || sget(seenKey()) === key) return;
   if (typeof cur.t === 'number' && skewOk && now() - cur.t > 5 * 60000) { sset(seenKey(), key); return; } // trop vieux (heure du serveur)
   if (Party.current === key) { sset(seenKey(), key); return; }               // on y est déjà
+  if (inviteEl && inviteEl.dataset.key === key) return;                      // invitation déjà affichée (relecture régulière)
   showInvite(cur, key);
 }
 function hideInvite() { clearInterval(countT); if (inviteEl) { inviteEl.remove(); inviteEl = null; } }
 function showInvite(cur, key) {
   hideInvite();
-  const el = inviteEl = document.createElement('div'); el.className = 'pty-inv'; el.setAttribute('role', 'alert');
+  const el = inviteEl = document.createElement('div'); el.className = 'pty-inv'; el.dataset.key = key; el.setAttribute('role', 'alert');
   el.innerHTML = `<div>👥 ${tr('launches', { n: esc(cur.n || '?'), g: esc(GAMES[cur.g][1]) })} <small class="cd"></small></div><div class="row"><button class="go">${tr('go')}</button><button class="no">${tr('later')}</button></div>`;
   document.body.appendChild(el);
   try { window.P && P.sfx && P.sfx('chat'); navigator.vibrate && navigator.vibrate([30, 60, 30]); } catch (e) {}
@@ -127,7 +132,7 @@ function showInvite(cur, key) {
   el.querySelector('.go').onclick = go;
   el.querySelector('.no').onclick = () => { hideInvite(); sset(seenKey(), key); };
   if (auto() && !Party.busy()) {
-    let s = 3; const cd = el.querySelector('.cd'); cd.textContent = tr('inSec', { s });
+    let s = 2; const cd = el.querySelector('.cd'); cd.textContent = tr('inSec', { s });
     countT = setInterval(() => { s--; if (s <= 0) { go(); return; } cd.textContent = tr('inSec', { s }); }, 1000);
   }
 }

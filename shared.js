@@ -184,6 +184,8 @@ class Relay extends Emitter {
         const c = new Conn(this, 'host'); this.conns.host = c; this.hostConn = c;
         this._listen(`${this.base}/down/${this.id}`);
         this._post(this.base + '/up', { f: this.id, k: 'c' });
+        // si la demande se perd, on la renvoie jusqu'à la réponse de l'hôte
+        { let n = 0; const rt = setInterval(() => { if (this.destroyed || (this.conns.host && this.conns.host.open) || ++n > 6) { clearInterval(rt); return; } this._post(this.base + '/up', { f: this.id, k: 'c' }); }, 2500); this.timers.push(rt); }
         this.timers.push(setInterval(async () => {
           if (this.destroyed) return;
           try {
@@ -264,7 +266,7 @@ class Relay extends Emitter {
     if (typeof EventSource === 'undefined') { poll(); return; }
     const es = new EventSource(P.DB_URL + path + '.json'); this.streams.push(es);
     es.addEventListener('put', onEvt); es.addEventListener('patch', onEvt);
-    es.onerror = () => { if (!opened) { es.close(); poll(); } };
+    es.onerror = () => { if (!opened || es.readyState === 2) { es.close(); poll(); } }; // flux coupé pour de bon : on passe en relecture
   }
   _msg(key, m) {
     if (this.seen.has(key) || !m || typeof m !== 'object') return; this.seen.add(key);
@@ -276,7 +278,7 @@ class Relay extends Emitter {
     if (this.role === 'host') {
       const f = String(m.f || ''); if (!/^g[a-z0-9]{1,12}$/.test(f)) return;
       if (m.k === 'c') {
-        if (this.conns[f]) return;
+        if (this.conns[f]) { if (this.conns[f].open) this._post(`${this.base}/down/${f}`, { k: 'o' }); return; } // demande répétée : on redit « ok »
         const c = new Conn(this, f); c.open = true; this.conns[f] = c;
         this.emit('connection', c); this._post(`${this.base}/down/${f}`, { k: 'o' });
       } else if (m.k === 'm' && this.conns[f]) this.conns[f].emit('data', d);
