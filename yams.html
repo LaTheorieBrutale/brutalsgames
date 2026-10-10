@@ -15,7 +15,7 @@
 <style>
 /* Yam's — « Lagon Tiki » : plage tropicale au crépuscule, palmiers, torches tiki, piste de dés turquoise et bambou.
    Écrans : accueil, salon, partie, fin. Chaque joueur choisit ses dés (skins). */
-:root{
+:root{--mine:#5fe8d8;
   --bg1:#0b1424;--bg2:#1b2f4e;--ink:#06101a;--panel:#1d4058;--panel2:#132d40;--line:#2f5a72;--text:#eefaf6;--muted:#9cc4c8;
   --felt:#13838a;--felt2:#0b5a62;--wood:#d6a24c;--gold:#f2c14e;--gold2:#c8902a;--red:#e04848;--green:#5cc24a;--blue:#4aa3ff;
   --f-title:"Lilita One","Arial Black",system-ui,sans-serif;--f-ui:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -105,7 +105,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .vp .nm{font-size:13px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .vp.me .nm::before{content:"● ";color:var(--green)}
 .vp .sc{font-family:var(--f-title);font-size:28px;line-height:1}
-.vp.cmp .sc{color:var(--gold)}.vp.me .sc{color:#8ee06a}
+.vp.cmp .sc{color:var(--gold)}.vp.me .sc{color:var(--mine)}
 .versus.many{gap:6px;overflow-x:auto;justify-content:flex-start;scrollbar-width:none}
 .versus.many::-webkit-scrollbar{display:none}
 .versus.many .vp .av{width:42px;height:42px}.versus.many .vp .av svg{width:30px;height:30px}.versus.many .vp .sc{font-size:20px}
@@ -122,10 +122,12 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .grow{flex:1;min-height:34px;display:grid;grid-template-columns:1fr 46px 50px;align-items:center;gap:0;padding:2px 6px;border-top:2px solid rgba(0,0,0,.45);background:linear-gradient(180deg,#1f4a62,#183c52)}
 .grow .ic{display:flex;align-items:center;gap:6px;min-width:0}
 .grow .ic svg{width:clamp(28px,8vw,40px);height:clamp(28px,8vw,40px);flex:none;filter:drop-shadow(0 2px 0 rgba(0,0,0,.5))}
-.badge2{display:grid;place-items:center;min-width:clamp(34px,10vw,46px);height:clamp(28px,8vw,38px);padding:0 5px;border-radius:9px;background:linear-gradient(180deg,#fff,#e4ded2);border:3px solid var(--ink);color:#1c1620;font-family:var(--f-title);font-size:clamp(14px,4vw,18px);box-shadow:0 2px 0 rgba(0,0,0,.5)}
+.badge2{position:relative;display:grid;place-items:center;box-sizing:border-box;width:calc(clamp(28px,8vw,40px) * .92);height:calc(clamp(28px,8vw,40px) * .92);margin:calc(clamp(28px,8vw,40px) * .04);flex:none;padding:0;border-radius:22%;
+  background:linear-gradient(135deg,#ffffff,#e4ded2);border:2px solid var(--ink);color:#1c1620;font-family:var(--f-title);font-size:clamp(11px,3.4vw,16px);letter-spacing:-.03em;line-height:1;box-shadow:0 2px 0 rgba(0,0,0,.5);overflow:hidden}
+.badge2::before{content:"";position:absolute;left:6%;right:6%;top:5%;height:24%;border-radius:999px;background:rgba(255,255,255,.22)}
 .grow .v{text-align:center;font-family:var(--f-title);font-size:clamp(17px,5vw,24px);color:var(--gold)}
 .grow .v.empty{color:rgba(255,255,255,.18)}
-.grow .me{margin:0 0 0 4px;height:calc(100% - 4px);min-height:28px;display:grid;place-items:center;border-radius:9px;background:#0c1d2b;font-family:var(--f-title);font-size:clamp(17px,5vw,24px);color:#8ee06a}
+.grow .me{margin:0 0 0 4px;height:calc(100% - 4px);min-height:28px;display:grid;place-items:center;border-radius:9px;background:#0c1d2b;font-family:var(--f-title);font-size:clamp(17px,5vw,24px);color:var(--mine)}
 .grow .me.empty{color:rgba(255,255,255,.12)}
 .grow .me.pick{cursor:pointer;background:rgba(92,194,74,.22);color:#b8ff9a;outline:2px dashed rgba(142,224,106,.7);outline-offset:-3px}
 .grow .me.pick.zero{background:rgba(224,72,72,.14);color:#ff9a9a;outline-color:rgba(255,120,120,.5)}
@@ -137,7 +139,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .grow.bon .lbl2{min-width:0;overflow:hidden}.grow.bon .lbl2 small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--f-ui);font-size:10px;color:var(--muted);font-weight:800}
 .ytag{font-size:10px;color:#ffcf6a;display:block;line-height:1}
 .gtot{display:grid;grid-template-columns:1fr 46px 50px;align-items:center;padding:6px;background:#0c1d2b;border-top:3px solid var(--ink);font-family:var(--f-title);font-size:15px}
-.gtot span{text-align:center;color:var(--gold)}.gtot span:first-child{text-align:left;color:var(--text);font-size:13px}.gtot span:last-child{color:#8ee06a}
+.gtot span{text-align:center;color:var(--gold)}.gtot span:first-child{text-align:left;color:var(--text);font-size:13px}.gtot span:last-child{color:var(--mine)}
 /* dés */
 .tray{flex:none;position:relative;padding:10px 8px 8px;border-radius:22px;border:4px solid var(--ink);
   background:radial-gradient(ellipse at 50% 30%,rgba(255,255,255,.1),transparent 65%),repeating-radial-gradient(circle at 40% 40%,rgba(0,0,0,.05) 0 2px,transparent 2px 5px),linear-gradient(180deg,var(--felt),var(--felt2));
@@ -889,7 +891,7 @@ function renderGrid(mine) {
     if (canPick && isMe) { const p = catScore(cat, V.dice); return `<span class="me pick${p ? '' : ' zero'}" data-cat="${cat}">${p}</span>`; }
     return `<span class="${cls} empty">·</span>`;
   };
-  const head = `<div class="ghead" style="${tpl}"><span></span>${cols.map(o => `<span style="color:${o.i === net.me ? '#8ee06a' : '#f2c14e'}">${esc(o.s.n)}</span>`).join('')}</div>`;
+  const head = `<div class="ghead" style="${tpl}"><span></span>${cols.map(o => `<span style="color:${o.i === net.me ? '#5fe8d8' : '#f2c14e'}">${esc(o.s.n)}</span>`).join('')}</div>`;
   const T = cols.map(o => totals(o.s.card));
   const left = head + UP.map((c, n) => `<div class="grow" style="${tpl}"><span class="ic" title="${esc(t(c))}">${upIcon(n + 1)}</span>${cols.map(o => cell(o, c)).join('')}</div>`).join('')
     + `<div class="grow bon" style="${tpl}"><span class="lbl2">BONUS<small>${t('bonusIf')}</small></span>${cols.map((o, x) => `<span class="${o.i === net.me ? 'me' : 'v'}">${T[x].bonus ? 35 : T[x].up ? `<small style="font-size:11px">${T[x].up}/63</small>` : 0}</span>`).join('')}</div>`
