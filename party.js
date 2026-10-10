@@ -5,7 +5,7 @@
    API : Party.announce(jeu, code) · Party.busy = () => bool · Party.onJoinHere = (jeu, code) => bool · Party.mountPanel(el) */
 (() => {
 const DB = window.BG_DB || 'https://quoridor-7b9d9-default-rtdb.europe-west1.firebasedatabase.app';
-const GAMES = { qd: ['quoridor.html', 'Quoridor'], df: ['differences.html', '7 Différences'], uc: ['undercover.html', 'Undercover'], cn: ['codenames.html', 'Codenames'], dr: ['dessin.html', 'Dessine & Devine'], bj: ['blackjack.html', 'Blackjack'] };
+const GAMES = { qd: ['quoridor.html', 'Quoridor'], df: ['differences.html', '7 Différences'], uc: ['undercover.html', 'Undercover'], cn: ['codenames.html', 'Codenames'], dr: ['dessin.html', 'Dessine & Devine'], bj: ['blackjack.html', 'Blackjack'], ym: ['yams.html', 'Yam\'s'] };
 const STR = {
   fr: { title: 'Groupe d’amis', sub: 'Rejoignez le même groupe une seule fois : quand quelqu’un lance une partie, tout le monde est invité automatiquement.', create: 'Créer un groupe', join: 'Rejoindre', codePh: 'CODE', leave: 'Quitter le groupe',
     code: 'Code du groupe', members: 'Dans le groupe', auto: 'Rejoindre les parties automatiquement', launches: '<b>{n}</b> lance <b>{g}</b> !', go: 'Rejoindre', later: 'Plus tard', inSec: 'dans {s} s…', nobody: 'Personne d’autre pour l’instant',

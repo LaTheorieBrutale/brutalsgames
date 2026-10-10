@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#1a0f0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Brutal's Games">
+<title>Yam's</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;700;800;900&display=swap">
+<style>
+/* Yam's — « La Taverne » : table en bois, piste de dés en feutre rouge, chopes et bougies.
+   Écrans : accueil, salon, partie, fin. Chaque joueur choisit ses dés (skins). */
+:root{
+  --bg1:#140b07;--bg2:#2a170e;--ink:#0d0705;--panel:#3a2416;--panel2:#24160d;--line:#5a3a24;--text:#f8ecd8;--muted:#c9ae8a;
+  --felt:#8a1f2a;--felt2:#5a1219;--wood:#7a4a26;--gold:#f2c14e;--gold2:#c8902a;--red:#e04848;--green:#5cc24a;--blue:#4aa3ff;
+  --f-title:"Lilita One","Arial Black",system-ui,sans-serif;--f-ui:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{margin:0;color:var(--text);font-family:var(--f-ui);font-weight:700;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
+  background:radial-gradient(ellipse at 20% 0%,rgba(255,170,80,.22),transparent 45%),radial-gradient(ellipse at 85% 10%,rgba(255,170,80,.14),transparent 40%),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 3px,transparent 3px 90px),repeating-linear-gradient(90deg,rgba(255,220,170,.03) 0 1px,transparent 1px 13px),linear-gradient(180deg,var(--bg2),var(--bg1)) fixed;background-color:var(--bg1)}
+[hidden]{display:none!important}
+#deco{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#deco svg{position:absolute}
+.frame{position:relative;background:linear-gradient(180deg,var(--panel),var(--panel2));border:4px solid var(--ink);border-radius:22px;box-shadow:0 7px 0 var(--ink)}
+.btn{position:relative;font-family:var(--f-ui);font-weight:900;font-size:17px;color:var(--ink);cursor:pointer;line-height:1.1;text-decoration:none;
+  background:linear-gradient(180deg,#f6e4c6 0,#dcbf94 55%,#bb9a6a 100%);border:4px solid var(--ink);border-radius:15px;padding:9px 14px 8px;
+  box-shadow:0 5px 0 var(--ink),inset 0 3px 0 rgba(255,255,255,.4);transition:transform .07s,box-shadow .07s,filter .15s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink),inset 0 3px 0 rgba(255,255,255,.4)}
+@media (hover:hover){.btn:hover{filter:brightness(1.07)}}
+.btn:disabled{opacity:.42;cursor:default;transform:none}
+.btn.gold{background:linear-gradient(180deg,#fff0b8 0,var(--gold) 55%,var(--gold2) 100%)}
+.btn.red{background:linear-gradient(180deg,#ffb8b8 0,var(--red) 55%,#a82a2a 100%);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.btn.icon{padding:7px;border-radius:13px;flex:none}
+.btn.icon svg{width:24px;height:24px}
+.btn.wide{width:100%;padding:13px 14px 11px}
+.btn.sm{font-size:14px;padding:7px 10px 6px}
+.field{font-family:var(--f-ui);font-weight:800;font-size:18px;color:var(--text);background:var(--panel2);border:4px solid var(--ink);border-radius:14px;padding:9px 12px 8px;width:100%;min-width:0;outline:none;-webkit-user-select:text;user-select:text;box-shadow:inset 0 3px 0 rgba(0,0,0,.25)}
+.field::placeholder{color:var(--muted)}
+.field:focus{border-color:var(--gold)}
+.field.code{text-transform:uppercase;letter-spacing:.3em;text-align:center}
+label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-weight:900}
+.sep{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.sep::before,.sep::after{content:"";flex:1;height:3px;border-radius:2px;background:var(--line)}
+.err{margin:0;color:#ff9a9a;font-size:14px;min-height:1em}
+.nseg{display:flex;gap:6px;flex-wrap:wrap}
+.nseg .btn{flex:1;padding:8px 4px 7px;font-size:14px;background:var(--panel2);color:var(--text);box-shadow:0 3px 0 var(--ink);min-width:0}
+.nseg .btn[aria-pressed="true"]{background:linear-gradient(180deg,#fff0b8,var(--gold) 60%,var(--gold2));color:var(--ink)}
+.screen{position:fixed;inset:0;z-index:1;overflow-y:auto;display:flex;padding:16px;padding-block:calc(env(safe-area-inset-top,0px) + 14px) calc(env(safe-area-inset-bottom,0px) + 70px);animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0}}
+.col{width:100%;max-width:470px;margin:auto;display:flex;flex-direction:column;gap:14px;align-items:stretch}
+.topnav{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.panel{padding:16px;display:flex;flex-direction:column;gap:11px}
+.row{display:flex;gap:8px;align-items:center}
+.logo{display:flex;flex-direction:column;align-items:center;animation:drop .7s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes drop{from{opacity:0;transform:translateY(-40px) scale(.85)}}
+.logo .dice{display:flex;gap:6px;filter:drop-shadow(0 6px 0 var(--ink))}
+.logo .dice svg{width:56px;height:56px;animation:bob 3s ease-in-out infinite}
+.logo .dice svg:nth-child(2){animation-delay:-.6s;transform:rotate(8deg)}.logo .dice svg:nth-child(3){animation-delay:-1.2s}
+@keyframes bob{50%{translate:0 -7px;rotate:-6deg}}
+.logo-t{font-family:var(--f-title);font-size:clamp(54px,15vw,80px);line-height:.95;margin-top:4px;letter-spacing:.02em;color:var(--gold);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:0 6px 0 var(--ink)}
+.tagline{font-size:15px;margin-top:8px;background:var(--panel);border:3px solid var(--ink);border-radius:999px;padding:3px 14px 2px;box-shadow:0 3px 0 var(--ink);transform:rotate(-1.5deg)}
+.mode{display:flex;align-items:center;gap:12px;width:100%;padding:11px 14px 10px;border-radius:20px;text-align:left;justify-content:flex-start}
+.mode svg{width:42px;height:42px;flex:none}
+.mode span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mode b{font-weight:900;font-size:20px}
+.mode small{font-size:12.5px;font-weight:700;opacity:.85}
+.bigcode{font-family:var(--f-title);font-size:54px;letter-spacing:.18em;color:var(--gold);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;text-shadow:0 4px 0 var(--ink);text-align:center;padding-left:.18em;line-height:1}
+.wait-txt{margin:0;font-size:14px;color:var(--muted);text-align:center;line-height:1.45}
+.dots::after{content:"";animation:dots 1.2s steps(4) infinite}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+.plist{display:flex;flex-wrap:wrap;gap:6px}
+.pl{display:flex;align-items:center;gap:6px;font-size:14.5px;background:rgba(0,0,0,.25);border-radius:12px;padding:3px 9px 3px 3px;min-width:0}
+.pl svg{width:28px;height:28px;flex:none}
+.pl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* sélecteur de dés */
+.skins{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.skins button{background:rgba(0,0,0,.25);border:3px solid var(--ink);border-radius:14px;padding:6px 2px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text);font:inherit;font-size:10.5px;font-weight:900}
+.skins button svg{width:38px;height:38px}
+.skins button.on{border-color:var(--gold);background:rgba(242,193,78,.18);box-shadow:0 0 0 2px rgba(242,193,78,.35)}
+
+/* ---------- Partie ---------- */
+#game{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;gap:7px;padding:8px 10px;padding-block:calc(env(safe-area-inset-top,0px) + 8px) calc(env(safe-area-inset-bottom,0px) + 8px);max-width:760px;margin:0 auto}
+.hud{display:flex;align-items:center;gap:7px;padding:6px 8px;flex:none}
+.hud .mid{flex:1;min-width:0;text-align:center;line-height:1.1}
+.hud .mid small{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.hud .mid b{display:block;font-family:var(--f-title);font-size:17px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tray{flex:none;position:relative;padding:12px 10px 10px;border-radius:24px;border:4px solid var(--ink);
+  background:radial-gradient(ellipse at 50% 30%,rgba(255,255,255,.1),transparent 65%),repeating-radial-gradient(circle at 40% 40%,rgba(0,0,0,.05) 0 2px,transparent 2px 5px),linear-gradient(180deg,var(--felt),var(--felt2));
+  box-shadow:inset 0 0 0 9px var(--wood),inset 0 0 0 12px var(--ink),inset 0 0 26px 14px rgba(0,0,0,.4),0 7px 0 var(--ink);display:flex;flex-direction:column;align-items:center;gap:8px}
+.who{display:flex;align-items:center;gap:7px;font-size:14px;color:#ffe8d0;margin-top:2px}
+.who svg{width:24px;height:24px}
+.dicerow{display:flex;gap:clamp(5px,2vw,14px);justify-content:center;padding:6px 0 2px}
+.die{position:relative;width:clamp(44px,13vw,72px);height:clamp(44px,13vw,72px);background:none;border:0;padding:0;cursor:pointer;transition:transform .15s}
+.die svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 0 rgba(0,0,0,.55))}
+.die.held{transform:translateY(-8px)}
+.die.held::after{content:"";position:absolute;left:12%;right:12%;bottom:-13px;height:5px;border-radius:3px;background:var(--gold);box-shadow:0 0 10px var(--gold)}
+.die:disabled{cursor:default}
+.die.rolling svg{animation:tumble .62s cubic-bezier(.3,1.4,.5,1)}
+@keyframes tumble{0%{transform:translateY(-34px) rotate(-200deg) scale(.7)}60%{transform:translateY(4px) rotate(18deg) scale(1.06)}100%{transform:none}}
+.die.blank svg{opacity:.35}
+.rollbar{display:flex;align-items:center;gap:10px;width:100%;justify-content:center}
+.rollbar .btn{min-width:150px;font-size:19px}
+.pipsleft{display:flex;gap:4px}
+.pipsleft i{width:12px;height:12px;border-radius:50%;border:2.5px solid var(--ink);background:var(--gold)}
+.pipsleft i.off{background:rgba(0,0,0,.35)}
+.hint{margin:0;font-size:13px;color:#ffe0c8;text-align:center;min-height:1.2em}
+.tbar{width:100%;height:6px;border-radius:4px;background:rgba(0,0,0,.4);overflow:hidden;border:2px solid var(--ink)}
+.tbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#ff9a3c);transform-origin:left;transition:transform .25s linear}
+/* feuille de score */
+.sheetwrap{flex:1;min-height:0;overflow:auto;border-radius:18px;border:4px solid var(--ink);background:#f4e8cf;box-shadow:0 6px 0 var(--ink);color:#2a1a10}
+table.score{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
+table.score th,table.score td{padding:5px 6px;border-bottom:1.5px solid rgba(90,58,36,.25);text-align:center;white-space:nowrap}
+table.score th:first-child,table.score td:first-child{position:sticky;left:0;z-index:1;text-align:left;background:#efe0c0;font-weight:900;border-right:2px solid rgba(90,58,36,.35)}
+table.score thead th{position:sticky;top:0;z-index:2;background:#e2cfa6;font-size:12px;max-width:80px;overflow:hidden;text-overflow:ellipsis}
+table.score thead th:first-child{z-index:3}
+table.score thead th.cur{background:var(--gold)}
+table.score thead th svg{width:18px;height:18px;vertical-align:-4px;margin-right:2px}
+table.score td small{display:block;font-size:10px;color:#8a6a4a;font-weight:800}
+table.score tr.sum td{background:#e8d6b0;font-weight:900}
+table.score tr.total td{background:#2a1a10;color:var(--gold);font-family:var(--f-title);font-size:17px}
+table.score tr.total td:first-child{background:#2a1a10;color:var(--gold)}
+table.score td.pick{cursor:pointer;color:#1f7a2e;font-weight:900;background:rgba(92,194,74,.14);outline:2px dashed rgba(31,122,46,.5);outline-offset:-3px}
+table.score td.pick.zero{color:#a83a3a;background:rgba(224,72,72,.08);outline-color:rgba(168,58,58,.4)}
+@media (hover:hover){table.score td.pick:hover{background:rgba(92,194,74,.35)}}
+table.score td.just{animation:flash 1s}
+@keyframes flash{0%,40%{background:var(--gold)}}
+table.score tr.yb td{color:#b06a00;font-weight:900}
+
+/* ---------- Fin ---------- */
+.banner{font-family:var(--f-title);font-size:clamp(30px,9vw,48px);text-align:center;line-height:1.05;color:var(--gold);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink);transform:rotate(-2deg);animation:drop .6s cubic-bezier(.2,1.5,.4,1) both}
+.ranks{display:flex;flex-direction:column;gap:5px}
+.ranks .pl{justify-content:flex-start;font-size:16px}
+.ranks .pl b{margin-left:auto;color:var(--gold);font-family:var(--f-title);font-weight:400}
+
+/* ---------- Chat ---------- */
+.rchat{position:fixed;z-index:22;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);transform:translateX(-50%);width:min(460px,calc(100% - 20px));height:min(62vh,460px);display:flex;flex-direction:column;gap:8px;padding:10px;animation:fadeIn .2s}
+.rc-head{display:flex;align-items:center;justify-content:space-between;font-family:var(--f-title);font-size:24px}
+.rc-list{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:6px;border-radius:12px;background:rgba(0,0,0,.25);font-size:14.5px;line-height:1.35}
+.rc-msg{display:flex;gap:6px;align-items:flex-start;overflow-wrap:anywhere}
+.rc-msg svg{width:26px;height:26px;flex:none}
+.rc-msg b{margin-right:4px}
+.rc-msg.me{flex-direction:row-reverse;text-align:right}
+.rc-msg .bub{background:var(--panel2);border:2px solid var(--ink);border-radius:12px;padding:3px 9px;max-width:80%}
+.rc-msg.me .bub{background:rgba(242,193,78,.18)}
+.rc-msg.sys{justify-content:center;color:var(--muted);font-size:12.5px}
+.rc-empty{margin:auto;color:var(--muted);font-size:13px;text-align:center}
+.rc-form{display:flex;gap:6px}
+.rc-form .field{font-size:16px;padding:8px 10px}
+.tr{cursor:help}.tr::after{content:" 🌐";font-size:10px;opacity:.65}
+.chatbar{position:relative;display:flex;align-items:center;gap:8px;width:100%;padding:7px 12px;font:inherit;font-size:14px;color:var(--text);cursor:pointer;text-align:left;box-shadow:0 4px 0 var(--ink);border-radius:16px;flex:none}
+.chatbar .cb-ico{font-size:19px;flex:none}
+.chatbar .cb-txt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chatbar .cb-txt b{margin-right:4px}
+.chatbar .cb-txt i{font-style:normal;color:var(--muted)}
+.badge{min-width:22px;height:22px;border-radius:11px;background:var(--red);color:#fff;font-size:12px;display:grid;place-items:center;border:2.5px solid var(--ink);padding:0 5px;flex:none}
+.badge:empty{display:none}
+.chatbtn{position:relative}.chatbtn .badge{position:absolute;top:-8px;right:-8px}
+@media (min-width:1150px){
+  body.netlive #rc{display:flex!important;left:auto;right:18px;top:18px;bottom:18px;height:auto;width:330px;transform:none}
+  body.netlive .chatbtn,body.netlive .chatbar,body.netlive #rcClose{display:none}
+  body.netlive #game{margin:0;left:max(10px,calc(50% - 560px));right:366px;max-width:820px}
+}
+#gchatHome{height:230px}
+.sheet{position:fixed;z-index:25;left:50%;top:50%;transform:translate(-50%,-50%);width:min(400px,calc(100% - 28px));max-height:calc(100% - 40px);overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;animation:fadeIn .2s}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;font-family:var(--f-title);font-size:28px}
+.rules{font-size:14.5px;line-height:1.5}
+.rules p{margin:0 0 8px}.rules b{color:var(--gold)}
+#toast{position:fixed;z-index:40;left:50%;top:40%;transform:translate(-50%,-50%) scale(.8);background:var(--panel);color:var(--text);border:4px solid var(--ink);border-radius:16px;padding:9px 16px 8px;font-size:17px;box-shadow:0 5px 0 var(--ink);opacity:0;pointer-events:none;transition:opacity .2s,transform .25s cubic-bezier(.2,1.6,.4,1);max-width:88vw;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#toast.bad{background:var(--red);color:#fff}
+#toast.good{background:var(--gold);color:var(--ink)}
+#toast.yams{font-family:var(--f-title);font-size:46px;background:var(--gold);color:var(--ink);-webkit-text-stroke:0;padding:14px 26px 10px}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:35}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="skinDefs"></defs></svg>
+<div id="deco" aria-hidden="true">
+  <svg style="right:-18px;top:10vh;width:110px;height:150px" viewBox="0 0 80 110"><path d="M14 30h44v66a8 8 0 0 1-8 8H22a8 8 0 0 1-8-8z" fill="#f2c14e" stroke="#0d0705" stroke-width="4"/><path d="M58 44h8a8 8 0 0 1 8 8v20a8 8 0 0 1-8 8h-8" fill="none" stroke="#0d0705" stroke-width="7"/><path d="M58 44h8a8 8 0 0 1 8 8v20a8 8 0 0 1-8 8h-8" fill="none" stroke="#c8902a" stroke-width="3"/><path d="M10 30c0-12 8-18 16-14 4-10 18-10 22 0 8-4 16 2 14 14z" fill="#fff8e8" stroke="#0d0705" stroke-width="4"/><path d="M26 50v40M42 50v40" stroke="#c8902a" stroke-width="4"/></svg>
+  <svg style="left:-10px;bottom:12vh;width:70px;height:130px" viewBox="0 0 50 100"><rect x="14" y="40" width="22" height="56" rx="4" fill="#f3e7c9" stroke="#0d0705" stroke-width="4"/><path d="M25 38c-7-8-2-18 0-26 3 8 8 16 0 26z" fill="#ffb347" stroke="#0d0705" stroke-width="3"/><path d="M25 34c-3-4-1-8 0-12 2 4 3 8 0 12z" fill="#fff3b0"/></svg>
+</div>
+
+<!-- ======== ACCUEIL ======== -->
+<section class="screen" id="home">
+  <div class="col">
+    <div class="topnav">
+      <a class="btn" href="index.html"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span data-i18n="games">Jeux</span></a>
+      <button class="btn icon" id="bSet" data-i18n-aria="settings"><svg viewBox="0 0 24 24"><path d="M12 2.5l2 2.6 3.2-.6.8 3.1 3 1.4-1.1 3 1.1 3-3 1.4-.8 3.1-3.2-.6-2 2.6-2-2.6-3.2.6-.8-3.1-3-1.4 1.1-3-1.1-3 3-1.4.8-3.1 3.2.6z" fill="currentColor" stroke="#0d0705" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="#0d0705" stroke-width="1.6"/></svg></button>
+    </div>
+    <div class="logo">
+      <div class="dice" id="logoDice"></div>
+      <div class="logo-t">Yam's</div>
+      <div class="tagline" data-i18n="tagline">Lance, garde, et vise le Yam's !</div>
+    </div>
+    <div class="frame panel">
+      <label for="inName" data-i18n="nick">Ton pseudo</label>
+      <input class="field" id="inName" maxlength="14" autocomplete="off" data-i18n-ph="namePh">
+      <label data-i18n="myDice">Tes dés</label>
+      <div class="skins" id="skinsHome"></div>
+      <button class="btn mode gold" id="mOnline">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#5cc24a" stroke="#0d0705" stroke-width="2"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" fill="none" stroke="#0d0705" stroke-width="1.8"/></svg>
+        <span><b data-i18n="online">Partie entre amis</b><small data-i18n="onlineSub">en ligne, 2 à 8 joueurs</small></span>
+      </button>
+      <button class="btn mode" id="mSolo">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="#fff" stroke="#0d0705" stroke-width="2"/><circle cx="8" cy="8" r="1.8" fill="#0d0705"/><circle cx="12" cy="12" r="1.8" fill="#0d0705"/><circle cx="16" cy="16" r="1.8" fill="#0d0705"/></svg>
+        <span><b data-i18n="solo">Partie solo</b><small id="soloSub" data-i18n="soloSub">bats ton record</small></span>
+      </button>
+      <button class="btn" id="bRules" data-i18n="howTo">Comment jouer ?</button>
+    </div>
+    <div class="frame panel"><div id="gchatHome"></div></div>
+  </div>
+</section>
+
+<!-- ======== EN LIGNE ======== -->
+<section class="screen" id="online" hidden>
+  <div class="col">
+    <div class="topnav"><button class="btn" id="onBack"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span data-i18n="back">Retour</span></button></div>
+    <div class="frame panel" id="onForm">
+      <button class="btn wide gold" id="bHost" style="font-size:20px;padding:16px" data-i18n="create">Créer une partie</button>
+      <div class="sep" data-i18n="orJoin">ou rejoindre des amis</div>
+      <div class="row"><input class="field code" id="inCode" maxlength="5" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="btn" id="bJoin" data-i18n="join">Rejoindre</button></div>
+      <p class="err" id="onErr"></p>
+    </div>
+    <div class="frame panel" id="onWait" hidden>
+      <div id="codeBox" style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <label data-i18n="gameCode">Code de la partie</label>
+        <div class="bigcode" id="codeShow">·····</div>
+        <button class="btn sm" id="bCopy" data-i18n="copyCode">Copier le code</button>
+      </div>
+      <label data-i18n="players">Joueurs</label>
+      <div class="plist" id="lobbyList"></div>
+      <label data-i18n="myDice">Tes dés</label>
+      <div class="skins" id="skinsLobby"></div>
+      <button class="btn wide gold" id="bStart" data-pstart data-i18n="start">Lancer la partie</button>
+      <p class="wait-txt" id="waitTxt"></p>
+      <button class="frame chatbar" id="bChatL"><span class="cb-ico">💬</span><span class="cb-txt"></span><span class="badge"></span></button>
+      <button class="btn sm" id="bLeave" data-i18n="leave">Quitter</button>
+    </div>
+  </div>
+</section>
+
+<!-- ======== PARTIE ======== -->
+<section id="game" hidden>
+  <div class="frame hud">
+    <button class="btn icon" id="bQuit" data-i18n-aria="quit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="mid"><small id="hRound"></small><b id="hInfo"></b></div>
+    <span id="hudDock" style="display:inline-flex"></span>
+    <button class="btn icon chatbtn" id="bChat" data-i18n-aria="chat">💬<span class="badge"></span></button>
+  </div>
+  <div class="tray">
+    <div class="who" id="who"></div>
+    <div class="dicerow" id="dice"></div>
+    <div class="rollbar"><div class="pipsleft" id="rollsLeft"></div><button class="btn gold" id="bRoll" data-i18n="roll">🎲 Lancer</button></div>
+    <p class="hint" id="hint"></p>
+    <div class="tbar"><i id="tbar"></i></div>
+  </div>
+  <div class="sheetwrap"><table class="score" id="score"></table></div>
+  <button class="frame chatbar" id="chatBar"><span class="cb-ico">💬</span><span class="cb-txt"></span><span class="badge"></span></button>
+</section>
+
+<!-- ======== FIN ======== -->
+<section class="screen" id="end" hidden>
+  <div class="col">
+    <div class="banner" id="endTitle"></div>
+    <div class="frame panel">
+      <div class="ranks" id="ranks"></div>
+      <button class="btn wide gold" id="bAgain" data-i18n="again">Rejouer</button>
+      <p class="wait-txt" id="endWait"></p>
+      <button class="btn" id="bMenu" data-i18n="lobby">Retour au salon</button>
+    </div>
+  </div>
+</section>
+
+<div class="frame rchat" id="rc" hidden>
+  <div class="rc-head"><span>💬 <span data-i18n="chat">Chat</span></span><button class="btn icon" id="rcClose" data-i18n-aria="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="rc-list" id="rcList"></div>
+  <form class="rc-form" id="rcForm" autocomplete="off"><input class="field" id="rcIn" maxlength="160" enterkeyhint="send" data-i18n-ph="chatPh"><button class="btn gold" type="submit" data-i18n="send">Envoyer</button></form>
+</div>
+<div class="frame sheet" id="settings" hidden>
+  <div class="sheet-head"><span data-i18n="settings">Réglages</span><button class="btn icon" id="bSetClose" data-i18n-aria="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <span class="lbl" data-i18n="music">Musique</span><div class="nseg" id="musSeg"></div>
+  <span class="lbl" data-i18n="sound">Sons</span><div class="nseg" id="sndSeg"></div>
+  <span class="lbl" data-i18n="language">Langue</span><div class="nseg langseg"></div>
+</div>
+<div class="frame sheet" id="rules" hidden>
+  <div class="sheet-head"><span data-i18n="howTo">Comment jouer ?</span><button class="btn icon" id="bRulesClose" data-i18n-aria="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="rules" data-i18n-html="rulesTxt"></div>
+</div>
+<div id="toast" role="status"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+<script src="shared.js"></script>
+<script src="chat.js"></script>
+<script src="party.js" data-game="ym"></script>
+<script>
+(() => {
+'use strict';
+const { $, esc, t } = P;
+const rnd = () => { try { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] / 4294967296; } catch (e) { return Math.random(); } };
+const d6 = () => 1 + Math.floor(rnd() * 6);
+
+/* ---------- Textes ---------- */
+P.addStrings({
+  fr: { games: 'Jeux', tagline: 'Lance, garde, et vise le Yam’s !', nick: 'Ton pseudo', myDice: 'Tes dés', online: 'Partie entre amis', onlineSub: 'en ligne, 2 à 8 joueurs', solo: 'Partie solo', soloSub: 'bats ton record', record: 'record : {n} points', howTo: 'Comment jouer ?',
+    create: 'Créer une partie', orJoin: 'ou rejoindre des amis', join: 'Rejoindre', gameCode: 'Code de la partie', copyCode: 'Copier le code', copied: 'Copié !', start: 'Lancer la partie', leave: 'Quitter', players: 'Joueurs',
+    badCode: 'Entre le code à 5 caractères.', connecting: 'Connexion…', noGame: 'Aucune partie avec ce code.', netErr: 'Connexion impossible. Réessaie.', full: 'Partie complète ou déjà commencée.', hostLeft: 'L’hôte a quitté la partie.',
+    waitHost: 'Tout le monde est là ? Lance la partie !', waitGuest: '<span class="dots">L’hôte va lancer la partie</span>', you: 'toi',
+    round: 'Tour {n}/13', yourTurn: 'À toi de jouer !', turnOf: 'Au tour de {name}', roll: '🎲 Lancer', rollAgain: '🎲 Relancer', rollsLeft: '{n} lancer(s)',
+    hintFirst: 'Lance les dés !', hintHold: 'Touche les dés à garder, relance, ou choisis une case dans la feuille.', hintPick: 'Choisis une case dans la feuille de score.', hintWatch: '{name} joue…',
+    scored: '{name} : {cat} → {n}', yams: 'YAM’S !', yamsBonus: 'Yam’s bonus +100 !', player: 'Joueur',
+    c1: 'As (1)', c2: 'Deux', c3: 'Trois', c4: 'Quatre', c5: 'Cinq', c6: 'Six', upper: 'Total haut', bonus: 'Bonus (63+)', c3k: 'Brelan', c4k: 'Carré', cfh: 'Full', css: 'Petite suite', cls: 'Grande suite', cy: 'Yam’s', cch: 'Chance', yb: 'Bonus Yam’s', lower: 'Total bas', total: 'TOTAL',
+    s3k: 'somme', s4k: 'somme', sfh: '25', sss: '30', sls: '40', sy: '50', sch: 'somme',
+    winner: '{name} gagne avec {n} points !', tie: 'Égalité !', soloEnd: '{n} points !', newRecord: 'Nouveau record ! 🏆', again: 'Rejouer', lobby: 'Retour au salon', hostAgain: 'L’hôte peut relancer une partie.',
+    quitQ: 'Quitter la partie ?', left: '{name} a quitté la partie', joinedSys: '{name} rejoint la partie',
+    chat: 'Chat', send: 'Envoyer', chatPh: 'Écris un message…', chatEmpty: 'Discutez ici !', chatInvite: 'Chat de la partie : touche pour écrire…', translated: 'Traduit automatiquement',
+    music: 'Musique', musOn: 'Activée', musOff: 'Coupée', on: 'Activés', off: 'Coupés',
+    sk_classic: 'Classique', sk_ruby: 'Rubis', sk_emerald: 'Émeraude', sk_sapphire: 'Saphir', sk_gold: 'Or', sk_wood: 'Bois', sk_bone: 'Os', sk_galaxy: 'Galaxie', sk_candy: 'Bonbon', sk_lava: 'Lave',
+    rulesTxt: '<p>À ton tour, lance les <b>5 dés</b> jusqu’à <b>3 fois</b>. Entre deux lancers, touche les dés que tu veux garder.</p><p>Ensuite, inscris ton résultat dans <b>une case</b> de ta feuille (une seule fois chacune, 0 si ça ne colle pas). Haut : la somme des 1, des 2… jusqu’aux 6 (<b>bonus de 35</b> si tu fais 63 ou plus). Bas : brelan et carré (somme des dés), full 25, petite suite 30, grande suite 40, <b>Yam’s</b> (5 dés pareils) 50, chance (somme).</p><p>Chaque Yam’s en plus rapporte <b>+100</b>. Après 13 tours, le plus gros total gagne !</p><p>Choisis ton skin de dés : tout le monde les voit quand c’est ton tour.</p>' },
+  en: { games: 'Games', tagline: 'Roll, hold, and go for the Yahtzee!', nick: 'Your nickname', myDice: 'Your dice', online: 'Game with friends', onlineSub: 'online, 2 to 8 players', solo: 'Solo game', soloSub: 'beat your high score', record: 'best: {n} points', howTo: 'How to play?',
+    create: 'Create a game', orJoin: 'or join friends', join: 'Join', gameCode: 'Game code', copyCode: 'Copy code', copied: 'Copied!', start: 'Start the game', leave: 'Leave', players: 'Players',
+    badCode: 'Enter the 5-character code.', connecting: 'Connecting…', noGame: 'No game with this code.', netErr: 'Can’t connect. Try again.', full: 'Game full or already started.', hostLeft: 'The host left the game.',
+    waitHost: 'Everyone here? Start the game!', waitGuest: '<span class="dots">The host will start the game</span>', you: 'you',
+    round: 'Turn {n}/13', yourTurn: 'Your turn!', turnOf: '{name}’s turn', roll: '🎲 Roll', rollAgain: '🎲 Roll again', rollsLeft: '{n} roll(s)',
+    hintFirst: 'Roll the dice!', hintHold: 'Tap dice to hold them, roll again, or pick a box on the sheet.', hintPick: 'Pick a box on your score sheet.', hintWatch: '{name} is playing…',
+    scored: '{name}: {cat} → {n}', yams: 'YAHTZEE!', yamsBonus: 'Yahtzee bonus +100!', player: 'Player',
+    c1: 'Ones', c2: 'Twos', c3: 'Threes', c4: 'Fours', c5: 'Fives', c6: 'Sixes', upper: 'Upper total', bonus: 'Bonus (63+)', c3k: '3 of a kind', c4k: '4 of a kind', cfh: 'Full house', css: 'Sm. straight', cls: 'Lg. straight', cy: 'Yahtzee', cch: 'Chance', yb: 'Yahtzee bonus', lower: 'Lower total', total: 'TOTAL',
+    s3k: 'sum', s4k: 'sum', sfh: '25', sss: '30', sls: '40', sy: '50', sch: 'sum',
+    winner: '{name} wins with {n} points!', tie: 'It’s a tie!', soloEnd: '{n} points!', newRecord: 'New high score! 🏆', again: 'Play again', lobby: 'Back to lobby', hostAgain: 'The host can start a new game.',
+    quitQ: 'Leave the game?', left: '{name} left the game', joinedSys: '{name} joins the game',
+    chat: 'Chat', send: 'Send', chatPh: 'Type a message…', chatEmpty: 'Talk here!', chatInvite: 'Game chat: tap to write…', translated: 'Auto-translated',
+    music: 'Music', musOn: 'On', musOff: 'Off', on: 'On', off: 'Off',
+    sk_classic: 'Classic', sk_ruby: 'Ruby', sk_emerald: 'Emerald', sk_sapphire: 'Sapphire', sk_gold: 'Gold', sk_wood: 'Wood', sk_bone: 'Bone', sk_galaxy: 'Galaxy', sk_candy: 'Candy', sk_lava: 'Lava',
+    rulesTxt: '<p>On your turn, roll the <b>5 dice</b> up to <b>3 times</b>. Between rolls, tap the dice you want to keep.</p><p>Then write your result in <b>one box</b> of your sheet (each box once, 0 if it doesn’t fit). Upper: the sum of 1s, 2s… up to 6s (<b>35 bonus</b> at 63 or more). Lower: 3 and 4 of a kind (sum of dice), full house 25, small straight 30, large straight 40, <b>Yahtzee</b> (5 of a kind) 50, chance (sum).</p><p>Each extra Yahtzee scores <b>+100</b>. After 13 turns, the highest total wins!</p><p>Pick your dice skin: everyone sees it on your turn.</p>' },
+  cs: { games: 'Hry', tagline: 'Hoď, podrž a jdi po Yamsu!', nick: 'Tvoje přezdívka', myDice: 'Tvoje kostky', online: 'Hra s kamarády', onlineSub: 'online, 2 až 8 hráčů', solo: 'Hra sólo', soloSub: 'překonej svůj rekord', record: 'rekord: {n} bodů', howTo: 'Jak hrát?',
+    create: 'Vytvořit hru', orJoin: 'nebo se připoj ke kamarádům', join: 'Připojit', gameCode: 'Kód hry', copyCode: 'Kopírovat kód', copied: 'Zkopírováno!', start: 'Spustit hru', leave: 'Odejít', players: 'Hráči',
+    badCode: 'Zadej 5místný kód.', connecting: 'Připojování…', noGame: 'Hra s tímto kódem neexistuje.', netErr: 'Nelze se připojit. Zkus to znovu.', full: 'Hra je plná nebo už začala.', hostLeft: 'Hostitel opustil hru.',
+    waitHost: 'Jsou všichni tady? Spusť hru!', waitGuest: '<span class="dots">Hostitel brzy spustí hru</span>', you: 'ty',
+    round: 'Kolo {n}/13', yourTurn: 'Jsi na tahu!', turnOf: 'Na tahu: {name}', roll: '🎲 Hodit', rollAgain: '🎲 Hodit znovu', rollsLeft: 'hody: {n}',
+    hintFirst: 'Hoď kostkami!', hintHold: 'Klepni na kostky, které chceš nechat, hoď znovu, nebo vyber políčko.', hintPick: 'Vyber políčko v tabulce.', hintWatch: '{name} hraje…',
+    scored: '{name}: {cat} → {n}', yams: 'YAMS!', yamsBonus: 'Bonus za Yams +100!', player: 'Hráč',
+    c1: 'Jedničky', c2: 'Dvojky', c3: 'Trojky', c4: 'Čtyřky', c5: 'Pětky', c6: 'Šestky', upper: 'Horní součet', bonus: 'Bonus (63+)', c3k: 'Trojice', c4k: 'Čtveřice', cfh: 'Full house', css: 'Malá postupka', cls: 'Velká postupka', cy: 'Yams', cch: 'Šance', yb: 'Bonus Yams', lower: 'Dolní součet', total: 'CELKEM',
+    s3k: 'součet', s4k: 'součet', sfh: '25', sss: '30', sls: '40', sy: '50', sch: 'součet',
+    winner: '{name} vyhrává s {n} body!', tie: 'Remíza!', soloEnd: '{n} bodů!', newRecord: 'Nový rekord! 🏆', again: 'Hrát znovu', lobby: 'Zpět do lobby', hostAgain: 'Hostitel může spustit novou hru.',
+    quitQ: 'Opustit hru?', left: '{name} opustil hru', joinedSys: '{name} se připojuje',
+    chat: 'Chat', send: 'Odeslat', chatPh: 'Napiš zprávu…', chatEmpty: 'Diskutujte tady!', chatInvite: 'Chat hry: klepni a piš…', translated: 'Automaticky přeloženo',
+    music: 'Hudba', musOn: 'Zapnutá', musOff: 'Vypnutá', on: 'Zapnuté', off: 'Vypnuté',
+    sk_classic: 'Klasika', sk_ruby: 'Rubín', sk_emerald: 'Smaragd', sk_sapphire: 'Safír', sk_gold: 'Zlato', sk_wood: 'Dřevo', sk_bone: 'Kost', sk_galaxy: 'Galaxie', sk_candy: 'Bonbon', sk_lava: 'Láva',
+    rulesTxt: '<p>Na tahu hoď <b>5 kostkami</b> až <b>3krát</b>. Mezi hody klepni na kostky, které chceš nechat.</p><p>Pak zapiš výsledek do <b>jednoho políčka</b> (každé jen jednou, 0 když nesedí). Nahoře: součet jedniček, dvojek… až šestek (<b>bonus 35</b> za 63 a víc). Dole: trojice a čtveřice (součet kostek), full house 25, malá postupka 30, velká postupka 40, <b>Yams</b> (5 stejných) 50, šance (součet).</p><p>Každý další Yams dává <b>+100</b>. Po 13 kolech vyhrává nejvyšší součet!</p><p>Vyber si vzhled kostek: všichni ho uvidí, když jsi na tahu.</p>' }
+});
+
+/* ---------- Skins de dés ---------- */
+const SKINS = {
+  classic: { f: ['#ffffff', '#e4ded2'], p: '#1c1620', e: '#0d0705', s: 'dot' },
+  ruby: { f: ['#ff8a96', '#c8202f'], p: '#ffffff', e: '#0d0705', s: 'dot' },
+  emerald: { f: ['#8af0b4', '#1f9a5a'], p: '#ffffff', e: '#0d0705', s: 'dot' },
+  sapphire: { f: ['#8ac4ff', '#1f4fb8'], p: '#ffffff', e: '#0d0705', s: 'dot' },
+  gold: { f: ['#fff3b8', '#e0a020'], p: '#6a4200', e: '#0d0705', s: 'star' },
+  wood: { f: ['#e2b07a', '#9a6232'], p: '#3a2210', e: '#0d0705', s: 'dot', grain: 1 },
+  bone: { f: ['#f6ead0', '#c8b48a'], p: '#3a1a1a', e: '#0d0705', s: 'skull' },
+  galaxy: { f: ['#6a4ab0', '#1a0f3a'], p: '#ffe08a', e: '#0d0705', s: 'star', stars: 1 },
+  candy: { f: ['#ffe0f2', '#ff7ab8'], p: '#ffffff', e: '#0d0705', s: 'heart', stroke: '#c83a7a' },
+  lava: { f: ['#ffb05a', '#c8361e'], p: '#2a0a00', e: '#0d0705', s: 'dot', cracks: 1 }
+};
+const SKIN_IDS = Object.keys(SKINS);
+$('#skinDefs').innerHTML = SKIN_IDS.map(id => `<linearGradient id="g_${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${SKINS[id].f[0]}"/><stop offset="1" stop-color="${SKINS[id].f[1]}"/></linearGradient>`).join('');
+const PIPS = { 1: [[50, 50]], 2: [[28, 28], [72, 72]], 3: [[26, 26], [50, 50], [74, 74]], 4: [[28, 28], [72, 28], [28, 72], [72, 72]], 5: [[27, 27], [73, 27], [50, 50], [27, 73], [73, 73]], 6: [[28, 24], [72, 24], [28, 50], [72, 50], [28, 76], [72, 76]] };
+function pip(sk, x, y, big) {
+  const r = big ? 11 : 8.5, c = sk.p, st = sk.stroke ? ` stroke="${sk.stroke}" stroke-width="1.5"` : '';
+  if (sk.s === 'star') { const pts = []; for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * 0.45 : r * 1.1; pts.push((x + rr * Math.cos(a)).toFixed(1) + ',' + (y + rr * Math.sin(a)).toFixed(1)); } return `<polygon points="${pts.join(' ')}" fill="${c}"/>`; }
+  if (sk.s === 'heart') { const s = r / 9; return `<path d="M${x} ${y + 8 * s} C${x - 12 * s} ${y} ${x - 8 * s} ${y - 9 * s} ${x} ${y - 4 * s} C${x + 8 * s} ${y - 9 * s} ${x + 12 * s} ${y} ${x} ${y + 8 * s}z" fill="${c}"${st}/>`; }
+  if (sk.s === 'skull') { const s = r / 9; return `<g><circle cx="${x}" cy="${y - 1.5 * s}" r="${8 * s}" fill="${c}"/><rect x="${x - 4.5 * s}" y="${y + 3 * s}" width="${9 * s}" height="${5 * s}" rx="${1.5 * s}" fill="${c}"/><circle cx="${x - 3 * s}" cy="${y - 2 * s}" r="${2.3 * s}" fill="${sk.f[0]}"/><circle cx="${x + 3 * s}" cy="${y - 2 * s}" r="${2.3 * s}" fill="${sk.f[0]}"/></g>`; }
+  return `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/><circle cx="${x - r * .3}" cy="${y - r * .3}" r="${r * .28}" fill="rgba(255,255,255,.25)"/>`;
+}
+function dieSVG(v, skinId) {
+  const id = SKINS[skinId] ? skinId : 'classic', sk = SKINS[id];
+  let extra = '';
+  if (sk.grain) extra = '<path d="M14 30c20 4 50-4 72 2M12 58c24 5 52-3 76 3M16 80c18 3 46-2 68 1" stroke="rgba(90,50,20,.35)" stroke-width="2" fill="none"/>';
+  if (sk.stars) extra = '<g fill="#fff" opacity=".75"><circle cx="20" cy="68" r="1.4"/><circle cx="82" cy="40" r="1.2"/><circle cx="60" cy="86" r="1.3"/><circle cx="38" cy="14" r="1.1"/><circle cx="84" cy="80" r="1"/></g>';
+  if (sk.cracks) extra = '<path d="M10 40l14 6 6 14M90 64l-16-2-8 14M60 8l-4 12 10 6" stroke="#ffe08a" stroke-width="2.5" fill="none" opacity=".8"/>';
+  const pips = v ? PIPS[v].map(([x, y]) => pip(sk, x, y, v === 1)).join('') : '';
+  return `<svg viewBox="0 0 100 100"><rect x="4" y="4" width="92" height="92" rx="20" fill="url(#g_${id})" stroke="${sk.e}" stroke-width="5"/><rect x="11" y="9" width="78" height="22" rx="11" fill="rgba(255,255,255,.22)"/>${extra}${pips}</svg>`;
+}
+let mySkin = SKINS[P.get('ym-skin', '')] ? P.get('ym-skin', '') : 'classic';
+function renderSkins() {
+  const html = SKIN_IDS.map((id, k) => `<button data-skin="${id}" class="${id === mySkin ? 'on' : ''}" aria-label="${esc(t('sk_' + id))}">${dieSVG((k % 6) + 1, id)}<span>${esc(t('sk_' + id))}</span></button>`).join('');
+  ['#skinsHome', '#skinsLobby'].forEach(s => { $(s).innerHTML = html; });
+  $('#logoDice').innerHTML = [5, 6, 1].map(v => dieSVG(v, mySkin)).join('');
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-skin]'); if (!b) return;
+  mySkin = b.dataset.skin; P.set('ym-skin', mySkin); P.sfx('click'); renderSkins();
+  if (net.role === 'guest' && net.conn && net.conn.open) net.conn.send({ t: 'skin', s: mySkin });
+  if (net.role === 'host' && net.roster[0]) { net.roster[0].skin = mySkin; if (S && S.seats[0]) { S.seats[0].skin = mySkin; sync(); } else broadcastLobby(); }
+});
+
+/* ---------- Avatars ---------- */
+const COLORS = ['#e04848', '#4aa3ff', '#5cc24a', '#f2c14e', '#b48aff', '#ff8ac8', '#ff9a3c', '#3ad0b0', '#c0b8a8', '#d89a5a'];
+const avatar = seat => { const c = COLORS[seat % 10], I = '#0d0705';
+  return `<svg viewBox="0 0 40 40"><rect x="5" y="5" width="30" height="30" rx="8" fill="${c}" stroke="${I}" stroke-width="2.5"/><circle cx="15" cy="17" r="2.6" fill="${I}"/><circle cx="25" cy="17" r="2.6" fill="${I}"/><path d="M14 25q6 5 12 0" fill="none" stroke="${I}" stroke-width="2.4" stroke-linecap="round"/></svg>`; };
+
+const SCREENS = ['home', 'online', 'game', 'end'];
+const show = id => { SCREENS.forEach(s => { $('#' + s).hidden = s !== id; }); document.body.classList.toggle('ingame', id === 'game'); if (window.BGDock) BGDock.slot(id === 'game' ? $('#hudDock') : null, true); };
+let toastT;
+function toast(msg, cls, ms) { const el = $('#toast'); el.innerHTML = msg; el.className = cls === true ? 'bad' : cls || ''; void el.offsetWidth; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), ms || 2200); }
+function renderSnd() { $('#sndSeg').innerHTML = `<button class="btn" data-snd="1" aria-pressed="${P.soundOn()}">${t('on')}</button><button class="btn" data-snd="0" aria-pressed="${!P.soundOn()}">${t('off')}</button>`; }
+document.addEventListener('click', e => { const b = e.target.closest('[data-snd]'); if (b) { P.setSound(b.dataset.snd === '1'); renderSnd(); P.sfx('click'); } });
+$('#bSet').onclick = () => { P.unlockAudio(); P.sfx('click'); $('#settings').hidden = !$('#settings').hidden; };
+$('#bSetClose').onclick = () => { P.sfx('click'); $('#settings').hidden = true; };
+$('#bRules').onclick = () => { P.unlockAudio(); P.sfx('click'); $('#rules').hidden = false; };
+$('#bRulesClose').onclick = () => { P.sfx('click'); $('#rules').hidden = true; };
+P.bindName($('#inName'));
+const nameOk = () => { if (P.needName($('#inName'))) return true; P.sfx('bad'); return false; };
+
+/* ---------- Musique : air de taverne (accordéon, guitare, tambourin), généré en direct ---------- */
+const MU = { on: P.get('ym-music', '1') !== '0', ctx: null, bus: null, timer: 0, step: 0, nextT: 0, vol: 1, noise: null };
+const ST = 60 / 132 / 4;
+const mf = m => 440 * Math.pow(2, (m - 69) / 12);
+const CH = [[45, 57, 60, 64], [43, 55, 59, 62], [41, 53, 57, 60], [40, 52, 56, 59]]; // Am G F E
+const MEL = [[69, -1, 72, 71, 69, -1, 67, -1, 69, -1, 64, -1, 67, 69, -1, -1], [67, -1, 71, 69, 67, -1, 66, -1, 67, -1, 62, -1, 66, 67, -1, -1], [65, -1, 69, 67, 65, -1, 64, -1, 65, -1, 60, -1, 64, 65, -1, -1], [64, -1, 68, 67, 66, -1, 64, -1, 71, -1, 68, -1, 64, -1, -1, -1]];
+function muInit() {
+  const ctx = P.audio(); if (!ctx || MU.ctx) return !!MU.ctx;
+  MU.ctx = ctx; MU.bus = ctx.createGain(); MU.bus.gain.value = MU.on ? MU.vol * P.musicVol() : 0;
+  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3000; MU.bus.connect(lp); lp.connect(ctx.destination);
+  const len = ctx.sampleRate * 0.2, buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1; MU.noise = buf;
+  return true;
+}
+function env(t, vol, a, dec) { const g = MU.ctx.createGain(); g.gain.value = 0; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + dec); g.connect(MU.bus); return g; }
+function osc(type, f, t, dur, g, det) { const o = MU.ctx.createOscillator(); o.type = type; o.frequency.value = f; if (det) o.detune.value = det; o.connect(g); o.start(t); o.stop(t + dur + 0.05); }
+function shaker(t, vol) { const s = MU.ctx.createBufferSource(); s.buffer = MU.noise; const f = MU.ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 6000; const g = env(t, vol, 0.003, 0.07); s.connect(f); f.connect(g); s.start(t); s.stop(t + 0.1); }
+function muStep(st, t) {
+  const bar = (st >> 4) % 4, s = st % 16, ch = CH[bar], part = (st >> 6) % 4;
+  if (s % 4 === 0) { const g = env(t, 0.18, 0.01, ST * 3); osc('triangle', mf(ch[0] - (s === 8 ? -7 : 0)), t, ST * 3, g); }
+  if (s % 4 === 2) ch.slice(1).forEach(m => { const g = env(t, 0.03, 0.01, ST * 1.6); osc('sawtooth', mf(m), t, ST * 1.6, g, -8); osc('sawtooth', mf(m), t, ST * 1.6, g, 8); });
+  if (part > 0) { const m = MEL[bar][s]; if (m > 0) { const g = env(t, 0.05, 0.02, ST * 3); osc('square', mf(m), t, ST * 3, g, 5); } }
+  if (s % 2 === 0) shaker(t, s % 4 === 2 ? 0.05 : 0.025);
+}
+function muTick() {
+  if (!MU.ctx) return; const now = MU.ctx.currentTime;
+  if (MU.nextT < now + 0.02) { const skip = Math.ceil((now + 0.05 - MU.nextT) / ST); MU.nextT += skip * ST; MU.step += skip; }
+  while (MU.nextT < now + 0.25) { muStep(MU.step, MU.nextT); MU.nextT += ST; MU.step++; }
+}
+const music = {
+  start() { if (!MU.on || MU.timer || !muInit()) return; MU.ctx.resume(); MU.step = 0; MU.nextT = MU.ctx.currentTime + 0.1; MU.timer = setInterval(muTick, 25); muTick(); },
+  stop() { clearInterval(MU.timer); MU.timer = 0; },
+  vol() { if (MU.bus && MU.on) MU.bus.gain.setTargetAtTime(MU.vol * P.musicVol(), MU.ctx.currentTime, 0.1); },
+  set(on) { MU.on = on; P.set('ym-music', on ? '1' : '0'); if (on && P.musicVol() < 0.05) P.set('bg-vol-music', '0.7'); if (on) { P.unlockAudio(); this.start(); this.vol(); } else { if (MU.bus) MU.bus.gain.setTargetAtTime(0, MU.ctx.currentTime, 0.1); setTimeout(() => { if (!MU.on) this.stop(); }, 400); } renderMus(); }
+};
+function renderMus() { $('#musSeg').innerHTML = `<button class="btn" data-mus="1" aria-pressed="${MU.on}">${t('musOn')}</button><button class="btn" data-mus="0" aria-pressed="${!MU.on}">${t('musOff')}</button>`; if (P.dock) P.dock.refresh(); }
+document.addEventListener('click', e => { const b = e.target.closest('[data-mus]'); if (b) { music.set(b.dataset.mus === '1'); P.sfx('click'); } });
+P.audioDock({ on: () => MU.on, set: v => music.set(v), vol: () => music.vol() });
+document.addEventListener('pointerdown', () => { P.unlockAudio(); music.start(); }, { capture: true });
+document.addEventListener('visibilitychange', () => { const c = P.audio(); if (!c) return; if (document.hidden) c.suspend(); else c.resume(); });
+// bruit des dés qui roulent
+function sRattle() {
+  const c = P.audio(); if (!c || !P.soundOn() || !MU.noise) { P.sfx('click'); return; }
+  const now = c.currentTime;
+  for (let k = 0; k < 7; k++) { const s = c.createBufferSource(); s.buffer = MU.noise; const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1800 + Math.random() * 2500; f.Q.value = 3; const g = c.createGain(); const tt = now + k * 0.055 + Math.random() * 0.03; g.gain.value = 0; g.gain.setValueAtTime(0.0001, tt); g.gain.exponentialRampToValueAtTime(0.25 * P.sfxVol(), tt + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, tt + 0.05); s.connect(f); f.connect(g); g.connect(c.destination); s.start(tt); s.stop(tt + 0.08); }
+}
+
+/* ---------- Traduction du chat ---------- */
+function trHtml(text, src, mine) {
+  const tl = P.lang();
+  if (mine || !src || src === tl || !window.BGT) return esc(text);
+  const v = BGT.peek(text, tl, src);
+  if (v === undefined) { BGT.want(text, tl, src, renderChat); return esc(text); }
+  return v ? `<span class="tr" data-orig="${esc(text)}" title="${esc(t('translated'))}">${esc(v)}</span>` : esc(text);
+}
+document.addEventListener('click', e => { const el = e.target.closest('.tr'); if (el) { e.stopPropagation(); toast('🌐 ' + esc(el.dataset.orig)); } }, true);
+
+/* =====================================================================
+   RÈGLES ET MOTEUR (chez l'hôte)
+   ===================================================================== */
+const UP = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'], LOW = ['c3k', 'c4k', 'cfh', 'css', 'cls', 'cy', 'cch'], CATS = UP.concat(LOW);
+const MAXP = 8, TURN_MS = 75000;
+function counts(d) { const c = [0, 0, 0, 0, 0, 0, 0]; d.forEach(v => c[v]++); return c; }
+function catScore(cat, d) {
+  if (!d.every(v => v >= 1 && v <= 6)) return 0;
+  const c = counts(d), sum = d.reduce((a, b) => a + b, 0), mx = Math.max(...c), has = n => c[n] > 0;
+  const run = (a, b) => { for (let k = a; k <= b; k++) if (!has(k)) return false; return true; };
+  switch (cat) {
+    case 'c1': case 'c2': case 'c3': case 'c4': case 'c5': case 'c6': { const n = +cat[1]; return c[n] * n; }
+    case 'c3k': return mx >= 3 ? sum : 0;
+    case 'c4k': return mx >= 4 ? sum : 0;
+    case 'cfh': return (c.includes(3) && c.includes(2)) || mx === 5 ? 25 : 0;
+    case 'css': return run(1, 4) || run(2, 5) || run(3, 6) ? 30 : 0;
+    case 'cls': return run(1, 5) || run(2, 6) ? 40 : 0;
+    case 'cy': return mx === 5 ? 50 : 0;
+    case 'cch': return sum;
+  }
+  return 0;
+}
+function totals(card) {
+  const up = UP.reduce((a, k) => a + (card[k] || 0), 0), bonus = up >= 63 ? 35 : 0, low = LOW.reduce((a, k) => a + (card[k] || 0), 0) + (card.yb || 0);
+  return { up, bonus, low, total: up + bonus + low };
+}
+let S = null, V = null;
+const net = { relay: null, role: '', code: '', roster: [], conn: null, sess: '', gameNo: 0, me: 0, lobby: [], solo: false };
+function newGame() {
+  S = { phase: 'play', round: 1, turn: 0, dice: [0, 0, 0, 0, 0], held: [false, false, false, false, false], rolls: 0, rollId: 0, deadline: 0, last: null,
+    seats: net.roster.map(r => ({ name: r.name, skin: r.skin || 'classic', card: {}, gone: !!r.gone })) };
+  startTurn(0);
+}
+function startTurn(i) {
+  S.turn = i; S.dice = [0, 0, 0, 0, 0]; S.held = [false, false, false, false, false]; S.rolls = 0; S.deadline = Date.now() + TURN_MS; sync();
+}
+function nextTurn() {
+  const n = S.seats.length;
+  for (let k = 1; k <= n; k++) {
+    let i = S.turn + k; let r = S.round; if (i >= n) { i -= n; r = S.round + 1; }
+    if (S.seats[i].gone) continue;
+    if (r > 13) return endGame();
+    S.round = r; return startTurn(i);
+  }
+  endGame();
+}
+function hostRoll(seat, held) {
+  if (!S || S.phase !== 'play' || seat !== S.turn || S.rolls >= 3) return;
+  if (Array.isArray(held) && S.rolls > 0) S.held = S.held.map((_, k) => !!held[k]);
+  if (S.rolls === 0) S.held = [false, false, false, false, false];
+  S.dice = S.dice.map((v, k) => S.held[k] && v ? v : d6());
+  S.rolls++; S.rollId++; S.deadline = Date.now() + TURN_MS; sync();
+}
+function hostHold(seat, i, v) {
+  if (!S || S.phase !== 'play' || seat !== S.turn || !S.rolls || S.rolls >= 3 || !(i >= 0 && i < 5)) return;
+  S.held[i] = !!v; sync();
+}
+function hostScore(seat, cat) {
+  if (!S || S.phase !== 'play' || seat !== S.turn || !S.rolls || !CATS.includes(cat)) return;
+  const card = S.seats[seat].card; if (card[cat] !== undefined) return;
+  const isY = counts(S.dice).includes(5);
+  let yb = false;
+  if (isY && card.cy === 50) { card.yb = (card.yb || 0) + 100; yb = true; }
+  const v = catScore(cat, S.dice); card[cat] = v;
+  S.last = { seat, cat, v, yams: isY && cat === 'cy' && v === 50, yb, id: (S.last ? S.last.id : 0) + 1 };
+  nextTurn();
+}
+function autoPlay() {
+  if (!S || S.phase !== 'play') return;
+  if (!S.rolls) { hostRoll(S.turn); }
+  const card = S.seats[S.turn].card, free = CATS.filter(c => card[c] === undefined);
+  let best = free[0], bv = -1; free.forEach(c => { const v = catScore(c, S.dice); if (v > bv) { bv = v; best = c; } });
+  hostScore(S.turn, best);
+}
+function endGame() {
+  S.phase = 'end'; S.deadline = 0; sync();
+  if (net.solo) { const tot = totals(S.seats[0].card).total, rec = +P.get('ym-best', '0'); if (tot > rec) { P.set('ym-best', String(tot)); S.newRecord = true; } return; }
+  const act = S.seats.filter(s => !s.gone); if (act.length < 2) return;
+  const sc = act.map(s => totals(s.card).total), top = Math.max(...sc), names = act.map(s => s.name), wa = sc.map((v, i) => v === top ? i : -1).filter(i => i >= 0);
+  P.pushMatch({ id: `ym${net.code}${net.sess}${net.gameNo}`, t: Date.now(), p: names, w: wa[0], wa, b: names.map(() => false), g: 'ym' });
+}
+setInterval(() => { if (net.role === 'host' && S && S.phase === 'play' && S.deadline && Date.now() > S.deadline) autoPlay(); }, 500);
+function pub() {
+  return { phase: S.phase, round: S.round, turn: S.turn, dice: S.dice, held: S.held, rolls: S.rolls, rollId: S.rollId, rem: Math.max(0, S.deadline - Date.now()), last: S.last, newRecord: !!S.newRecord,
+    seats: S.seats.map(s => ({ n: s.name, skin: s.skin, card: s.card, gone: s.gone })) };
+}
+function sync() {
+  if (!S) return; V = pub(); render();
+  const msg = { t: 'st', v: V }; net.roster.forEach(r => { if (r.conn && r.conn.open && !r.gone) r.conn.send(msg); });
+}
+function hostAct(seat, m) {
+  if (!S || !m) return;
+  if (m.t === 'roll') hostRoll(seat, m.held);
+  else if (m.t === 'hold') hostHold(seat, m.i | 0, !!m.v);
+  else if (m.t === 'score') hostScore(seat, String(m.c));
+}
+function playerLeft(i) {
+  const r = net.roster[i]; if (r) r.gone = true;
+  if (!S || S.phase === 'end') return;
+  const s = S.seats[i]; if (!s) return; s.gone = true;
+  chatSys(t('left', { name: s.name }));
+  if (S.seats.filter(x => !x.gone).length < (net.solo ? 1 : 1)) return endGame();
+  if (S.turn === i) return nextTurn();
+  sync();
+}
+
+/* ---------- Réseau : salon ---------- */
+function leaveNet() {
+  document.body.classList.remove('netlive'); $('#rc').hidden = true; CHAT.list = []; CHAT.unread = 0; renderChat();
+  const r = net.relay; Object.assign(net, { relay: null, conn: null, roster: [], role: '', lobby: [], solo: false });
+  try { r && r.destroy(); } catch (e) {}
+}
+window.addEventListener('pagehide', leaveNet);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && net.relay) net.relay.wake(); });
+const send = m => { if (net.role === 'host') hostAct(0, m); else if (net.conn && net.conn.open) net.conn.send(m); };
+let pendingJoin = null;
+$('#mOnline').onclick = () => { P.unlockAudio(); if (!nameOk()) return; P.sfx('click'); show('online'); $('#onForm').hidden = false; $('#onWait').hidden = true; $('#onErr').textContent = ''; if (pendingJoin) { $('#inCode').value = pendingJoin; pendingJoin = null; $('#bJoin').click(); } };
+$('#mSolo').onclick = () => {
+  P.unlockAudio(); if (!nameOk()) return; P.sfx('click'); leaveNet();
+  Object.assign(net, { role: 'host', solo: true, me: 0, code: 'solo', sess: Date.now().toString(36), roster: [{ name: P.name(), conn: null, lang: P.lang(), skin: mySkin }] });
+  net.gameNo++; show('game'); newGame();
+};
+$('#onBack').onclick = () => { P.sfx('click'); leaveNet(); show('home'); };
+$('#bLeave').onclick = () => { P.sfx('click'); leaveNet(); $('#onForm').hidden = false; $('#onWait').hidden = true; };
+function backToForm(msg) { leaveNet(); S = null; V = null; show('online'); $('#onForm').hidden = false; $('#onWait').hidden = true; $('#onErr').textContent = msg || ''; }
+const lobbyList = () => net.role === 'host' ? net.roster.filter(r => !r.gone).map(r => ({ n: r.name, skin: r.skin })) : net.lobby;
+function renderLobby() {
+  const host = net.role === 'host', L = lobbyList();
+  $('#lobbyList').innerHTML = L.map((p, i) => `<div class="pl">${dieSVG(6, p.skin)}<span>${esc(p.n)}${i === net.me ? ` <small style="color:var(--muted)">(${t('you')})</small>` : ''}</span></div>`).join('');
+  $('#codeBox').hidden = !host; $('#bStart').hidden = !host; $('#bStart').disabled = L.length < 2;
+  $('#waitTxt').innerHTML = host ? t('waitHost') : t('waitGuest');
+}
+function broadcastLobby() {
+  const act0 = net.roster.filter(r => !r.gone), L = act0.map(r => ({ n: r.name, skin: r.skin }));
+  act0.forEach((r, i) => { if (r.conn && r.conn.open) r.conn.send({ t: 'lobby', list: L, you: i }); });
+  renderLobby();
+}
+$('#bHost').onclick = () => { P.sfx('click'); leaveNet(); $('#onErr').textContent = t('connecting'); openHost(0); };
+function openHost(attempt) {
+  const code = P.genCode(), relay = new P.Online('ym', code, 'host');
+  document.body.classList.add('netlive');
+  Object.assign(net, { relay, code, role: 'host', solo: false, sess: Date.now().toString(36), gameNo: 0, me: 0, roster: [{ name: P.name(), conn: null, lang: P.lang(), skin: mySkin }] });
+  relay.on('open', () => { if (window.Party) Party.announce('ym', code); $('#onErr').textContent = ''; $('#codeShow').textContent = code; $('#onForm').hidden = true; $('#onWait').hidden = false; renderLobby(); renderChat(); });
+  relay.on('error', e => { if (net.relay !== relay) return; if (e.type === 'taken' && attempt < 4) { leaveNet(); openHost(attempt + 1); return; } if (net.roster.length > 1) return; backToForm(t('netErr')); });
+  relay.on('connection', conn => {
+    const entry = { conn, name: '', lang: 'fr', skin: 'classic' };
+    conn.on('data', m => hostData(entry, m));
+    conn.on('close', () => {
+      const i = net.roster.indexOf(entry); if (i < 0 || entry.gone) return;
+      if (S && S.phase !== 'end' && !$('#game').hidden) { playerLeft(i); return; }
+      net.roster.splice(i, 1); toast(t('left', { name: esc(entry.name) }), true); broadcastLobby();
+    });
+  });
+}
+function hostData(entry, m) {
+  if (!m || typeof m !== 'object') return;
+  if (m.t === 'hello') {
+    const inGame = S && S.phase !== 'end' && !$('#game').hidden;
+    if (inGame || net.roster.filter(r => !r.gone).length >= MAXP) { entry.conn.send({ t: 'full' }); return; }
+    let nm = String(m.name || '?').slice(0, 14); const base = nm; let k = 2; while (net.roster.some(r => !r.gone && r.name.toLowerCase() === nm.toLowerCase())) nm = base.slice(0, 12) + k++;
+    entry.name = nm; entry.lang = ['fr', 'en', 'cs'].includes(m.lang) ? m.lang : 'fr'; entry.skin = SKINS[m.skin] ? m.skin : 'classic';
+    net.roster.push(entry); P.sfx('click'); chatSys(t('joinedSys', { name: nm })); broadcastLobby();
+    return;
+  }
+  const s = net.roster.indexOf(entry); if (s < 1 || entry.gone) return;
+  if (m.t === 'lang' && ['fr', 'en', 'cs'].includes(m.l)) { entry.lang = m.l; return; }
+  if (m.t === 'skin' && SKINS[m.s]) { entry.skin = m.s; if (S && S.seats[s]) { S.seats[s].skin = m.s; sync(); } else broadcastLobby(); return; }
+  if (m.t === 'chat') { chatIn(s, m.txt, m.l); return; }
+  hostAct(s, m);
+}
+$('#bStart').onclick = () => {
+  P.sfx('click');
+  net.roster = net.roster.filter(r => !r.gone && (r.conn === null || r.conn.open));
+  if (net.roster.length < 2) return;
+  net.gameNo++;
+  net.roster.forEach((r, i) => { if (r.conn && r.conn.open) r.conn.send({ t: 'go', seat: i, sess: net.sess, game: net.gameNo }); });
+  net.me = 0; show('game'); newGame(); P.sfx('hint');
+};
+$('#bCopy').onclick = () => { const done = () => { $('#bCopy').textContent = t('copied'); setTimeout(() => { $('#bCopy').textContent = t('copyCode'); }, 1400); }; if (navigator.clipboard) navigator.clipboard.writeText(net.code).then(done, () => {}); };
+$('#inCode').addEventListener('input', e => { e.target.value = window.BGCode ? BGCode(e.target.value) : e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
+$('#inCode').addEventListener('keydown', e => { if (e.key === 'Enter') $('#bJoin').click(); });
+$('#bJoin').onclick = () => {
+  P.sfx('click');
+  const code = $('#inCode').value.trim().toUpperCase();
+  if (code.length !== 5) { $('#onErr').textContent = t('badCode'); return; }
+  leaveNet(); $('#onErr').textContent = t('connecting');
+  const relay = new P.Online('ym', code, 'guest');
+  document.body.classList.add('netlive');
+  Object.assign(net, { relay, code, role: 'guest', lobby: [] });
+  let linked = false;
+  const timer = setTimeout(() => { if (!linked) backToForm(t('noGame')); }, 15000);
+  relay.on('error', e => { if (net.relay !== relay) return; clearTimeout(timer); backToForm(e.type === 'nogame' ? t('noGame') : t('netErr')); });
+  relay.on('open', conn => {
+    net.conn = conn;
+    conn.on('open', () => { linked = true; clearTimeout(timer); $('#onErr').textContent = ''; conn.send({ t: 'hello', name: P.name(), lang: P.lang(), skin: mySkin }); });
+    conn.on('data', guestData);
+    conn.on('close', () => { if (net.conn === conn) { backToForm(t('hostLeft')); P.sfx('bad'); } });
+  });
+};
+function guestData(m) {
+  if (!m || typeof m !== 'object') return;
+  if (m.t === 'lobby') {
+    net.lobby = (Array.isArray(m.list) ? m.list : []).slice(0, MAXP).map(p => ({ n: String(p.n || '?').slice(0, 14), skin: SKINS[p.skin] ? p.skin : 'classic' }));
+    if (Number.isInteger(m.you)) net.me = m.you;
+    if ($('#game').hidden && $('#end').hidden) { show('online'); $('#onForm').hidden = true; $('#onWait').hidden = false; }
+    renderLobby();
+  }
+  else if (m.t === 'full') backToForm(t('full'));
+  else if (m.t === 'go') { net.me = m.seat | 0; net.sess = String(m.sess || ''); net.gameNo = m.game | 0; V = null; P.stopConfetti(); show('game'); P.sfx('hint'); }
+  else if (m.t === 'st' && m.v) { V = m.v; render(); }
+  else if (m.t === 'chat') chatAdd(m.m);
+}
+
+/* ---------- Affichage de la partie ---------- */
+let localHeld = null, heldKey = '', lastRoll = -1, lastLast = 0, lastTurnKey = '', localDeadline = 0;
+function render() {
+  if (!V) return;
+  if (V.phase === 'end') { renderEnd(); return; }
+  if ($('#game').hidden) show('game');
+  const cur = V.seats[V.turn] || {}, mine = V.turn === net.me;
+  $('#hRound').textContent = t('round', { n: Math.min(13, V.round) });
+  $('#hInfo').innerHTML = mine ? t('yourTurn') : esc(t('turnOf', { name: cur.n || '' }));
+  $('#who').innerHTML = `${avatar(V.turn)}<span>${esc(cur.n || '')}</span>`;
+  // dés gardés : en local, pour que le clic réponde tout de suite
+  const hk = V.turn + ':' + V.round + ':' + V.rolls;
+  if (heldKey !== hk || !mine) { heldKey = hk; localHeld = V.held.slice(); }
+  const rolled = V.rollId !== lastRoll; const firstSeen = lastRoll === -1; lastRoll = V.rollId;
+  const canHold = mine && V.rolls > 0 && V.rolls < 3;
+  $('#dice').innerHTML = V.dice.map((v, k) => `<button class="die${localHeld[k] ? ' held' : ''}${!v ? ' blank' : ''}${rolled && !firstSeen && v && !V.held[k] ? ' rolling' : ''}" data-die="${k}" ${canHold ? '' : 'disabled'} aria-label="${v || ''}">${dieSVG(v || 6, cur.skin)}</button>`).join('');
+  if (rolled && !firstSeen && V.rolls) { sRattle(); const c = counts(V.dice); if (c.includes(5)) setTimeout(() => { toast('🎲 ' + t('yams'), 'yams', 2600); P.sfx('win'); P.confetti($('#confetti')); }, 650); }
+  // bouton et lancers restants
+  $('#rollsLeft').innerHTML = [0, 1, 2].map(k => `<i class="${k < 3 - V.rolls ? '' : 'off'}"></i>`).join('');
+  const rb = $('#bRoll'); rb.textContent = V.rolls ? t('rollAgain') : t('roll'); rb.disabled = !mine || V.rolls >= 3; rb.style.visibility = mine ? '' : 'hidden';
+  $('#hint').textContent = !mine ? t('hintWatch', { name: cur.n || '' }) : !V.rolls ? t('hintFirst') : V.rolls < 3 ? t('hintHold') : t('hintPick');
+  localDeadline = Date.now() + (V.rem || 0);
+  // feuille de score
+  renderScore(mine);
+  // annonces
+  if (V.last && V.last.id !== lastLast) {
+    const L = V.last; lastLast = L.id; const who = (V.seats[L.seat] || {}).n || '';
+    if (L.yb) { toast('🎲 ' + t('yamsBonus'), 'good'); P.sfx('win'); }
+    else if (L.seat !== net.me) toast(esc(t('scored', { name: who, cat: t(L.cat), n: L.v })));
+    if (L.seat === net.me) P.sfx(L.v > 0 ? 'good' : 'other');
+  }
+  const tk = V.turn + ':' + V.round;
+  if (tk !== lastTurnKey) { lastTurnKey = tk; if (mine) { P.sfx('hint'); try { navigator.vibrate && navigator.vibrate(30); } catch (e) {} } }
+}
+function renderScore(mine) {
+  const cols = V.seats.map((s, i) => ({ s, i })).filter(o => !o.s.gone || Object.keys(o.s.card).length);
+  const canPick = mine && V.rolls > 0;
+  const head = `<thead><tr><th></th>${cols.map(o => `<th class="${o.i === V.turn ? 'cur' : ''}">${dieSVG(5, o.s.skin)}${esc(o.s.n)}</th>`).join('')}</tr></thead>`;
+  const just = V.last ? V.last.seat + ':' + V.last.cat : '';
+  const cell = (o, cat) => {
+    const v = o.s.card[cat];
+    if (v !== undefined) return `<td class="${just === o.i + ':' + cat ? 'just' : ''}">${v}</td>`;
+    if (canPick && o.i === net.me) { const p = catScore(cat, V.dice); return `<td class="pick${p ? '' : ' zero'}" data-cat="${cat}">${p}</td>`; }
+    return '<td></td>';
+  };
+  const row = (cat, sub) => `<tr><td>${t(cat)}${sub ? `<small>${t(sub)}</small>` : ''}</td>${cols.map(o => cell(o, cat)).join('')}</tr>`;
+  const T = cols.map(o => totals(o.s.card));
+  const body = UP.map(c => row(c)).join('')
+    + `<tr class="sum"><td>${t('upper')}</td>${T.map(x => `<td>${x.up}</td>`).join('')}</tr>`
+    + `<tr class="sum"><td>${t('bonus')}</td>${T.map(x => `<td>${x.bonus ? '+35' : x.up ? `<small>${63 - x.up > 0 ? '−' + (63 - x.up) : ''}</small>` : ''}</td>`).join('')}</tr>`
+    + LOW.map(c => row(c, 's' + c.slice(1))).join('')
+    + (cols.some(o => o.s.card.yb) ? `<tr class="yb"><td>${t('yb')}</td>${cols.map(o => `<td>${o.s.card.yb ? '+' + o.s.card.yb : ''}</td>`).join('')}</tr>` : '')
+    + `<tr class="total"><td>${t('total')}</td>${T.map(x => `<td>${x.total}</td>`).join('')}</tr>`;
+  $('#score').innerHTML = head + '<tbody>' + body + '</tbody>';
+}
+setInterval(() => { const b = document.getElementById('tbar'); if (b && V && V.phase === 'play') b.style.transform = `scaleX(${Math.max(0, Math.min(1, (localDeadline - Date.now()) / TURN_MS))})`; }, 250);
+$('#dice').addEventListener('click', e => {
+  const b = e.target.closest('[data-die]'); if (!b || b.disabled || !V) return;
+  const k = +b.dataset.die; localHeld[k] = !localHeld[k]; b.classList.toggle('held', localHeld[k]); P.sfx('click');
+  send({ t: 'hold', i: k, v: localHeld[k] });
+});
+$('#bRoll').onclick = () => { if (!V || V.turn !== net.me || V.rolls >= 3) return; P.unlockAudio(); $('#bRoll').disabled = true; send({ t: 'roll', held: localHeld }); };
+$('#score').addEventListener('click', e => {
+  const c = e.target.closest('[data-cat]'); if (!c || !V || V.turn !== net.me || !V.rolls) return;
+  const cat = c.dataset.cat; P.sfx('click'); document.querySelectorAll('#score [data-cat]').forEach(x => x.removeAttribute('data-cat')); send({ t: 'score', c: cat });
+});
+document.addEventListener('keydown', e => {
+  if (!V || V.turn !== net.me || document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); $('#bRoll').click(); }
+  const n = +e.key; if (n >= 1 && n <= 5) { const b = document.querySelector(`[data-die="${n - 1}"]`); if (b && !b.disabled) b.click(); }
+});
+$('#bQuit').onclick = () => {
+  P.sfx('click');
+  if (Date.now() - (window.__q || 0) > 2500) { window.__q = Date.now(); toast(t('quitQ') + ' ✕'); return; }
+  leaveNet(); S = null; V = null; show('home'); renderSoloSub();
+};
+
+/* ---------- Fin ---------- */
+let endKey = '';
+function renderEnd() {
+  show('end');
+  const L = V.seats.map((s, i) => ({ s, i, tot: totals(s.card).total })).filter(o => !o.s.gone).sort((a, b) => b.tot - a.tot);
+  const top = L.length ? L[0].tot : 0, win = L.filter(o => o.tot === top);
+  $('#endTitle').textContent = net.solo ? t('soloEnd', { n: top }) + (V.newRecord ? ' ' + t('newRecord') : '') : win.length > 1 ? t('tie') : t('winner', { name: win[0] ? win[0].s.n : '?', n: top });
+  $('#ranks').innerHTML = L.map((o, k) => `<div class="pl">${k < 3 ? ['🥇', '🥈', '🥉'][k] : '#' + (k + 1)} ${dieSVG(6, o.s.skin)}<span>${esc(o.s.n)}</span><b>${o.tot}</b></div>`).join('');
+  const guest = net.role !== 'host';
+  $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : ''; $('#bMenu').hidden = net.solo;
+  const k = net.gameNo + ':' + net.sess;
+  if (endKey !== k) { endKey = k; const won = (win.some(o => o.i === net.me) && !net.solo) || V.newRecord; P.sfx(won ? 'win' : 'lose'); if (won) P.confetti($('#confetti')); }
+}
+$('#bAgain').onclick = () => { P.sfx('click'); P.stopConfetti(); if (net.solo) { net.gameNo++; show('game'); net.roster[0].skin = mySkin; newGame(); } else if (net.role === 'host') $('#bStart').click(); };
+$('#bMenu').onclick = () => {
+  P.sfx('click'); P.stopConfetti();
+  if (net.relay) { S = null; V = null; show('online'); $('#onForm').hidden = true; $('#onWait').hidden = false; if (net.role === 'host') { net.roster = net.roster.filter(r => !r.gone); broadcastLobby(); } else renderLobby(); return; }
+  show('home');
+};
+function renderSoloSub() { const r = +P.get('ym-best', '0'); $('#soloSub').textContent = r ? t('record', { n: r }) : t('soloSub'); }
+
+/* ---------- Chat de la partie ---------- */
+const CHAT = { list: [], unread: 0 };
+const wideChat = () => matchMedia('(min-width:1150px)').matches && document.body.classList.contains('netlive');
+const chatVisible = () => !$('#rc').hidden || wideChat();
+function chatIn(s, txt, l) {
+  txt = String(txt || '').replace(/\s+/g, ' ').trim().slice(0, 160); if (!txt) return;
+  const r = net.roster[s] || {};
+  const m = { s, n: r.name || '?', txt, l: ['fr', 'en', 'cs'].includes(l) ? l : 'fr' };
+  net.roster.forEach(o => { if (o.conn && o.conn.open && !o.gone) o.conn.send({ t: 'chat', m }); });
+  chatAdd(m);
+}
+function chatSys(txt) { const m = { sys: true, txt }; net.roster.forEach(o => { if (o.conn && o.conn.open && !o.gone) o.conn.send({ t: 'chat', m }); }); chatAdd(m); }
+function chatAdd(m) {
+  if (!m || typeof m.txt !== 'string') return;
+  CHAT.list.push({ s: m.s | 0, n: String(m.n || '?').slice(0, 14), txt: m.txt.slice(0, 160), l: m.l, sys: !!m.sys });
+  if (CHAT.list.length > 80) CHAT.list.shift();
+  if (!m.sys && m.s !== net.me) { if (!chatVisible()) { CHAT.unread++; toast(`💬 <b>${esc(String(m.n || '?'))}</b> : ${esc(String(m.txt).slice(0, 60))}`); } P.sfx('chat'); }
+  renderChat();
+}
+function renderChat() {
+  const L = $('#rcList');
+  L.innerHTML = CHAT.list.length ? CHAT.list.map(m => m.sys ? `<div class="rc-msg sys">${esc(m.txt)}</div>` : `<div class="rc-msg${m.s === net.me ? ' me' : ''}">${avatar(m.s)}<div class="bub"><b style="color:${COLORS[m.s % 10]}">${esc(m.n)}</b>${trHtml(m.txt, m.l, m.s === net.me)}</div></div>`).join('') : `<p class="rc-empty">${t('chatEmpty')}</p>`;
+  L.scrollTop = L.scrollHeight;
+  if (chatVisible()) CHAT.unread = 0;
+  document.querySelectorAll('.badge').forEach(b => { b.textContent = CHAT.unread ? CHAT.unread : ''; });
+  const last = [...CHAT.list].reverse().find(m => !m.sys);
+  const bar = last ? `<b style="color:${COLORS[last.s % 10]}">${esc(last.n)}</b>${trHtml(last.txt, last.l, last.s === net.me)}` : `<i>${t('chatInvite')}</i>`;
+  document.querySelectorAll('.chatbar .cb-txt').forEach(el => { el.innerHTML = bar; });
+  document.querySelectorAll('#chatBar, #bChat').forEach(el => { el.style.display = net.solo ? 'none' : ''; });
+}
+function toggleChat(open) { $('#rc').hidden = !open; if (open) { CHAT.unread = 0; renderChat(); setTimeout(() => $('#rcIn').focus(), 50); } }
+$('#bChat').onclick = () => { P.sfx('click'); toggleChat($('#rc').hidden); };
+$('#chatBar').onclick = () => { P.sfx('click'); toggleChat(true); };
+$('#bChatL').onclick = () => { P.sfx('click'); toggleChat(true); };
+$('#rcClose').onclick = () => { P.sfx('click'); toggleChat(false); };
+$('#rcForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const v = $('#rcIn').value.replace(/\s+/g, ' ').trim().slice(0, 160); if (!v) return;
+  $('#rcIn').value = '';
+  if (net.role === 'host') chatIn(0, v, P.lang()); else if (net.conn && net.conn.open) net.conn.send({ t: 'chat', txt: v, l: P.lang() });
+});
+window.addEventListener('resize', renderChat);
+const gcHome = window.GChat ? GChat.mount($('#gchatHome'), { db: P.DB_URL, lang: P.lang, name: () => P.hasName() ? P.name() : '', needName: () => P.needName($('#inName')) }) : null;
+
+/* ---------- Groupe d'amis ---------- */
+function joinFromParty(c) { P.stopConfetti(); S = null; V = null; pendingJoin = c; if (!P.hasName()) { show('home'); nameOk(); return; } $('#mOnline').click(); }
+if (window.Party) { Party.busy = () => !$('#game').hidden && !!V && V.phase !== 'end' && !net.solo; Party.onJoinHere = (g, c) => { joinFromParty(c); return true; }; }
+
+/* ---------- Démarrage ---------- */
+P.onLang(() => {
+  if (net.role === 'guest' && net.conn && net.conn.open) net.conn.send({ t: 'lang', l: P.lang() });
+  renderSnd(); renderMus(); renderChat(); renderSkins(); renderSoloSub(); if (gcHome) gcHome.refresh();
+  if (!$('#onWait').hidden) renderLobby(); if (V) render();
+});
+P.applyStatic(); renderSnd(); renderMus(); renderChat(); renderSkins(); renderSoloSub();
+{ const jc = window.Party && Party.takeJoin(); if (jc) joinFromParty(jc); }
+window.__ym = { get S() { return S; }, get V() { return V; }, net, catScore, totals };
+})();
+</script>
+</body>
+</html>
