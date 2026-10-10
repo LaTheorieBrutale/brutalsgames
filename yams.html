@@ -86,53 +86,78 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .skins button svg{width:38px;height:38px}
 .skins button.on{border-color:var(--gold);background:rgba(242,193,78,.18);box-shadow:0 0 0 2px rgba(242,193,78,.35)}
 
-/* ---------- Partie ---------- */
-#game{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;gap:7px;padding:8px 10px;padding-block:calc(env(safe-area-inset-top,0px) + 8px) calc(env(safe-area-inset-bottom,0px) + 8px);max-width:760px;margin:0 auto}
-.hud{display:flex;align-items:center;gap:7px;padding:6px 8px;flex:none}
+/* ---------- Partie : disposition « feuille en 2 colonnes » ---------- */
+#game{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;gap:6px;padding:8px 10px;padding-block:calc(env(safe-area-inset-top,0px) + 8px) calc(env(safe-area-inset-bottom,0px) + 8px);max-width:640px;margin:0 auto}
+.hud{display:flex;align-items:center;gap:7px;padding:5px 8px;flex:none}
 .hud .mid{flex:1;min-width:0;text-align:center;line-height:1.1}
 .hud .mid small{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
-.hud .mid b{display:block;font-family:var(--f-title);font-size:17px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tray{flex:none;position:relative;padding:12px 10px 10px;border-radius:24px;border:4px solid var(--ink);
+.hud .mid b{display:block;font-family:var(--f-title);font-size:16px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* tableau des joueurs */
+.versus{flex:none;display:flex;align-items:center;justify-content:center;gap:10px;padding:2px 4px}
+.versus .vs{font-family:var(--f-title);font-size:20px;color:var(--muted)}
+.vp{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;cursor:pointer;background:none;border:0;padding:0;color:var(--text);font:inherit}
+.vp .av{position:relative;width:52px;height:52px;border-radius:50%;border:3px solid var(--ink);background:var(--panel);display:grid;place-items:center;box-shadow:0 3px 0 var(--ink)}
+.vp .av svg{width:38px;height:38px}
+.vp.turn .av{border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,193,78,.45),0 3px 0 var(--ink)}
+.vp.turn .av::before{content:"";position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:28px;height:5px;border-radius:3px;background:var(--gold)}
+.vp .nm{font-size:13px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vp.me .nm::before{content:"● ";color:var(--green)}
+.vp .sc{font-family:var(--f-title);font-size:28px;line-height:1}
+.vp.cmp .sc{color:var(--gold)}.vp.me .sc{color:#8ee06a}
+.versus.many{gap:6px;overflow-x:auto;justify-content:flex-start;scrollbar-width:none}
+.versus.many::-webkit-scrollbar{display:none}
+.versus.many .vp .av{width:42px;height:42px}.versus.many .vp .av svg{width:30px;height:30px}.versus.many .vp .sc{font-size:20px}
+.versus.duo .vp{flex-direction:row;gap:8px}
+.versus.duo .vp .info{display:flex;flex-direction:column;align-items:center}
+.status{flex:none;text-align:center;font-size:15px;min-height:20px}
+.status b{color:var(--gold)}
+/* grille */
+.grid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;border:4px solid var(--ink);border-radius:18px;overflow:hidden;background:#2a1a10;box-shadow:0 6px 0 var(--ink)}
+.gcol{display:flex;flex-direction:column;min-width:0}
+.gcol+.gcol{border-left:3px solid var(--ink)}
+.ghead{display:grid;grid-template-columns:1fr 46px 50px;align-items:center;padding:3px 6px;font-size:11px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;background:#1e130b}
+.ghead span{text-align:center;overflow:hidden;font-size:10.5px;font-weight:900;line-height:1.05;word-break:break-all;text-transform:none;letter-spacing:0;max-height:2.2em}
+.grow{flex:1;min-height:34px;display:grid;grid-template-columns:1fr 46px 50px;align-items:center;gap:0;padding:2px 6px;border-top:2px solid rgba(0,0,0,.45);background:linear-gradient(180deg,#4a2f1c,#3d2616)}
+.grow .ic{display:flex;align-items:center;gap:6px;min-width:0}
+.grow .ic svg{width:clamp(28px,8vw,40px);height:clamp(28px,8vw,40px);flex:none;filter:drop-shadow(0 2px 0 rgba(0,0,0,.5))}
+.badge2{display:grid;place-items:center;min-width:clamp(34px,10vw,46px);height:clamp(28px,8vw,38px);padding:0 5px;border-radius:9px;background:linear-gradient(180deg,#fff,#e4ded2);border:3px solid var(--ink);color:#1c1620;font-family:var(--f-title);font-size:clamp(14px,4vw,18px);box-shadow:0 2px 0 rgba(0,0,0,.5)}
+.grow .v{text-align:center;font-family:var(--f-title);font-size:clamp(17px,5vw,24px);color:var(--gold)}
+.grow .v.empty{color:rgba(255,255,255,.18)}
+.grow .me{margin:0 0 0 4px;height:calc(100% - 4px);min-height:28px;display:grid;place-items:center;border-radius:9px;background:#22150c;font-family:var(--f-title);font-size:clamp(17px,5vw,24px);color:#8ee06a}
+.grow .me.empty{color:rgba(255,255,255,.12)}
+.grow .me.pick{cursor:pointer;background:rgba(92,194,74,.22);color:#b8ff9a;outline:2px dashed rgba(142,224,106,.7);outline-offset:-3px}
+.grow .me.pick.zero{background:rgba(224,72,72,.14);color:#ff9a9a;outline-color:rgba(255,120,120,.5)}
+@media (hover:hover){.grow .me.pick:hover{background:rgba(92,194,74,.45)}}
+.grow .me.just,.grow .v.just{animation:flash 1.2s}
+@keyframes flash{0%,40%{background:var(--gold);color:var(--ink)}}
+.grow.bon{background:linear-gradient(180deg,#3a2414,#2e1c10)}
+.grow.bon .lbl2{font-family:var(--f-title);font-size:16px;line-height:1}
+.grow.bon .lbl2{min-width:0;overflow:hidden}.grow.bon .lbl2 small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--f-ui);font-size:10px;color:var(--muted);font-weight:800}
+.ytag{font-size:10px;color:#ffcf6a;display:block;line-height:1}
+.gtot{display:grid;grid-template-columns:1fr 46px 50px;align-items:center;padding:6px;background:#1e130b;border-top:3px solid var(--ink);font-family:var(--f-title);font-size:15px}
+.gtot span{text-align:center;color:var(--gold)}.gtot span:first-child{text-align:left;color:var(--text);font-size:13px}.gtot span:last-child{color:#8ee06a}
+/* dés */
+.tray{flex:none;position:relative;padding:10px 8px 8px;border-radius:22px;border:4px solid var(--ink);
   background:radial-gradient(ellipse at 50% 30%,rgba(255,255,255,.1),transparent 65%),repeating-radial-gradient(circle at 40% 40%,rgba(0,0,0,.05) 0 2px,transparent 2px 5px),linear-gradient(180deg,var(--felt),var(--felt2));
-  box-shadow:inset 0 0 0 9px var(--wood),inset 0 0 0 12px var(--ink),inset 0 0 26px 14px rgba(0,0,0,.4),0 7px 0 var(--ink);display:flex;flex-direction:column;align-items:center;gap:8px}
-.who{display:flex;align-items:center;gap:7px;font-size:14px;color:#ffe8d0;margin-top:2px}
-.who svg{width:24px;height:24px}
-.dicerow{display:flex;gap:clamp(5px,2vw,14px);justify-content:center;padding:6px 0 2px}
-.die{position:relative;width:clamp(44px,13vw,72px);height:clamp(44px,13vw,72px);background:none;border:0;padding:0;cursor:pointer;transition:transform .15s}
+  box-shadow:inset 0 0 0 7px var(--wood),inset 0 0 0 10px var(--ink),inset 0 0 22px 10px rgba(0,0,0,.4),0 6px 0 var(--ink);display:flex;flex-direction:column;align-items:center;gap:6px}
+.dicerow{display:flex;gap:clamp(5px,2vw,14px);justify-content:center;padding:4px 0 6px}
+.die{position:relative;width:clamp(50px,15vw,78px);height:clamp(50px,15vw,78px);background:none;border:0;padding:0;cursor:pointer;transition:transform .15s}
 .die svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 0 rgba(0,0,0,.55))}
-.die.held{transform:translateY(-8px)}
-.die.held::after{content:"";position:absolute;left:12%;right:12%;bottom:-13px;height:5px;border-radius:3px;background:var(--gold);box-shadow:0 0 10px var(--gold)}
+.die.held{transform:translateY(-7px)}
+.die.held::after{content:"";position:absolute;left:12%;right:12%;bottom:-11px;height:5px;border-radius:3px;background:var(--gold);box-shadow:0 0 10px var(--gold)}
 .die:disabled{cursor:default}
 .die.rolling svg{animation:tumble .62s cubic-bezier(.3,1.4,.5,1)}
 @keyframes tumble{0%{transform:translateY(-34px) rotate(-200deg) scale(.7)}60%{transform:translateY(4px) rotate(18deg) scale(1.06)}100%{transform:none}}
-.die.blank svg{opacity:.35}
+.die.blank svg{opacity:.3}
 .rollbar{display:flex;align-items:center;gap:10px;width:100%;justify-content:center}
-.rollbar .btn{min-width:150px;font-size:19px}
+.rollbar .btn{min-width:150px;font-size:18px;padding:8px 14px 7px}
 .pipsleft{display:flex;gap:4px}
 .pipsleft i{width:12px;height:12px;border-radius:50%;border:2.5px solid var(--ink);background:var(--gold)}
 .pipsleft i.off{background:rgba(0,0,0,.35)}
-.hint{margin:0;font-size:13px;color:#ffe0c8;text-align:center;min-height:1.2em}
+.hint{margin:0;font-size:12.5px;color:#ffe0c8;text-align:center;min-height:1.2em}
 .tbar{width:100%;height:6px;border-radius:4px;background:rgba(0,0,0,.4);overflow:hidden;border:2px solid var(--ink)}
 .tbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#ff9a3c);transform-origin:left;transition:transform .25s linear}
-/* feuille de score */
-.sheetwrap{flex:1;min-height:0;overflow:auto;border-radius:18px;border:4px solid var(--ink);background:#f4e8cf;box-shadow:0 6px 0 var(--ink);color:#2a1a10}
-table.score{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
-table.score th,table.score td{padding:5px 6px;border-bottom:1.5px solid rgba(90,58,36,.25);text-align:center;white-space:nowrap}
-table.score th:first-child,table.score td:first-child{position:sticky;left:0;z-index:1;text-align:left;background:#efe0c0;font-weight:900;border-right:2px solid rgba(90,58,36,.35)}
-table.score thead th{position:sticky;top:0;z-index:2;background:#e2cfa6;font-size:12px;max-width:80px;overflow:hidden;text-overflow:ellipsis}
-table.score thead th:first-child{z-index:3}
-table.score thead th.cur{background:var(--gold)}
-table.score thead th svg{width:18px;height:18px;vertical-align:-4px;margin-right:2px}
-table.score td small{display:block;font-size:10px;color:#8a6a4a;font-weight:800}
-table.score tr.sum td{background:#e8d6b0;font-weight:900}
-table.score tr.total td{background:#2a1a10;color:var(--gold);font-family:var(--f-title);font-size:17px}
-table.score tr.total td:first-child{background:#2a1a10;color:var(--gold)}
-table.score td.pick{cursor:pointer;color:#1f7a2e;font-weight:900;background:rgba(92,194,74,.14);outline:2px dashed rgba(31,122,46,.5);outline-offset:-3px}
-table.score td.pick.zero{color:#a83a3a;background:rgba(224,72,72,.08);outline-color:rgba(168,58,58,.4)}
-@media (hover:hover){table.score td.pick:hover{background:rgba(92,194,74,.35)}}
-table.score td.just{animation:flash 1s}
-@keyframes flash{0%,40%{background:var(--gold)}}
-table.score tr.yb td{color:#b06a00;font-weight:900}
+@media (max-height:700px){.grow{min-height:28px}.vp .av{width:42px;height:42px}.vp .sc{font-size:22px}.die{width:clamp(44px,13vw,64px);height:clamp(44px,13vw,64px)}}
 
 /* ---------- Fin ---------- */
 .banner{font-family:var(--f-title);font-size:clamp(30px,9vw,48px);text-align:center;line-height:1.05;color:var(--gold);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink);transform:rotate(-2deg);animation:drop .6s cubic-bezier(.2,1.5,.4,1) both}
@@ -256,14 +281,15 @@ table.score tr.yb td{color:#b06a00;font-weight:900}
     <span id="hudDock" style="display:inline-flex"></span>
     <button class="btn icon chatbtn" id="bChat" data-i18n-aria="chat">💬<span class="badge"></span></button>
   </div>
+  <div class="versus" id="versus"></div>
+  <div class="status" id="status"></div>
+  <div class="grid" id="grid"></div>
   <div class="tray">
-    <div class="who" id="who"></div>
     <div class="dicerow" id="dice"></div>
     <div class="rollbar"><div class="pipsleft" id="rollsLeft"></div><button class="btn gold" id="bRoll" data-i18n="roll">🎲 Lancer</button></div>
     <p class="hint" id="hint"></p>
     <div class="tbar"><i id="tbar"></i></div>
   </div>
-  <div class="sheetwrap"><table class="score" id="score"></table></div>
   <button class="frame chatbar" id="chatBar"><span class="cb-ico">💬</span><span class="cb-txt"></span><span class="badge"></span></button>
 </section>
 
@@ -318,7 +344,7 @@ P.addStrings({
     round: 'Tour {n}/13', yourTurn: 'À toi de jouer !', turnOf: 'Au tour de {name}', roll: '🎲 Lancer', rollAgain: '🎲 Relancer', rollsLeft: '{n} lancer(s)',
     hintFirst: 'Lance les dés !', hintHold: 'Touche les dés à garder, relance, ou choisis une case dans la feuille.', hintPick: 'Choisis une case dans la feuille de score.', hintWatch: '{name} joue…',
     scored: '{name} : {cat} → {n}', yams: 'YAM’S !', yamsBonus: 'Yam’s bonus +100 !', player: 'Joueur',
-    c1: 'As (1)', c2: 'Deux', c3: 'Trois', c4: 'Quatre', c5: 'Cinq', c6: 'Six', upper: 'Total haut', bonus: 'Bonus (63+)', c3k: 'Brelan', c4k: 'Carré', cfh: 'Full', css: 'Petite suite', cls: 'Grande suite', cy: 'Yam’s', cch: 'Chance', yb: 'Bonus Yam’s', lower: 'Total bas', total: 'TOTAL',
+    c1: 'As (1)', c2: 'Deux', c3: 'Trois', c4: 'Quatre', c5: 'Cinq', c6: 'Six', upper: 'Total haut', upperS: 'SUPÉRIEUR', lowerS: 'INFÉRIEUR', bonusIf: '63 et +', youPlayed: 'Tu as joué', hePlayed: '{name} a joué', forPts: 'pour {n} pts', b_ss: 'PS', b_ls: 'GS', bonus: 'Bonus (63+)', c3k: 'Brelan', c4k: 'Carré', cfh: 'Full', css: 'Petite suite', cls: 'Grande suite', cy: 'Yam’s', cch: 'Chance', yb: 'Bonus Yam’s', lower: 'Total bas', total: 'TOTAL',
     s3k: 'somme', s4k: 'somme', sfh: '25', sss: '30', sls: '40', sy: '50', sch: 'somme',
     winner: '{name} gagne avec {n} points !', tie: 'Égalité !', soloEnd: '{n} points !', newRecord: 'Nouveau record ! 🏆', again: 'Rejouer', lobby: 'Retour au salon', hostAgain: 'L’hôte peut relancer une partie.',
     quitQ: 'Quitter la partie ?', left: '{name} a quitté la partie', joinedSys: '{name} rejoint la partie',
@@ -333,7 +359,7 @@ P.addStrings({
     round: 'Turn {n}/13', yourTurn: 'Your turn!', turnOf: '{name}’s turn', roll: '🎲 Roll', rollAgain: '🎲 Roll again', rollsLeft: '{n} roll(s)',
     hintFirst: 'Roll the dice!', hintHold: 'Tap dice to hold them, roll again, or pick a box on the sheet.', hintPick: 'Pick a box on your score sheet.', hintWatch: '{name} is playing…',
     scored: '{name}: {cat} → {n}', yams: 'YAHTZEE!', yamsBonus: 'Yahtzee bonus +100!', player: 'Player',
-    c1: 'Ones', c2: 'Twos', c3: 'Threes', c4: 'Fours', c5: 'Fives', c6: 'Sixes', upper: 'Upper total', bonus: 'Bonus (63+)', c3k: '3 of a kind', c4k: '4 of a kind', cfh: 'Full house', css: 'Sm. straight', cls: 'Lg. straight', cy: 'Yahtzee', cch: 'Chance', yb: 'Yahtzee bonus', lower: 'Lower total', total: 'TOTAL',
+    c1: 'Ones', c2: 'Twos', c3: 'Threes', c4: 'Fours', c5: 'Fives', c6: 'Sixes', upper: 'Upper total', upperS: 'UPPER', lowerS: 'LOWER', bonusIf: '63 or more', youPlayed: 'You played', hePlayed: '{name} played', forPts: 'for {n} pts', b_ss: 'SM', b_ls: 'LG', bonus: 'Bonus (63+)', c3k: '3 of a kind', c4k: '4 of a kind', cfh: 'Full house', css: 'Sm. straight', cls: 'Lg. straight', cy: 'Yahtzee', cch: 'Chance', yb: 'Yahtzee bonus', lower: 'Lower total', total: 'TOTAL',
     s3k: 'sum', s4k: 'sum', sfh: '25', sss: '30', sls: '40', sy: '50', sch: 'sum',
     winner: '{name} wins with {n} points!', tie: 'It’s a tie!', soloEnd: '{n} points!', newRecord: 'New high score! 🏆', again: 'Play again', lobby: 'Back to lobby', hostAgain: 'The host can start a new game.',
     quitQ: 'Leave the game?', left: '{name} left the game', joinedSys: '{name} joins the game',
@@ -348,7 +374,7 @@ P.addStrings({
     round: 'Kolo {n}/13', yourTurn: 'Jsi na tahu!', turnOf: 'Na tahu: {name}', roll: '🎲 Hodit', rollAgain: '🎲 Hodit znovu', rollsLeft: 'hody: {n}',
     hintFirst: 'Hoď kostkami!', hintHold: 'Klepni na kostky, které chceš nechat, hoď znovu, nebo vyber políčko.', hintPick: 'Vyber políčko v tabulce.', hintWatch: '{name} hraje…',
     scored: '{name}: {cat} → {n}', yams: 'YAMS!', yamsBonus: 'Bonus za Yams +100!', player: 'Hráč',
-    c1: 'Jedničky', c2: 'Dvojky', c3: 'Trojky', c4: 'Čtyřky', c5: 'Pětky', c6: 'Šestky', upper: 'Horní součet', bonus: 'Bonus (63+)', c3k: 'Trojice', c4k: 'Čtveřice', cfh: 'Full house', css: 'Malá postupka', cls: 'Velká postupka', cy: 'Yams', cch: 'Šance', yb: 'Bonus Yams', lower: 'Dolní součet', total: 'CELKEM',
+    c1: 'Jedničky', c2: 'Dvojky', c3: 'Trojky', c4: 'Čtyřky', c5: 'Pětky', c6: 'Šestky', upper: 'Horní součet', upperS: 'HORNÍ', lowerS: 'DOLNÍ', bonusIf: '63 a víc', youPlayed: 'Zahrál jsi', hePlayed: '{name} zahrál', forPts: 'za {n} b.', b_ss: 'MP', b_ls: 'VP', bonus: 'Bonus (63+)', c3k: 'Trojice', c4k: 'Čtveřice', cfh: 'Full house', css: 'Malá postupka', cls: 'Velká postupka', cy: 'Yams', cch: 'Šance', yb: 'Bonus Yams', lower: 'Dolní součet', total: 'CELKEM',
     s3k: 'součet', s4k: 'součet', sfh: '25', sss: '30', sls: '40', sy: '50', sch: 'součet',
     winner: '{name} vyhrává s {n} body!', tie: 'Remíza!', soloEnd: '{n} bodů!', newRecord: 'Nový rekord! 🏆', again: 'Hrát znovu', lobby: 'Zpět do lobby', hostAgain: 'Hostitel může spustit novou hru.',
     quitQ: 'Opustit hru?', left: '{name} opustil hru', joinedSys: '{name} se připojuje',
@@ -691,7 +717,21 @@ function guestData(m) {
 }
 
 /* ---------- Affichage de la partie ---------- */
-let localHeld = null, heldKey = '', lastRoll = -1, lastLast = 0, lastTurnKey = '', localDeadline = 0;
+let localHeld = null, heldKey = '', lastRoll = -1, lastLast = 0, lastTurnKey = '', localDeadline = 0, cmpPick = -1;
+// icônes des cases : dés aux points colorés (haut), étiquettes (bas)
+const UPCOL = ['#e0483a', '#f08a1e', '#2a7ad8', '#3aa84a', '#9a3ad8', '#1ab0a8'];
+function upIcon(n) { return `<svg viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90" rx="20" fill="#fbf7ee" stroke="#0d0705" stroke-width="6"/>${PIPS[n].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${n === 1 ? 11 : 9}" fill="${UPCOL[n - 1]}"/>`).join('')}</svg>`; }
+const LOWTAG = { c3k: '3X', c4k: '4X', cfh: 'FH', css: 'b_ss', cls: 'b_ls', cy: '5X', cch: 'CH' };
+const tagOf = c => { const v = LOWTAG[c]; return v.startsWith('b_') ? t(v) : v; };
+// joueurs affichés en colonnes : tous jusqu'à 3, sinon toi + l'adversaire choisi (touche son avatar)
+function shownCols() {
+  const live = V.seats.map((s, i) => ({ s, i })).filter(o => !o.s.gone || Object.keys(o.s.card).length);
+  const others = live.filter(o => o.i !== net.me), me = live.find(o => o.i === net.me);
+  if (live.length <= 3) return others.concat(me ? [me] : []);
+  let c = others.find(o => o.i === cmpPick);
+  if (!c) c = others.find(o => o.i === V.turn) || others.slice().sort((a, b) => totals(b.s.card).total - totals(a.s.card).total)[0];
+  return [c].concat(me ? [me] : []).filter(Boolean);
+}
 function render() {
   if (!V) return;
   if (V.phase === 'end') { renderEnd(); return; }
@@ -699,7 +739,6 @@ function render() {
   const cur = V.seats[V.turn] || {}, mine = V.turn === net.me;
   $('#hRound').textContent = t('round', { n: Math.min(13, V.round) });
   $('#hInfo').innerHTML = mine ? t('yourTurn') : esc(t('turnOf', { name: cur.n || '' }));
-  $('#who').innerHTML = `${avatar(V.turn)}<span>${esc(cur.n || '')}</span>`;
   // dés gardés : en local, pour que le clic réponde tout de suite
   const hk = V.turn + ':' + V.round + ':' + V.rolls;
   if (heldKey !== hk || !mine) { heldKey = hk; localHeld = V.held.slice(); }
@@ -707,43 +746,52 @@ function render() {
   const canHold = mine && V.rolls > 0 && V.rolls < 3;
   $('#dice').innerHTML = V.dice.map((v, k) => `<button class="die${localHeld[k] ? ' held' : ''}${!v ? ' blank' : ''}${rolled && !firstSeen && v && !V.held[k] ? ' rolling' : ''}" data-die="${k}" ${canHold ? '' : 'disabled'} aria-label="${v || ''}">${dieSVG(v || 6, cur.skin)}</button>`).join('');
   if (rolled && !firstSeen && V.rolls) { sRattle(); const c = counts(V.dice); if (c.includes(5)) setTimeout(() => { toast('🎲 ' + t('yams'), 'yams', 2600); P.sfx('win'); P.confetti($('#confetti')); }, 650); }
-  // bouton et lancers restants
   $('#rollsLeft').innerHTML = [0, 1, 2].map(k => `<i class="${k < 3 - V.rolls ? '' : 'off'}"></i>`).join('');
   const rb = $('#bRoll'); rb.textContent = V.rolls ? t('rollAgain') : t('roll'); rb.disabled = !mine || V.rolls >= 3; rb.style.visibility = mine ? '' : 'hidden';
   $('#hint').textContent = !mine ? t('hintWatch', { name: cur.n || '' }) : !V.rolls ? t('hintFirst') : V.rolls < 3 ? t('hintHold') : t('hintPick');
   localDeadline = Date.now() + (V.rem || 0);
-  // feuille de score
-  renderScore(mine);
-  // annonces
+  renderVersus(); renderGrid(mine);
+  // ligne d'info : dernier coup joué
+  if (V.last) { const L = V.last, who = L.seat === net.me ? t('youPlayed') : esc(t('hePlayed', { name: (V.seats[L.seat] || {}).n || '' })); $('#status').innerHTML = `${who} <b>${t(L.cat)}</b> ${t('forPts', { n: L.v })}`; }
+  else $('#status').innerHTML = mine ? t('hintFirst') : esc(t('turnOf', { name: cur.n || '' }));
   if (V.last && V.last.id !== lastLast) {
-    const L = V.last; lastLast = L.id; const who = (V.seats[L.seat] || {}).n || '';
+    const L = V.last; lastLast = L.id;
     if (L.yb) { toast('🎲 ' + t('yamsBonus'), 'good'); P.sfx('win'); }
-    else if (L.seat !== net.me) toast(esc(t('scored', { name: who, cat: t(L.cat), n: L.v })));
-    if (L.seat === net.me) P.sfx(L.v > 0 ? 'good' : 'other');
+    if (L.seat === net.me) P.sfx(L.v > 0 ? 'good' : 'other'); else P.sfx('click');
   }
   const tk = V.turn + ':' + V.round;
   if (tk !== lastTurnKey) { lastTurnKey = tk; if (mine) { P.sfx('hint'); try { navigator.vibrate && navigator.vibrate(30); } catch (e) {} } }
 }
-function renderScore(mine) {
-  const cols = V.seats.map((s, i) => ({ s, i })).filter(o => !o.s.gone || Object.keys(o.s.card).length);
-  const canPick = mine && V.rolls > 0;
-  const head = `<thead><tr><th></th>${cols.map(o => `<th class="${o.i === V.turn ? 'cur' : ''}">${dieSVG(5, o.s.skin)}${esc(o.s.n)}</th>`).join('')}</tr></thead>`;
+function renderVersus() {
+  const live = V.seats.map((s, i) => ({ s, i })).filter(o => !o.s.gone);
+  const cols = shownCols(), cmp = cols.length === 2 && live.length > 3 ? cols[0].i : -1;
+  const vp = o => `<button class="vp${o.i === V.turn ? ' turn' : ''}${o.i === net.me ? ' me' : ''}${o.i === cmp || (live.length === 2 && o.i !== net.me) ? ' cmp' : ''}" data-cmp="${o.i}"><span class="av">${avatar(o.i)}</span><span class="nm">${esc(o.s.n)}</span><span class="sc">${totals(o.s.card).total}</span></button>`;
+  const box = $('#versus');
+  box.className = 'versus' + (live.length > 3 ? ' many' : '');
+  if (live.length === 2) {
+    const other = live.find(o => o.i !== net.me) || live[1], me = live.find(o => o.i === net.me) || live[0];
+    box.innerHTML = vp(other) + '<span class="vs">VS</span>' + vp(me);
+  } else box.innerHTML = live.map(vp).join('');
+}
+function renderGrid(mine) {
+  const cols = shownCols(), canPick = mine && V.rolls > 0, k = cols.length;
+  const tpl = `grid-template-columns:minmax(${k > 2 ? 34 : 44}px,auto) repeat(${k}, minmax(${k > 2 ? 36 : 46}px,1fr))`;
   const just = V.last ? V.last.seat + ':' + V.last.cat : '';
   const cell = (o, cat) => {
-    const v = o.s.card[cat];
-    if (v !== undefined) return `<td class="${just === o.i + ':' + cat ? 'just' : ''}">${v}</td>`;
-    if (canPick && o.i === net.me) { const p = catScore(cat, V.dice); return `<td class="pick${p ? '' : ' zero'}" data-cat="${cat}">${p}</td>`; }
-    return '<td></td>';
+    const v = o.s.card[cat], isMe = o.i === net.me, cls = isMe ? 'me' : 'v', j = just === o.i + ':' + cat ? ' just' : '';
+    if (v !== undefined) return `<span class="${cls}${j}">${v}${cat === 'cy' && o.s.card.yb ? `<small class="ytag">+${o.s.card.yb}</small>` : ''}</span>`;
+    if (canPick && isMe) { const p = catScore(cat, V.dice); return `<span class="me pick${p ? '' : ' zero'}" data-cat="${cat}">${p}</span>`; }
+    return `<span class="${cls} empty">·</span>`;
   };
-  const row = (cat, sub) => `<tr><td>${t(cat)}${sub ? `<small>${t(sub)}</small>` : ''}</td>${cols.map(o => cell(o, cat)).join('')}</tr>`;
+  const head = `<div class="ghead" style="${tpl}"><span></span>${cols.map(o => `<span style="color:${o.i === net.me ? '#8ee06a' : '#f2c14e'}">${esc(o.s.n)}</span>`).join('')}</div>`;
   const T = cols.map(o => totals(o.s.card));
-  const body = UP.map(c => row(c)).join('')
-    + `<tr class="sum"><td>${t('upper')}</td>${T.map(x => `<td>${x.up}</td>`).join('')}</tr>`
-    + `<tr class="sum"><td>${t('bonus')}</td>${T.map(x => `<td>${x.bonus ? '+35' : x.up ? `<small>${63 - x.up > 0 ? '−' + (63 - x.up) : ''}</small>` : ''}</td>`).join('')}</tr>`
-    + LOW.map(c => row(c, 's' + c.slice(1))).join('')
-    + (cols.some(o => o.s.card.yb) ? `<tr class="yb"><td>${t('yb')}</td>${cols.map(o => `<td>${o.s.card.yb ? '+' + o.s.card.yb : ''}</td>`).join('')}</tr>` : '')
-    + `<tr class="total"><td>${t('total')}</td>${T.map(x => `<td>${x.total}</td>`).join('')}</tr>`;
-  $('#score').innerHTML = head + '<tbody>' + body + '</tbody>';
+  const left = head + UP.map((c, n) => `<div class="grow" style="${tpl}"><span class="ic" title="${esc(t(c))}">${upIcon(n + 1)}</span>${cols.map(o => cell(o, c)).join('')}</div>`).join('')
+    + `<div class="grow bon" style="${tpl}"><span class="lbl2">BONUS<small>${t('bonusIf')}</small></span>${cols.map((o, x) => `<span class="${o.i === net.me ? 'me' : 'v'}">${T[x].bonus ? 35 : T[x].up ? `<small style="font-size:11px">${T[x].up}/63</small>` : 0}</span>`).join('')}</div>`
+    + `<div class="gtot" style="${tpl}"><span>${t('upperS')}</span>${T.map(x => `<span>${x.up + x.bonus}</span>`).join('')}</div>`;
+  const right = head + LOW.map(c => `<div class="grow" style="${tpl}"><span class="ic" title="${esc(t(c))}"><span class="badge2">${tagOf(c)}</span></span>${cols.map(o => cell(o, c)).join('')}</div>`).join('')
+    + `<div class="gtot" style="${tpl}"><span>${t('lowerS')}</span>${T.map(x => `<span>${x.low}</span>`).join('')}</div>`;
+  $('#grid').innerHTML = `<div class="gcol">${left}</div><div class="gcol">${right}</div>`;
+  // couleurs des colonnes : toi en vert, les autres en or (comme l'en-tête)
 }
 setInterval(() => { const b = document.getElementById('tbar'); if (b && V && V.phase === 'play') b.style.transform = `scaleX(${Math.max(0, Math.min(1, (localDeadline - Date.now()) / TURN_MS))})`; }, 250);
 $('#dice').addEventListener('click', e => {
@@ -752,9 +800,10 @@ $('#dice').addEventListener('click', e => {
   send({ t: 'hold', i: k, v: localHeld[k] });
 });
 $('#bRoll').onclick = () => { if (!V || V.turn !== net.me || V.rolls >= 3) return; P.unlockAudio(); $('#bRoll').disabled = true; send({ t: 'roll', held: localHeld }); };
-$('#score').addEventListener('click', e => {
+$('#versus').addEventListener('click', e => { const b = e.target.closest('[data-cmp]'); if (!b || +b.dataset.cmp === net.me) return; cmpPick = +b.dataset.cmp; P.sfx('click'); if (V) render(); });
+$('#grid').addEventListener('click', e => {
   const c = e.target.closest('[data-cat]'); if (!c || !V || V.turn !== net.me || !V.rolls) return;
-  const cat = c.dataset.cat; P.sfx('click'); document.querySelectorAll('#score [data-cat]').forEach(x => x.removeAttribute('data-cat')); send({ t: 'score', c: cat });
+  const cat = c.dataset.cat; P.sfx('click'); document.querySelectorAll('#grid [data-cat]').forEach(x => x.removeAttribute('data-cat')); send({ t: 'score', c: cat });
 });
 document.addEventListener('keydown', e => {
   if (!V || V.turn !== net.me || document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
