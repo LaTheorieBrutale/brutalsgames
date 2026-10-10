@@ -96,10 +96,12 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 @keyframes pulse{to{transform:scale(1.15)}}
 .wordbar{flex:none;min-height:46px;padding:6px 10px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;text-align:center;font-size:15px}
 .wordbar .w{font-family:var(--f-title);font-size:24px;letter-spacing:.06em;color:var(--sun);text-transform:uppercase}
-.slots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;align-items:flex-end}
-.slots i{font-style:normal;font-family:var(--f-title);font-size:21px;min-width:15px;text-align:center;border-bottom:3px solid var(--text);line-height:1.05;text-transform:uppercase;color:var(--sun)}
-.slots i.sp{border:0;min-width:12px}
-.slots i.pn{border:0}
+.slots{display:flex;column-gap:0;row-gap:6px;flex-wrap:wrap;justify-content:center;align-items:flex-end;max-width:100%;
+  --cw:min(17px,calc((100vw - 60px) / var(--nl) - 3px))}
+.slots .wd{display:inline-flex;gap:3px;white-space:nowrap;flex:none}
+.slots .sp{display:inline-block;width:clamp(16px,6vw,28px);flex:none}
+.slots i{font-style:normal;font-family:var(--f-title);font-size:calc(var(--cw) * 1.25);width:var(--cw);text-align:center;border-bottom:3px solid var(--text);line-height:1.05;text-transform:uppercase;color:var(--sun)}
+.slots i.pn{border:0;width:auto}
 .slots small{font-size:12px;color:var(--muted);margin-left:4px;align-self:center}
 .stage{position:relative;flex:none;width:100%;aspect-ratio:4/3;max-height:46dvh;margin:0 auto;border:4px solid var(--ink);border-radius:16px;overflow:hidden;box-shadow:0 6px 0 var(--ink);background:var(--paper)}
 #cv{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
@@ -144,6 +146,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .rc-msg.close{color:var(--sun);font-style:normal}
 .rc-msg.priv{background:rgba(92,214,92,.13);border-radius:8px;padding:1px 6px}
 .rc-msg.priv::before{content:"🔒 ";font-size:11px}
+.rc-msg.gs{opacity:.75}.rc-msg.gs::before{content:"✗ ";color:var(--coral);font-weight:900}
 .rc-empty{margin:auto;color:var(--muted);font-size:13px;text-align:center}
 .rc-form{display:flex;gap:6px}
 .rc-form .field{font-size:16px;padding:8px 10px}
@@ -670,6 +673,7 @@ function chatIn(s, txt, l) {
     if (got.length >= partsOf(G.word).length) return found(s);
     if (fresh.length) { privTo(s, { sys: 1, k: 'half', w: txt }); return; } // un des deux mots : on ne le montre pas aux autres
     if (c.close) privTo(s, { sys: 1, k: 'close', w: txt });
+    if (/[\p{L}\p{N}]/u.test(txt)) { m.gs = 1; return sendGuess(s, m); } // réponse ratée : les autres joueurs ne la voient pas (pas d'indice d'orthographe)
   }
   broadcastChat(m);
 }
@@ -718,6 +722,7 @@ function playerLeft(s) {
 /* ---------- Chat de la partie (distribution) ---------- */
 function broadcastChat(m) { net.roster.forEach((r, i) => { if (i !== 0 && r.conn && r.conn.open && !r.gone) r.conn.send({ t: 'chat', m }); }); chatAdd(m); }
 function sendPriv(m) { net.roster.forEach((r, i) => { if (!(r.found || i === G.drawer) || r.gone) return; if (i === 0) chatAdd(m); else if (r.conn && r.conn.open) r.conn.send({ t: 'chat', m }); }); }
+function sendGuess(s, m) { net.roster.forEach((r, i) => { if (r.gone || !(i === s || i === G.drawer || r.found)) return; if (i === 0) chatAdd(m); else if (r.conn && r.conn.open) r.conn.send({ t: 'chat', m }); }); }
 function privTo(s, m) { if (s === 0) chatAdd(m); else { const r = net.roster[s]; if (r && r.conn && r.conn.open) r.conn.send({ t: 'chat', m }); } }
 
 /* ---------- Réseau : salon ---------- */
@@ -840,8 +845,12 @@ function guestData(m) {
 
 /* ---------- Affichage de la partie ---------- */
 function slotsHtml(pat) {
-  const n = [...pat].filter(ch => ch === '_' || /[\p{L}\p{N}]/u.test(ch)).length;
-  return `<span class="slots">${[...pat].map(ch => ch === ' ' ? '<i class="sp"></i>' : ch === '_' ? '<i>&nbsp;</i>' : /[\p{L}\p{N}]/u.test(ch) ? `<i>${esc(ch)}</i>` : `<i class="pn">${esc(ch)}</i>`).join('')}<small>${t('letters', { n })}</small></span>`;
+  const isL = ch => ch === '_' || /[\p{L}\p{N}]/u.test(ch);
+  const n = [...pat].filter(isL).length;
+  const cell = ch => ch === '_' ? '<i>&nbsp;</i>' : /[\p{L}\p{N}]/u.test(ch) ? `<i>${esc(ch)}</i>` : `<i class="pn">${esc(ch)}</i>`;
+  const words = pat.split(' ').filter(w => w.length);
+  const longest = Math.max(1, ...words.map(w => [...w].length));
+  return `<span class="slots" style="--nl:${longest}">${words.map(w => `<span class="wd">${[...w].map(cell).join('')}</span>`).join('<span class="sp" aria-hidden="true"></span>')}<small>${t('letters', { n })}</small></span>`;
 }
 let ovKey = '';
 function render() {
@@ -958,7 +967,7 @@ function sysText(m) {
 function chatAdd(m) {
   if (!m || typeof m !== 'object') return;
   const e = m.sys ? { sys: 1, k: String(m.k || ''), name: String(m.name || '?').slice(0, 14), p: m.p | 0, w: String(m.w || '').slice(0, 40), s: m.s | 0 }
-    : { s: m.s | 0, n: String(m.n || '?').slice(0, 14), txt: String(m.txt || '').slice(0, 120), l: m.l, priv: !!m.priv };
+    : { s: m.s | 0, n: String(m.n || '?').slice(0, 14), txt: String(m.txt || '').slice(0, 120), l: m.l, priv: !!m.priv, gs: !!m.gs };
   CHAT.list.push(e); if (CHAT.list.length > 120) CHAT.list.shift();
   if (e.sys) {
     if (e.k === 'found') { if (e.s === net.me) { toast(t('youFound', { p: e.p }), 'good'); P.sfx('win'); } else P.sfx('good'); }
@@ -971,7 +980,7 @@ function chatAdd(m) {
 function renderChat() {
   const L = $('#rcList'); if (!L) return;
   L.innerHTML = CHAT.list.length ? CHAT.list.map(m => m.sys ? `<div class="rc-msg sys ${m.k === 'found' ? 'ok' : m.k === 'close' ? 'close' : m.k === 'half' ? 'ok' : ''}">${esc(sysText(m))}</div>`
-    : `<div class="rc-msg${m.priv ? ' priv' : ''}"><b style="color:${COLORS[m.s % 10]}">${esc(m.n)}</b>${trHtml(m.txt, m.l, m.s === net.me)}</div>`).join('') : `<p class="rc-empty">${t('chatEmpty')}</p>`;
+    : `<div class="rc-msg${m.priv ? ' priv' : ''}${m.gs ? ' gs' : ''}"><b style="color:${COLORS[m.s % 10]}">${esc(m.n)}</b>${trHtml(m.txt, m.l, m.s === net.me)}</div>`).join('') : `<p class="rc-empty">${t('chatEmpty')}</p>`;
   L.scrollTop = L.scrollHeight;
 }
 $('#rcForm').addEventListener('submit', e => {
