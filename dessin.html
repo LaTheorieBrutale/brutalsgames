@@ -968,6 +968,9 @@ function chatAdd(m) {
   if (!m || typeof m !== 'object') return;
   const e = m.sys ? { sys: 1, k: String(m.k || ''), name: String(m.name || '?').slice(0, 14), p: m.p | 0, w: String(m.w || '').slice(0, 40), s: m.s | 0 }
     : { s: m.s | 0, n: String(m.n || '?').slice(0, 14), txt: String(m.txt || '').slice(0, 120), l: m.l, priv: !!m.priv, gs: !!m.gs };
+  // double sécurité (même si l'hôte a une ancienne version) : tant que je n'ai pas trouvé, je ne vois pas les réponses des autres chercheurs
+  if (!e.sys && !e.priv && V && V.phase === 'draw' && e.s !== net.me && e.s !== V.drawer && net.me !== V.drawer
+      && !((V.players || [])[net.me] || {}).f && /[\p{L}\p{N}]/u.test(e.txt)) return;
   CHAT.list.push(e); if (CHAT.list.length > 120) CHAT.list.shift();
   if (e.sys) {
     if (e.k === 'found') { if (e.s === net.me) { toast(t('youFound', { p: e.p }), 'good'); P.sfx('win'); } else P.sfx('good'); }
