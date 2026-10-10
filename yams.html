@@ -518,19 +518,59 @@ P.audioDock({ on: () => MU.on, set: v => music.set(v), vol: () => music.vol() })
 document.addEventListener('pointerdown', () => { P.unlockAudio(); music.start(); }, { capture: true });
 document.addEventListener('visibilitychange', () => { const c = P.audio(); if (!c) return; if (document.hidden) c.suspend(); else c.resume(); });
 // bruit des dés qui roulent
-function sRattle() {
-  const c = P.audio(); if (!c || !P.soundOn() || !MU.noise) { P.sfx('click'); return; }
-  const now = c.currentTime;
-  for (let k = 0; k < 7; k++) { const s = c.createBufferSource(); s.buffer = MU.noise; const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1800 + Math.random() * 2500; f.Q.value = 3; const g = c.createGain(); const tt = now + k * 0.055 + Math.random() * 0.03; g.gain.value = 0; g.gain.setValueAtTime(0.0001, tt); g.gain.exponentialRampToValueAtTime(0.25 * P.sfxVol(), tt + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, tt + 0.05); s.connect(f); f.connect(g); g.connect(c.destination); s.start(tt); s.stop(tt + 0.08); }
-}
 
-// petit choc d'un dé sur la piste
-function sTick(delay, vol) {
-  const c = P.audio(); if (!c || !P.soundOn() || !MU.noise) return;
-  const tt = c.currentTime + delay / 1000, s = c.createBufferSource(); s.buffer = MU.noise;
-  const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1400 + Math.random() * 1800; f.Q.value = 4;
-  const g = c.createGain(); g.gain.value = 0; g.gain.setValueAtTime(0.0001, tt); g.gain.exponentialRampToValueAtTime(vol * P.sfxVol(), tt + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, tt + 0.06);
-  s.connect(f); f.connect(g); g.connect(c.destination); s.start(tt); s.stop(tt + 0.09);
+/* ---------- Bruit des dés : vrais chocs de dés en plastique sur une table en bois ----------
+   Chaque choc est fabriqué une fois (résonances du plastique + claquement + petit « toc » du bois),
+   puis on en joue une série pour chaque dé : il roule, rebondit sur ses arêtes et se pose. */
+const DS = { ctx: null, hits: [], clicks: [] };
+function dsBuild(c) {
+  if (DS.ctx === c) return; DS.ctx = c; DS.hits = []; DS.clicks = [];
+  const sr = c.sampleRate, R = Math.random;
+  const make = (bright, wood) => {
+    const len = Math.floor(sr * 0.11), b = c.createBuffer(1, len, sr), d = b.getChannelData(0);
+    const base = (bright ? 3600 : 2500) + R() * 1500;
+    const modes = [1, 1.59, 2.31, 3.17, 4.4].map((m, i) => ({ f: base * m * (0.94 + R() * 0.12), a: [1, .7, .5, .32, .2][i] * (0.6 + R() * 0.8), k: [70, 95, 130, 170, 230][i] * (0.75 + R() * 0.5), p: R() * 6.28 }));
+    const tf = 140 + R() * 110, tk = 60 + R() * 40;
+    let lp = 0;
+    for (let n = 0; n < len; n++) {
+      const t = n / sr; let x = 0;
+      for (const m of modes) x += m.a * Math.exp(-m.k * t) * Math.sin(6.2832 * m.f * t + m.p);
+      x *= 0.42;
+      if (t < 0.002) { const nz = R() * 2 - 1; lp += (nz - lp) * 0.5; x += lp * (1 - t / 0.002) * 1.1; }
+      if (wood) x += wood * Math.exp(-tk * t) * Math.sin(6.2832 * tf * t) * (1 - Math.exp(-t * 3000));
+      d[n] = x;
+    }
+    let mx = 0; for (let n = 0; n < len; n++) mx = Math.max(mx, Math.abs(d[n]));
+    for (let n = 0; n < len; n++) d[n] /= mx || 1;
+    return b;
+  };
+  for (let k = 0; k < 10; k++) DS.hits.push(make(false, 0.55 + R() * 0.3));
+  for (let k = 0; k < 6; k++) DS.clicks.push(make(true, 0));
+}
+function dsHit(c, dest, when, vol, pan, click) {
+  const set = click ? DS.clicks : DS.hits, s = c.createBufferSource();
+  s.buffer = set[Math.floor(Math.random() * set.length)]; s.playbackRate.value = 0.88 + Math.random() * 0.3;
+  const g = c.createGain(); g.gain.value = vol;
+  let out = g;
+  if (c.createStereoPanner) { const pn = c.createStereoPanner(); pn.pan.value = Math.max(-1, Math.min(1, pan)); g.connect(pn); out = pn; }
+  s.connect(g); out.connect(dest); s.start(Math.max(when, c.currentTime)); s.stop(Math.max(when, c.currentTime) + 0.13);
+}
+// un dé qui arrive en roulant : chocs de plus en plus rapprochés et doux, puis il se pose (et cogne parfois son voisin)
+function dsDie(c, dest, t0, dur, pan, vol) {
+  dsBuild(c);
+  const fr = [0.04, 0.17, 0.29, 0.40, 0.50, 0.59, 0.67, 0.74, 0.80, 0.855, 0.9, 0.935];
+  fr.forEach((f, i) => {
+    if (i > 2 && Math.random() < 0.18) return;
+    const amp = vol * (1 - i / fr.length * 0.75) * (0.75 + Math.random() * 0.4);
+    dsHit(c, dest, t0 + dur * (f + (Math.random() - 0.5) * 0.025), amp, pan * (1 - f * 0.6), false);
+  });
+  if (Math.random() < 0.6) dsHit(c, dest, t0 + dur * (0.88 + Math.random() * 0.06), vol * 0.45, pan * 0.4, true);
+}
+function diceSound(plan) {
+  const c = P.audio(); if (!c || !P.soundOn()) return;
+  const dest = c.createGain(); dest.gain.value = 0.55 * P.sfxVol(); dest.connect(c.destination);
+  const now = c.currentTime;
+  plan.forEach(p => dsDie(c, dest, now + p.delay / 1000, p.dur / 1000, p.pan, 1));
 }
 
 /* ---------- Animation des lancers ---------- */
@@ -543,7 +583,7 @@ function animateRoll(skin, prev) {
   row.classList.add('busy');
   const rw = row.getBoundingClientRect(), tray = row.closest('.tray'), tr = tray.getBoundingClientRect();
   const OUT = 170, GAP = 125, FLY = 640;
-  let longest = 0;
+  let longest = 0; const plan = [];
   dice.forEach((b, n) => {
     const k = +b.dataset.die, body = b.querySelector('.dbody'), sh = b.querySelector('.dsh');
     // 1) l'ancien dé rapetisse et disparaît sur place
@@ -583,9 +623,10 @@ function animateRoll(skin, prev) {
       requestAnimationFrame(trail);
     };
     requestAnimationFrame(trail);
-    sTick(delay + FLY * .45, .12); sTick(delay + FLY * .88, .3);
+    plan.push({ delay, dur: FLY, pan: ((br.left + br.width / 2) - (tr.left + tr.width / 2)) / (tr.width / 2) * 0.7 });
     longest = Math.max(longest, delay + FLY);
   });
+  diceSound(plan);
   return longest;
 }
 
@@ -907,7 +948,7 @@ $('#dice').addEventListener('click', e => {
   const k = +b.dataset.die; localHeld[k] = !localHeld[k]; b.classList.toggle('held', localHeld[k]); P.sfx('click');
   send({ t: 'hold', i: k, v: localHeld[k] });
 });
-$('#bRoll').onclick = () => { if (!V || V.turn !== net.me || V.rolls >= 3) return; if (animating()) return; P.unlockAudio(); const rb = $('#bRoll'); rb.disabled = true; rb.classList.remove('shake'); void rb.offsetWidth; rb.classList.add('shake'); sRattle(); send({ t: 'roll', held: localHeld }); };
+$('#bRoll').onclick = () => { if (!V || V.turn !== net.me || V.rolls >= 3) return; if (animating()) return; P.unlockAudio(); const rb = $('#bRoll'); rb.disabled = true; rb.classList.remove('shake'); void rb.offsetWidth; rb.classList.add('shake'); send({ t: 'roll', held: localHeld }); };
 $('#versus').addEventListener('click', e => { const b = e.target.closest('[data-cmp]'); if (!b || +b.dataset.cmp === net.me) return; cmpPick = +b.dataset.cmp; P.sfx('click'); if (V) render(); });
 $('#grid').addEventListener('click', e => {
   const c = e.target.closest('[data-cat]'); if (!c || !V || V.turn !== net.me || !V.rolls) return;
@@ -1001,7 +1042,7 @@ P.onLang(() => {
 });
 P.applyStatic(); renderSnd(); renderMus(); renderChat(); renderSkins(); renderSoloSub();
 { const jc = window.Party && Party.takeJoin(); if (jc) joinFromParty(jc); }
-window.__ym = { get S() { return S; }, get V() { return V; }, net, catScore, totals };
+window.__ym = { dsDie,  get S() { return S; }, get V() { return V; }, net, catScore, totals };
 })();
 </script>
 </body>
