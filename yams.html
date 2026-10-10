@@ -515,59 +515,42 @@ const music = {
 function renderMus() { $('#musSeg').innerHTML = `<button class="btn" data-mus="1" aria-pressed="${MU.on}">${t('musOn')}</button><button class="btn" data-mus="0" aria-pressed="${!MU.on}">${t('musOff')}</button>`; if (P.dock) P.dock.refresh(); }
 document.addEventListener('click', e => { const b = e.target.closest('[data-mus]'); if (b) { music.set(b.dataset.mus === '1'); P.sfx('click'); } });
 P.audioDock({ on: () => MU.on, set: v => music.set(v), vol: () => music.vol() });
-document.addEventListener('pointerdown', () => { P.unlockAudio(); music.start(); }, { capture: true });
+document.addEventListener('pointerdown', () => { P.unlockAudio(); music.start(); dsLoad(P.audio()); }, { capture: true });
 document.addEventListener('visibilitychange', () => { const c = P.audio(); if (!c) return; if (document.hidden) c.suspend(); else c.resume(); });
 // bruit des dés qui roulent
 
-/* ---------- Bruit des dés : vrais chocs de dés en plastique sur une table en bois ----------
-   Chaque choc est fabriqué une fois (résonances du plastique + claquement + petit « toc » du bois),
-   puis on en joue une série pour chaque dé : il roule, rebondit sur ses arêtes et se pose. */
-const DS = { ctx: null, hits: [], clicks: [] };
-function dsBuild(c) {
-  if (DS.ctx === c) return; DS.ctx = c; DS.hits = []; DS.clicks = [];
-  const sr = c.sampleRate, R = Math.random;
-  const make = (bright, wood) => {
-    const len = Math.floor(sr * 0.11), b = c.createBuffer(1, len, sr), d = b.getChannelData(0);
-    const base = (bright ? 3600 : 2500) + R() * 1500;
-    const modes = [1, 1.59, 2.31, 3.17, 4.4].map((m, i) => ({ f: base * m * (0.94 + R() * 0.12), a: [1, .7, .5, .32, .2][i] * (0.6 + R() * 0.8), k: [70, 95, 130, 170, 230][i] * (0.75 + R() * 0.5), p: R() * 6.28 }));
-    const tf = 140 + R() * 110, tk = 60 + R() * 40;
-    let lp = 0;
-    for (let n = 0; n < len; n++) {
-      const t = n / sr; let x = 0;
-      for (const m of modes) x += m.a * Math.exp(-m.k * t) * Math.sin(6.2832 * m.f * t + m.p);
-      x *= 0.42;
-      if (t < 0.002) { const nz = R() * 2 - 1; lp += (nz - lp) * 0.5; x += lp * (1 - t / 0.002) * 1.1; }
-      if (wood) x += wood * Math.exp(-tk * t) * Math.sin(6.2832 * tf * t) * (1 - Math.exp(-t * 3000));
-      d[n] = x;
-    }
-    let mx = 0; for (let n = 0; n < len; n++) mx = Math.max(mx, Math.abs(d[n]));
-    for (let n = 0; n < len; n++) d[n] /= mx || 1;
-    return b;
-  };
-  for (let k = 0; k < 10; k++) DS.hits.push(make(false, 0.55 + R() * 0.3));
-  for (let k = 0; k < 6; k++) DS.clicks.push(make(true, 0));
+/* ---------- Bruit des dés : vrais enregistrements (dé sur table en bois, dé contre dé) ----------
+   Pour chaque dé on enchaîne quelques chocs calés sur l'animation : il roule, rebondit et se pose. */
+const DS = { hits: [], clicks: [], loading: null };
+function dsLoad(c) {
+  if (DS.loading || !c) return DS.loading;
+  const L = (name, list) => fetch('sounds/dice/' + name + '.mp3').then(r => r.arrayBuffer())
+    .then(a => new Promise((res, rej) => c.decodeAudioData(a, res, rej))).then(b => { list.push(b); }).catch(() => {});
+  const jobs = [];
+  for (let i = 1; i <= 7; i++) jobs.push(L('wood' + i, DS.hits));
+  for (let i = 1; i <= 15; i++) jobs.push(L('hit' + i, DS.clicks));
+  return DS.loading = Promise.all(jobs);
 }
 function dsHit(c, dest, when, vol, pan, click) {
-  const set = click ? DS.clicks : DS.hits, s = c.createBufferSource();
-  s.buffer = set[Math.floor(Math.random() * set.length)]; s.playbackRate.value = 0.88 + Math.random() * 0.3;
+  const set = click && DS.clicks.length ? DS.clicks : DS.hits; if (!set.length) return;
+  const s = c.createBufferSource(), t = Math.max(when, c.currentTime);
+  s.buffer = set[Math.floor(Math.random() * set.length)]; s.playbackRate.value = 0.94 + Math.random() * 0.14;
   const g = c.createGain(); g.gain.value = vol;
   let out = g;
   if (c.createStereoPanner) { const pn = c.createStereoPanner(); pn.pan.value = Math.max(-1, Math.min(1, pan)); g.connect(pn); out = pn; }
-  s.connect(g); out.connect(dest); s.start(Math.max(when, c.currentTime)); s.stop(Math.max(when, c.currentTime) + 0.13);
+  s.connect(g); out.connect(dest); s.start(t);
 }
 // un dé qui arrive en roulant : chocs de plus en plus rapprochés et doux, puis il se pose (et cogne parfois son voisin)
 function dsDie(c, dest, t0, dur, pan, vol) {
-  dsBuild(c);
-  const fr = [0.04, 0.17, 0.29, 0.40, 0.50, 0.59, 0.67, 0.74, 0.80, 0.855, 0.9, 0.935];
-  fr.forEach((f, i) => {
-    if (i > 2 && Math.random() < 0.18) return;
-    const amp = vol * (1 - i / fr.length * 0.75) * (0.75 + Math.random() * 0.4);
-    dsHit(c, dest, t0 + dur * (f + (Math.random() - 0.5) * 0.025), amp, pan * (1 - f * 0.6), false);
+  [[0.03, 1], [0.24, 0.8], [0.45, 0.75], [0.62, 0.55], [0.76, 0.45], [0.87, 0.35], [0.95, 0.18]].forEach(([f, a], i) => {
+    if (i > 1 && i < 6 && Math.random() < 0.2) return;
+    dsHit(c, dest, t0 + dur * (f + (Math.random() - 0.5) * 0.03), vol * a * (0.8 + Math.random() * 0.35), pan * (1 - f * 0.6), false);
   });
-  if (Math.random() < 0.6) dsHit(c, dest, t0 + dur * (0.88 + Math.random() * 0.06), vol * 0.45, pan * 0.4, true);
+  if (Math.random() < 0.7) dsHit(c, dest, t0 + dur * (0.86 + Math.random() * 0.08), vol * 0.6, pan * 0.4, true);
+  if (Math.random() < 0.35) dsHit(c, dest, t0 + dur * (0.5 + Math.random() * 0.2), vol * 0.4, pan * 0.7, true);
 }
 function diceSound(plan) {
-  const c = P.audio(); if (!c || !P.soundOn()) return;
+  const c = P.audio(); if (!c || !P.soundOn()) return; dsLoad(c);
   const dest = c.createGain(); dest.gain.value = 0.55 * P.sfxVol(); dest.connect(c.destination);
   const now = c.currentTime;
   plan.forEach(p => dsDie(c, dest, now + p.delay / 1000, p.dur / 1000, p.pan, 1));
@@ -1042,7 +1025,7 @@ P.onLang(() => {
 });
 P.applyStatic(); renderSnd(); renderMus(); renderChat(); renderSkins(); renderSoloSub();
 { const jc = window.Party && Party.takeJoin(); if (jc) joinFromParty(jc); }
-window.__ym = { dsDie,  get S() { return S; }, get V() { return V; }, net, catScore, totals };
+window.__ym = { dsDie, dsLoad,  get S() { return S; }, get V() { return V; }, net, catScore, totals };
 })();
 </script>
 </body>
