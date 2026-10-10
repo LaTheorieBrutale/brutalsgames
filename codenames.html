@@ -433,11 +433,12 @@ document.addEventListener('pointerdown', () => { P.unlockAudio(); music.start();
 document.addEventListener('visibilitychange', () => { const c = P.audio(); if (!c) return; if (document.hidden) c.suspend(); else c.resume(); });
 
 /* ---------- Traduction (indices, chat) ---------- */
+const trRedraw = () => { if (V) render(); renderChat(); };
 function trHtml(text, src, mine) {
   const tl = P.lang();
   if (mine || !src || src === tl || !window.BGT) return esc(text);
   const v = BGT.peek(text, tl, src);
-  if (v === undefined) { BGT.translate(text, tl, src).then(r => { if (r) { render(); renderChat(); } }); return esc(text); }
+  if (v === undefined) { BGT.want(text, tl, src, trRedraw); return esc(text); }
   return v ? `<span class="tr" data-orig="${esc(text)}" title="${esc(t('translated'))}">${esc(v)}</span>` : esc(text);
 }
 document.addEventListener('click', e => { const el = e.target.closest('.tr'); if (el && !el.closest('.card')) { e.stopPropagation(); toast('🌐 ' + esc(el.dataset.orig)); } }, true);

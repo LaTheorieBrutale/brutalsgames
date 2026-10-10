@@ -463,7 +463,7 @@ function trHtml(text, src, mine) {
   // pendant le dessin, on ne traduit pas les réponses courtes (sinon la traduction pourrait souffler le mot)
   if (V && V.phase === 'draw' && text.trim().split(/\s+/).length < 3) return esc(text);
   const v = BGT.peek(text, tl, src);
-  if (v === undefined) { BGT.translate(text, tl, src).then(r => { if (r) renderChat(); }); return esc(text); }
+  if (v === undefined) { BGT.want(text, tl, src, renderChat); return esc(text); }
   return v ? `<span class="tr" data-orig="${esc(text)}" title="${esc(t('translated'))}">${esc(v)}</span>` : esc(text);
 }
 document.addEventListener('click', e => { const el = e.target.closest('.tr'); if (el) { e.stopPropagation(); toast('🌐 ' + esc(el.dataset.orig)); } }, true);

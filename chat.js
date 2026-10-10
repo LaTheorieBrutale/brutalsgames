@@ -27,6 +27,10 @@ const BGT = window.BGT = (() => {
     if (!r.ok) throw new Error(r.status);
     const j = await r.json(); return { out: (j.responseData && j.responseData.translatedText) || '', src: sl };
   }
+  // au plus 4 traductions en même temps (sinon des dizaines de requêtes partent d'un coup à l'ouverture)
+  let active = 0; const waiting = [];
+  const slot = () => new Promise(res => { if (active < 4) { active++; res(); } else waiting.push(res); });
+  const release = () => { const n = waiting.shift(); if (n) n(); else active--; };
   function translate(text, tl, sl = 'auto') {
     text = String(text || '').trim();
     if (!text || !tl || (sl !== 'auto' && sl === tl) || /^[\p{P}\p{S}\s\d…]+$/u.test(text)) return Promise.resolve(null);
@@ -35,14 +39,25 @@ const BGT = window.BGT = (() => {
     if (pending.has(key)) return pending.get(key);
     const job = (async () => {
       let res = null;
-      try { res = await gtx(text, tl, sl); } catch (e) { try { res = await mym(text, tl, sl); } catch (e2) { res = null; } }
+      await slot();
+      try { res = await gtx(text, tl, sl); } catch (e) { try { res = await mym(text, tl, sl); } catch (e2) { res = null; } } finally { release(); }
       const v = res && res.out && res.src !== tl && !same(res.out, text) ? res.out : null;
       cache.set(key, v); pending.delete(key); if (res) save(); return v;
     })();
     pending.set(key, job); return job;
   }
   const peek = (text, tl, sl = 'auto') => cache.get(tl + '|' + sl + '|' + String(text || '').trim());
-  return { translate, peek };
+  // want : demande une traduction UNE seule fois et redessine une seule fois (groupé) quand des traductions arrivent.
+  // (avant, chaque affichage relançait des rappels : des milliers de re-rendus figeaient la page au premier chargement)
+  const asked = new Map(), due = new Set(); let dueT = 0;
+  const flush = () => { dueT = 0; const fs = [...due]; due.clear(); fs.forEach(f => { try { f(); } catch (e) {} }); };
+  function want(text, tl, sl, redraw) {
+    const key = tl + '|' + (sl || 'auto') + '|' + String(text || '').trim();
+    let set = asked.get(key);
+    if (!set) { set = new Set(); asked.set(key, set); translate(text, tl, sl || 'auto').then(v => { asked.delete(key); if (v) { set.forEach(f => due.add(f)); if (!dueT) dueT = setTimeout(flush, 150); } }); }
+    if (redraw) set.add(redraw);
+  }
+  return { translate, peek, want };
 })();
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const hue = n => { let h = 0; for (const c of String(n).toLowerCase()) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
@@ -99,7 +114,7 @@ function mount(el, o) {
       if (day !== lastDay) { if (day !== today || lastDay) html += `<div class="gc-day">${day === today ? '—' : esc(d.toLocaleDateString(s.locale, { day: 'numeric', month: 'short' }))}</div>`; lastDay = day; }
       const tl = o.lang ? o.lang() : 'fr', mine = m.n.toLowerCase() === me;
       let txt = esc(m.m);
-      if (!mine && m.l !== tl) { const tr = BGT.peek(m.m, tl, m.l); if (tr === undefined) BGT.translate(m.m, tl, m.l).then(v => { if (v) render(); }); else if (tr) txt = `<span class="gc-tr" title="${esc(m.m)}">${esc(tr)}</span>`; }
+      if (!mine && m.l !== tl) { const tr = BGT.peek(m.m, tl, m.l); if (tr === undefined) BGT.want(m.m, tl, m.l, render); else if (tr) txt = `<span class="gc-tr" title="${esc(m.m)}">${esc(tr)}</span>`; }
       html += `<div class="gc-msg${mine ? ' me' : ''}"><time>${d.toLocaleTimeString(s.locale, { hour: '2-digit', minute: '2-digit' })}</time><b style="color:hsl(${hue(m.n)},85%,70%)">${esc(m.n)}</b>${txt}</div>`;
     }
     list.innerHTML = html;

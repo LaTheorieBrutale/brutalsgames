@@ -490,7 +490,7 @@ function trHtml(text, src, mine) {
   const tl = P.lang();
   if (mine || !src || src === tl || !window.BGT) return esc(text);
   const v = BGT.peek(text, tl, src);
-  if (v === undefined) { BGT.translate(text, tl, src).then(r => { if (r) renderChat(); }); return esc(text); }
+  if (v === undefined) { BGT.want(text, tl, src, renderChat); return esc(text); }
   return v ? `<span class="tr" data-orig="${esc(text)}" title="${esc(t('translated'))}">${esc(v)}</span>` : esc(text);
 }
 document.addEventListener('click', e => { const el = e.target.closest('.tr'); if (el) { e.stopPropagation(); toast('🌐 ' + esc(el.dataset.orig)); } }, true);
