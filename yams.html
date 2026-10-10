@@ -811,6 +811,7 @@ function guestData(m) {
 }
 
 /* ---------- Affichage de la partie ---------- */
+let justId = -1, justUntil = 0;
 let localHeld = null, heldKey = '', lastRoll = -1, lastLast = 0, lastTurnKey = '', localDeadline = 0, cmpPick = -1;
 // icônes des cases : dés aux points colorés (haut), étiquettes (bas)
 const UPCOL = ['#e0483a', '#f08a1e', '#2a7ad8', '#3aa84a', '#9a3ad8', '#1ab0a8'];
@@ -879,7 +880,9 @@ function renderVersus() {
 function renderGrid(mine) {
   const cols = shownCols(), canPick = mine && V.rolls > 0 && !animating(), k = cols.length;
   const tpl = `grid-template-columns:minmax(${k > 2 ? 34 : 44}px,auto) repeat(${k}, minmax(${k > 2 ? 36 : 46}px,1fr))`;
-  const just = V.last ? V.last.seat + ':' + V.last.cat : '';
+  // la case jouée ne clignote qu'une fois, pas à chaque mise à jour de la feuille
+  if (V.last && V.last.id !== justId) { justId = V.last.id; justUntil = Date.now() + 1200; }
+  const just = V.last && Date.now() < justUntil ? V.last.seat + ':' + V.last.cat : '';
   const cell = (o, cat) => {
     const v = o.s.card[cat], isMe = o.i === net.me, cls = isMe ? 'me' : 'v', j = just === o.i + ':' + cat ? ' just' : '';
     if (v !== undefined) return `<span class="${cls}${j}">${v}${cat === 'cy' && o.s.card.yb ? `<small class="ytag">+${o.s.card.yb}</small>` : ''}</span>`;
