@@ -146,8 +146,15 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .die.held{transform:translateY(-7px)}
 .die.held::after{content:"";position:absolute;left:12%;right:12%;bottom:-11px;height:5px;border-radius:3px;background:var(--gold);box-shadow:0 0 10px var(--gold)}
 .die:disabled{cursor:default}
-.die.rolling svg{animation:tumble .62s cubic-bezier(.3,1.4,.5,1)}
-@keyframes tumble{0%{transform:translateY(-34px) rotate(-200deg) scale(.7)}60%{transform:translateY(4px) rotate(18deg) scale(1.06)}100%{transform:none}}
+.die .dbody{display:block;width:100%;height:100%;position:relative;z-index:1;transform-origin:50% 80%;will-change:transform}
+.die .dsh{position:absolute;left:10%;right:10%;bottom:-6px;height:9px;border-radius:50%;background:rgba(0,0,0,.45);filter:blur(2px);opacity:0;pointer-events:none}
+.die.anim .dsh{opacity:1}
+.die.anim svg{filter:drop-shadow(0 2px 0 rgba(0,0,0,.5))}
+.dicerow.busy .die{pointer-events:none}
+.tray.thud{animation:thud .18s}
+@keyframes thud{40%{transform:translateY(2px)}}
+#bRoll.shake{animation:shake .32s}
+@keyframes shake{20%{transform:rotate(-5deg)}40%{transform:rotate(5deg)}60%{transform:rotate(-3deg)}80%{transform:rotate(2deg)}}
 .die.blank svg{opacity:.3}
 .rollbar{display:flex;align-items:center;gap:10px;width:100%;justify-content:center}
 .rollbar .btn{min-width:150px;font-size:18px;padding:8px 14px 7px}
@@ -279,6 +286,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
     <button class="btn icon" id="bQuit" data-i18n-aria="quit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     <div class="mid"><small id="hRound"></small><b id="hInfo"></b></div>
     <span id="hudDock" style="display:inline-flex"></span>
+    <button class="btn icon" id="bSkin" data-i18n-aria="changeDice" title=""><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="#fff" stroke="#0d0705" stroke-width="2"/><circle cx="8" cy="8" r="1.9" fill="#0d0705"/><circle cx="16" cy="8" r="1.9" fill="#0d0705"/><circle cx="12" cy="12" r="1.9" fill="#0d0705"/><circle cx="8" cy="16" r="1.9" fill="#0d0705"/><circle cx="16" cy="16" r="1.9" fill="#0d0705"/></svg></button>
     <button class="btn icon chatbtn" id="bChat" data-i18n-aria="chat">💬<span class="badge"></span></button>
   </div>
   <div class="versus" id="versus"></div>
@@ -310,6 +318,10 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
   <div class="rc-head"><span>💬 <span data-i18n="chat">Chat</span></span><button class="btn icon" id="rcClose" data-i18n-aria="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   <div class="rc-list" id="rcList"></div>
   <form class="rc-form" id="rcForm" autocomplete="off"><input class="field" id="rcIn" maxlength="160" enterkeyhint="send" data-i18n-ph="chatPh"><button class="btn gold" type="submit" data-i18n="send">Envoyer</button></form>
+</div>
+<div class="frame sheet" id="skinSheet" hidden>
+  <div class="sheet-head"><span data-i18n="myDice">Tes dés</span><button class="btn icon" id="bSkinClose" data-i18n-aria="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="skins" id="skinsGame"></div>
 </div>
 <div class="frame sheet" id="settings" hidden>
   <div class="sheet-head"><span data-i18n="settings">Réglages</span><button class="btn icon" id="bSetClose" data-i18n-aria="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
@@ -350,7 +362,7 @@ P.addStrings({
     quitQ: 'Quitter la partie ?', left: '{name} a quitté la partie', joinedSys: '{name} rejoint la partie',
     chat: 'Chat', send: 'Envoyer', chatPh: 'Écris un message…', chatEmpty: 'Discutez ici !', chatInvite: 'Chat de la partie : touche pour écrire…', translated: 'Traduit automatiquement',
     music: 'Musique', musOn: 'Activée', musOff: 'Coupée', on: 'Activés', off: 'Coupés',
-    sk_classic: 'Classique', sk_ruby: 'Rubis', sk_emerald: 'Émeraude', sk_sapphire: 'Saphir', sk_gold: 'Or', sk_wood: 'Bois', sk_bone: 'Os', sk_galaxy: 'Galaxie', sk_candy: 'Bonbon', sk_lava: 'Lave',
+    changeDice: 'Changer de dés', sk_classic: 'Classique', sk_ruby: 'Rubis', sk_emerald: 'Émeraude', sk_sapphire: 'Saphir', sk_gold: 'Or', sk_wood: 'Bois', sk_bone: 'Os', sk_galaxy: 'Galaxie', sk_candy: 'Bonbon', sk_lava: 'Lave',
     rulesTxt: '<p>À ton tour, lance les <b>5 dés</b> jusqu’à <b>3 fois</b>. Entre deux lancers, touche les dés que tu veux garder.</p><p>Ensuite, inscris ton résultat dans <b>une case</b> de ta feuille (une seule fois chacune, 0 si ça ne colle pas). Haut : la somme des 1, des 2… jusqu’aux 6 (<b>bonus de 35</b> si tu fais 63 ou plus). Bas : brelan et carré (somme des dés), full 25, petite suite 30, grande suite 40, <b>Yam’s</b> (5 dés pareils) 50, chance (somme).</p><p>Chaque Yam’s en plus rapporte <b>+100</b>. Après 13 tours, le plus gros total gagne !</p><p>Choisis ton skin de dés : tout le monde les voit quand c’est ton tour.</p>' },
   en: { games: 'Games', tagline: 'Roll, hold, and go for the Yahtzee!', nick: 'Your nickname', myDice: 'Your dice', online: 'Game with friends', onlineSub: 'online, 2 to 8 players', solo: 'Solo game', soloSub: 'beat your high score', record: 'best: {n} points', howTo: 'How to play?',
     create: 'Create a game', orJoin: 'or join friends', join: 'Join', gameCode: 'Game code', copyCode: 'Copy code', copied: 'Copied!', start: 'Start the game', leave: 'Leave', players: 'Players',
@@ -365,7 +377,7 @@ P.addStrings({
     quitQ: 'Leave the game?', left: '{name} left the game', joinedSys: '{name} joins the game',
     chat: 'Chat', send: 'Send', chatPh: 'Type a message…', chatEmpty: 'Talk here!', chatInvite: 'Game chat: tap to write…', translated: 'Auto-translated',
     music: 'Music', musOn: 'On', musOff: 'Off', on: 'On', off: 'Off',
-    sk_classic: 'Classic', sk_ruby: 'Ruby', sk_emerald: 'Emerald', sk_sapphire: 'Sapphire', sk_gold: 'Gold', sk_wood: 'Wood', sk_bone: 'Bone', sk_galaxy: 'Galaxy', sk_candy: 'Candy', sk_lava: 'Lava',
+    changeDice: 'Change dice', sk_classic: 'Classic', sk_ruby: 'Ruby', sk_emerald: 'Emerald', sk_sapphire: 'Sapphire', sk_gold: 'Gold', sk_wood: 'Wood', sk_bone: 'Bone', sk_galaxy: 'Galaxy', sk_candy: 'Candy', sk_lava: 'Lava',
     rulesTxt: '<p>On your turn, roll the <b>5 dice</b> up to <b>3 times</b>. Between rolls, tap the dice you want to keep.</p><p>Then write your result in <b>one box</b> of your sheet (each box once, 0 if it doesn’t fit). Upper: the sum of 1s, 2s… up to 6s (<b>35 bonus</b> at 63 or more). Lower: 3 and 4 of a kind (sum of dice), full house 25, small straight 30, large straight 40, <b>Yahtzee</b> (5 of a kind) 50, chance (sum).</p><p>Each extra Yahtzee scores <b>+100</b>. After 13 turns, the highest total wins!</p><p>Pick your dice skin: everyone sees it on your turn.</p>' },
   cs: { games: 'Hry', tagline: 'Hoď, podrž a jdi po Yamsu!', nick: 'Tvoje přezdívka', myDice: 'Tvoje kostky', online: 'Hra s kamarády', onlineSub: 'online, 2 až 8 hráčů', solo: 'Hra sólo', soloSub: 'překonej svůj rekord', record: 'rekord: {n} bodů', howTo: 'Jak hrát?',
     create: 'Vytvořit hru', orJoin: 'nebo se připoj ke kamarádům', join: 'Připojit', gameCode: 'Kód hry', copyCode: 'Kopírovat kód', copied: 'Zkopírováno!', start: 'Spustit hru', leave: 'Odejít', players: 'Hráči',
@@ -380,7 +392,7 @@ P.addStrings({
     quitQ: 'Opustit hru?', left: '{name} opustil hru', joinedSys: '{name} se připojuje',
     chat: 'Chat', send: 'Odeslat', chatPh: 'Napiš zprávu…', chatEmpty: 'Diskutujte tady!', chatInvite: 'Chat hry: klepni a piš…', translated: 'Automaticky přeloženo',
     music: 'Hudba', musOn: 'Zapnutá', musOff: 'Vypnutá', on: 'Zapnuté', off: 'Vypnuté',
-    sk_classic: 'Klasika', sk_ruby: 'Rubín', sk_emerald: 'Smaragd', sk_sapphire: 'Safír', sk_gold: 'Zlato', sk_wood: 'Dřevo', sk_bone: 'Kost', sk_galaxy: 'Galaxie', sk_candy: 'Bonbon', sk_lava: 'Láva',
+    changeDice: 'Změnit kostky', sk_classic: 'Klasika', sk_ruby: 'Rubín', sk_emerald: 'Smaragd', sk_sapphire: 'Safír', sk_gold: 'Zlato', sk_wood: 'Dřevo', sk_bone: 'Kost', sk_galaxy: 'Galaxie', sk_candy: 'Bonbon', sk_lava: 'Láva',
     rulesTxt: '<p>Na tahu hoď <b>5 kostkami</b> až <b>3krát</b>. Mezi hody klepni na kostky, které chceš nechat.</p><p>Pak zapiš výsledek do <b>jednoho políčka</b> (každé jen jednou, 0 když nesedí). Nahoře: součet jedniček, dvojek… až šestek (<b>bonus 35</b> za 63 a víc). Dole: trojice a čtveřice (součet kostek), full house 25, malá postupka 30, velká postupka 40, <b>Yams</b> (5 stejných) 50, šance (součet).</p><p>Každý další Yams dává <b>+100</b>. Po 13 kolech vyhrává nejvyšší součet!</p><p>Vyber si vzhled kostek: všichni ho uvidí, když jsi na tahu.</p>' }
 });
 
@@ -419,12 +431,15 @@ function dieSVG(v, skinId) {
 let mySkin = SKINS[P.get('ym-skin', '')] ? P.get('ym-skin', '') : 'classic';
 function renderSkins() {
   const html = SKIN_IDS.map((id, k) => `<button data-skin="${id}" class="${id === mySkin ? 'on' : ''}" aria-label="${esc(t('sk_' + id))}">${dieSVG((k % 6) + 1, id)}<span>${esc(t('sk_' + id))}</span></button>`).join('');
-  ['#skinsHome', '#skinsLobby'].forEach(s => { $(s).innerHTML = html; });
+  ['#skinsHome', '#skinsLobby', '#skinsGame'].forEach(s => { $(s).innerHTML = html; });
+  $('#bSkin').innerHTML = dieSVG(5, mySkin);
   $('#logoDice').innerHTML = [5, 6, 1].map(v => dieSVG(v, mySkin)).join('');
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-skin]'); if (!b) return;
+  const fromGame = !!b.closest('#skinsGame');
   mySkin = b.dataset.skin; P.set('ym-skin', mySkin); P.sfx('click'); renderSkins();
+  if (fromGame) setTimeout(() => { $('#skinSheet').hidden = true; }, 250);
   if (net.role === 'guest' && net.conn && net.conn.open) net.conn.send({ t: 'skin', s: mySkin });
   if (net.role === 'host' && net.roster[0]) { net.roster[0].skin = mySkin; if (S && S.seats[0]) { S.seats[0].skin = mySkin; sync(); } else broadcastLobby(); }
 });
@@ -440,6 +455,8 @@ let toastT;
 function toast(msg, cls, ms) { const el = $('#toast'); el.innerHTML = msg; el.className = cls === true ? 'bad' : cls || ''; void el.offsetWidth; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), ms || 2200); }
 function renderSnd() { $('#sndSeg').innerHTML = `<button class="btn" data-snd="1" aria-pressed="${P.soundOn()}">${t('on')}</button><button class="btn" data-snd="0" aria-pressed="${!P.soundOn()}">${t('off')}</button>`; }
 document.addEventListener('click', e => { const b = e.target.closest('[data-snd]'); if (b) { P.setSound(b.dataset.snd === '1'); renderSnd(); P.sfx('click'); } });
+$('#bSkin').onclick = () => { P.sfx('click'); $('#skinSheet').hidden = !$('#skinSheet').hidden; };
+$('#bSkinClose').onclick = () => { P.sfx('click'); $('#skinSheet').hidden = true; };
 $('#bSet').onclick = () => { P.unlockAudio(); P.sfx('click'); $('#settings').hidden = !$('#settings').hidden; };
 $('#bSetClose').onclick = () => { P.sfx('click'); $('#settings').hidden = true; };
 $('#bRules').onclick = () => { P.unlockAudio(); P.sfx('click'); $('#rules').hidden = false; };
@@ -492,6 +509,65 @@ function sRattle() {
   const c = P.audio(); if (!c || !P.soundOn() || !MU.noise) { P.sfx('click'); return; }
   const now = c.currentTime;
   for (let k = 0; k < 7; k++) { const s = c.createBufferSource(); s.buffer = MU.noise; const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1800 + Math.random() * 2500; f.Q.value = 3; const g = c.createGain(); const tt = now + k * 0.055 + Math.random() * 0.03; g.gain.value = 0; g.gain.setValueAtTime(0.0001, tt); g.gain.exponentialRampToValueAtTime(0.25 * P.sfxVol(), tt + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, tt + 0.05); s.connect(f); f.connect(g); g.connect(c.destination); s.start(tt); s.stop(tt + 0.08); }
+}
+
+// petit choc d'un dé sur la piste
+function sTick(delay, vol) {
+  const c = P.audio(); if (!c || !P.soundOn() || !MU.noise) return;
+  const tt = c.currentTime + delay / 1000, s = c.createBufferSource(); s.buffer = MU.noise;
+  const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1400 + Math.random() * 1800; f.Q.value = 4;
+  const g = c.createGain(); g.gain.value = 0; g.gain.setValueAtTime(0.0001, tt); g.gain.exponentialRampToValueAtTime(vol * P.sfxVol(), tt + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, tt + 0.06);
+  s.connect(f); f.connect(g); g.connect(c.destination); s.start(tt); s.stop(tt + 0.09);
+}
+
+/* ---------- Animation des lancers ---------- */
+const ROLL_MS = 1050;
+let animEnd = 0, animTimer = 0;
+const animating = () => Date.now() < animEnd;
+function animateRoll(skin) {
+  const row = $('#dice'), dice = [...row.querySelectorAll('.die.rolling')];
+  if (!dice.length) return 0;
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches || !Element.prototype.animate) { sRattle(); return 0; }
+  row.classList.add('busy');
+  const rw = row.getBoundingClientRect();
+  let longest = 0;
+  dice.forEach((b, n) => {
+    const body = b.querySelector('.dbody'), sh = b.querySelector('.dsh'), fin = +b.dataset.v;
+    const delay = n * 70 + rnd() * 50, dur = ROLL_MS - 120 + rnd() * 160;
+    const br = b.getBoundingClientRect(), cx = br.left + br.width / 2 - (rw.left + rw.width / 2);
+    // les dés partent du bas du gobelet (au centre), retombent et rebondissent jusqu'à leur place
+    const x0 = -cx * 0.8 + (rnd() - 0.5) * 50, h = br.height, spin = (rnd() < 0.5 ? -1 : 1) * (540 + rnd() * 360);
+    const k = [
+      { offset: 0, transform: `translate(${x0}px, ${h * 1.1}px) rotate(0deg) scale(.55)`, opacity: 0, easing: 'cubic-bezier(.2,.7,.4,1)' },
+      { offset: .08, opacity: 1 },
+      { offset: .3, transform: `translate(${x0 * .55}px, ${-h * 1.35}px) rotate(${spin * .5}deg) scale(1.08)`, easing: 'cubic-bezier(.6,0,1,.6)' },
+      { offset: .52, transform: `translate(${x0 * .2}px, 0px) rotate(${spin * .82}deg) scale(1.12, .86)`, easing: 'cubic-bezier(0,.5,.5,1)' },
+      { offset: .66, transform: `translate(${x0 * .08}px, ${-h * .38}px) rotate(${spin * .94}deg) scale(1)`, easing: 'cubic-bezier(.6,0,1,.6)' },
+      { offset: .8, transform: `translate(0px, 0px) rotate(${spin + (rnd() - .5) * 20}deg) scale(1.07, .92)`, easing: 'cubic-bezier(0,.5,.5,1)' },
+      { offset: .9, transform: `translate(0px, ${-h * .08}px) rotate(${spin}deg) scale(1)`, easing: 'ease-in' },
+      { offset: 1, transform: `translate(0px, 0px) rotate(${spin}deg) scale(1)`, opacity: 1 }
+    ];
+    body.animate(k, { duration: dur, delay, fill: 'backwards' });
+    sh.animate([
+      { offset: 0, transform: 'scale(.3)', opacity: 0 }, { offset: .3, transform: 'scale(.45)', opacity: .35 },
+      { offset: .52, transform: 'scale(1.1)', opacity: 1 }, { offset: .66, transform: 'scale(.7)', opacity: .6 },
+      { offset: .8, transform: 'scale(1.05)', opacity: 1 }, { offset: 1, transform: 'scale(1)', opacity: 1 }
+    ], { duration: dur, delay, fill: 'backwards' });
+    // la face change en roulant, puis se fige sur le résultat au 2e rebond
+    const settle = delay + dur * .8, t0 = performance.now();
+    let last = 0;
+    const spinFace = () => {
+      const el = performance.now() - t0;
+      if (el >= settle) { body.innerHTML = dieSVG(fin, skin); return; }
+      if (el > delay && el - last > 55 + (el / settle) * 70) { last = el; let v; do v = d6(); while (v === +body.dataset.f); body.dataset.f = v; body.innerHTML = dieSVG(v, skin); }
+      requestAnimationFrame(spinFace);
+    };
+    requestAnimationFrame(spinFace);
+    sTick(delay + dur * .52, .32); sTick(delay + dur * .8, .2); sTick(delay + dur * .97, .08);
+    longest = Math.max(longest, delay + dur);
+  });
+  setTimeout(() => { const tr = document.querySelector('.tray'); if (tr) { tr.classList.remove('thud'); void tr.offsetWidth; tr.classList.add('thud'); } }, 120 + ROLL_MS * .45);
+  return longest;
 }
 
 /* ---------- Traduction du chat ---------- */
@@ -745,10 +821,18 @@ function render() {
   if (heldKey !== hk || !mine) { heldKey = hk; localHeld = V.held.slice(); }
   const rolled = V.rollId !== lastRoll; const firstSeen = lastRoll === -1; lastRoll = V.rollId;
   const canHold = mine && V.rolls > 0 && V.rolls < 3;
-  $('#dice').innerHTML = V.dice.map((v, k) => `<button class="die${localHeld[k] ? ' held' : ''}${!v ? ' blank' : ''}${rolled && !firstSeen && v && !V.held[k] ? ' rolling' : ''}" data-die="${k}" ${canHold ? '' : 'disabled'} aria-label="${v || ''}">${dieSVG(v || 6, cur.skin)}</button>`).join('');
-  if (rolled && !firstSeen && V.rolls) { sRattle(); const c = counts(V.dice); if (c.includes(5)) setTimeout(() => { toast('🎲 ' + t('yams'), 'yams', 2600); P.sfx('win'); P.confetti($('#confetti')); }, 650); }
+  const doAnim = rolled && !firstSeen && V.rolls;
+  if (doAnim || !animating()) {
+    $('#dice').classList.remove('busy');
+    $('#dice').innerHTML = V.dice.map((v, k) => `<button class="die${localHeld[k] ? ' held' : ''}${!v ? ' blank' : ''}${doAnim && v && !V.held[k] ? ' rolling anim' : ''}" data-die="${k}" data-v="${v}" ${canHold ? '' : 'disabled'} aria-label="${v || ''}"><span class="dbody">${dieSVG(v || 6, cur.skin)}</span><i class="dsh"></i></button>`).join('');
+  }
+  if (doAnim) {
+    const ms = animateRoll(cur.skin); animEnd = Date.now() + ms;
+    clearTimeout(animTimer); if (ms) animTimer = setTimeout(() => { animEnd = 0; render(); }, ms + 30);
+    const c = counts(V.dice); if (c.includes(5)) setTimeout(() => { toast('🎲 ' + t('yams'), 'yams', 2600); P.sfx('win'); P.confetti($('#confetti')); }, ms + 150);
+  }
   $('#rollsLeft').innerHTML = [0, 1, 2].map(k => `<i class="${k < 3 - V.rolls ? '' : 'off'}"></i>`).join('');
-  const rb = $('#bRoll'); rb.textContent = V.rolls ? t('rollAgain') : t('roll'); rb.disabled = !mine || V.rolls >= 3; rb.style.visibility = mine ? '' : 'hidden';
+  const rb = $('#bRoll'); rb.textContent = V.rolls ? t('rollAgain') : t('roll'); rb.disabled = !mine || V.rolls >= 3 || animating(); rb.style.visibility = mine ? '' : 'hidden';
   $('#hint').textContent = !mine ? t('hintWatch', { name: cur.n || '' }) : !V.rolls ? t('hintFirst') : V.rolls < 3 ? t('hintHold') : t('hintPick');
   localDeadline = Date.now() + (V.rem || 0);
   renderVersus(); renderGrid(mine);
@@ -775,7 +859,7 @@ function renderVersus() {
   } else box.innerHTML = live.map(vp).join('');
 }
 function renderGrid(mine) {
-  const cols = shownCols(), canPick = mine && V.rolls > 0, k = cols.length;
+  const cols = shownCols(), canPick = mine && V.rolls > 0 && !animating(), k = cols.length;
   const tpl = `grid-template-columns:minmax(${k > 2 ? 34 : 44}px,auto) repeat(${k}, minmax(${k > 2 ? 36 : 46}px,1fr))`;
   const just = V.last ? V.last.seat + ':' + V.last.cat : '';
   const cell = (o, cat) => {
@@ -800,7 +884,7 @@ $('#dice').addEventListener('click', e => {
   const k = +b.dataset.die; localHeld[k] = !localHeld[k]; b.classList.toggle('held', localHeld[k]); P.sfx('click');
   send({ t: 'hold', i: k, v: localHeld[k] });
 });
-$('#bRoll').onclick = () => { if (!V || V.turn !== net.me || V.rolls >= 3) return; P.unlockAudio(); $('#bRoll').disabled = true; send({ t: 'roll', held: localHeld }); };
+$('#bRoll').onclick = () => { if (!V || V.turn !== net.me || V.rolls >= 3) return; if (animating()) return; P.unlockAudio(); const rb = $('#bRoll'); rb.disabled = true; rb.classList.remove('shake'); void rb.offsetWidth; rb.classList.add('shake'); sRattle(); send({ t: 'roll', held: localHeld }); };
 $('#versus').addEventListener('click', e => { const b = e.target.closest('[data-cmp]'); if (!b || +b.dataset.cmp === net.me) return; cmpPick = +b.dataset.cmp; P.sfx('click'); if (V) render(); });
 $('#grid').addEventListener('click', e => {
   const c = e.target.closest('[data-cat]'); if (!c || !V || V.turn !== net.me || !V.rolls) return;
