@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#1a0f0a">
+<meta name="theme-color" content="#0b1424">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,30 +13,30 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;700;800;900&display=swap">
 <style>
-/* Yam's — « La Taverne » : table en bois, piste de dés en feutre rouge, chopes et bougies.
+/* Yam's — « Lagon Tiki » : plage tropicale au crépuscule, palmiers, torches tiki, piste de dés turquoise et bambou.
    Écrans : accueil, salon, partie, fin. Chaque joueur choisit ses dés (skins). */
 :root{
-  --bg1:#140b07;--bg2:#2a170e;--ink:#0d0705;--panel:#3a2416;--panel2:#24160d;--line:#5a3a24;--text:#f8ecd8;--muted:#c9ae8a;
-  --felt:#8a1f2a;--felt2:#5a1219;--wood:#7a4a26;--gold:#f2c14e;--gold2:#c8902a;--red:#e04848;--green:#5cc24a;--blue:#4aa3ff;
+  --bg1:#0b1424;--bg2:#1b2f4e;--ink:#06101a;--panel:#1d4058;--panel2:#132d40;--line:#2f5a72;--text:#eefaf6;--muted:#9cc4c8;
+  --felt:#13838a;--felt2:#0b5a62;--wood:#d6a24c;--gold:#f2c14e;--gold2:#c8902a;--red:#e04848;--green:#5cc24a;--blue:#4aa3ff;
   --f-title:"Lilita One","Arial Black",system-ui,sans-serif;--f-ui:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
 body{margin:0;color:var(--text);font-family:var(--f-ui);font-weight:700;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
-  background:radial-gradient(ellipse at 20% 0%,rgba(255,170,80,.22),transparent 45%),radial-gradient(ellipse at 85% 10%,rgba(255,170,80,.14),transparent 40%),
-    repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 3px,transparent 3px 90px),repeating-linear-gradient(90deg,rgba(255,220,170,.03) 0 1px,transparent 1px 13px),linear-gradient(180deg,var(--bg2),var(--bg1)) fixed;background-color:var(--bg1)}
+  background:radial-gradient(circle at 82% 12%,#fff3c4 0 3.2vmin,rgba(255,243,196,.25) 3.4vmin,transparent 9vmin),radial-gradient(ellipse at 50% 108%,rgba(255,120,90,.35),transparent 55%),
+    linear-gradient(180deg,var(--bg1) 0,#22325a 55%,#3a3a6a 78%,#1a5a6a 78.4%,#0e3c4a 100%) fixed;background-color:var(--bg1)}
 [hidden]{display:none!important}
 #deco{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 #deco svg{position:absolute}
 .frame{position:relative;background:linear-gradient(180deg,var(--panel),var(--panel2));border:4px solid var(--ink);border-radius:22px;box-shadow:0 7px 0 var(--ink)}
 .btn{position:relative;font-family:var(--f-ui);font-weight:900;font-size:17px;color:var(--ink);cursor:pointer;line-height:1.1;text-decoration:none;
-  background:linear-gradient(180deg,#f6e4c6 0,#dcbf94 55%,#bb9a6a 100%);border:4px solid var(--ink);border-radius:15px;padding:9px 14px 8px;
+  background:linear-gradient(180deg,#d8fbf4 0,#8ee3d6 55%,#55bfb2 100%);border:4px solid var(--ink);border-radius:15px;padding:9px 14px 8px;
   box-shadow:0 5px 0 var(--ink),inset 0 3px 0 rgba(255,255,255,.4);transition:transform .07s,box-shadow .07s,filter .15s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink),inset 0 3px 0 rgba(255,255,255,.4)}
 @media (hover:hover){.btn:hover{filter:brightness(1.07)}}
 .btn:disabled{opacity:.42;cursor:default;transform:none}
-.btn.gold{background:linear-gradient(180deg,#fff0b8 0,var(--gold) 55%,var(--gold2) 100%)}
+.btn.gold{background:linear-gradient(180deg,#fff0b8 0,#ffc23e 55%,#f08a2a 100%)}
 .btn.red{background:linear-gradient(180deg,#ffb8b8 0,var(--red) 55%,#a82a2a 100%);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35)}
 .btn.icon{padding:7px;border-radius:13px;flex:none}
 .btn.icon svg{width:24px;height:24px}
@@ -112,29 +112,29 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .status{flex:none;text-align:center;font-size:15px;min-height:20px}
 .status b{color:var(--gold)}
 /* grille */
-.grid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;border:4px solid var(--ink);border-radius:18px;overflow:hidden;background:#2a1a10;box-shadow:0 6px 0 var(--ink)}
+.grid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;border:4px solid var(--ink);border-radius:18px;overflow:hidden;background:#0f2434;box-shadow:0 6px 0 var(--ink)}
 .gcol{display:flex;flex-direction:column;min-width:0}
 .gcol+.gcol{border-left:3px solid var(--ink)}
-.ghead{display:grid;grid-template-columns:1fr 46px 50px;align-items:center;padding:3px 6px;font-size:11px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;background:#1e130b}
+.ghead{display:grid;grid-template-columns:1fr 46px 50px;align-items:center;padding:3px 6px;font-size:11px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;background:#0c1d2b}
 .ghead span{text-align:center;overflow:hidden;font-size:10.5px;font-weight:900;line-height:1.05;word-break:break-all;text-transform:none;letter-spacing:0;max-height:2.2em}
-.grow{flex:1;min-height:34px;display:grid;grid-template-columns:1fr 46px 50px;align-items:center;gap:0;padding:2px 6px;border-top:2px solid rgba(0,0,0,.45);background:linear-gradient(180deg,#4a2f1c,#3d2616)}
+.grow{flex:1;min-height:34px;display:grid;grid-template-columns:1fr 46px 50px;align-items:center;gap:0;padding:2px 6px;border-top:2px solid rgba(0,0,0,.45);background:linear-gradient(180deg,#1f4a62,#183c52)}
 .grow .ic{display:flex;align-items:center;gap:6px;min-width:0}
 .grow .ic svg{width:clamp(28px,8vw,40px);height:clamp(28px,8vw,40px);flex:none;filter:drop-shadow(0 2px 0 rgba(0,0,0,.5))}
 .badge2{display:grid;place-items:center;min-width:clamp(34px,10vw,46px);height:clamp(28px,8vw,38px);padding:0 5px;border-radius:9px;background:linear-gradient(180deg,#fff,#e4ded2);border:3px solid var(--ink);color:#1c1620;font-family:var(--f-title);font-size:clamp(14px,4vw,18px);box-shadow:0 2px 0 rgba(0,0,0,.5)}
 .grow .v{text-align:center;font-family:var(--f-title);font-size:clamp(17px,5vw,24px);color:var(--gold)}
 .grow .v.empty{color:rgba(255,255,255,.18)}
-.grow .me{margin:0 0 0 4px;height:calc(100% - 4px);min-height:28px;display:grid;place-items:center;border-radius:9px;background:#22150c;font-family:var(--f-title);font-size:clamp(17px,5vw,24px);color:#8ee06a}
+.grow .me{margin:0 0 0 4px;height:calc(100% - 4px);min-height:28px;display:grid;place-items:center;border-radius:9px;background:#0c1d2b;font-family:var(--f-title);font-size:clamp(17px,5vw,24px);color:#8ee06a}
 .grow .me.empty{color:rgba(255,255,255,.12)}
 .grow .me.pick{cursor:pointer;background:rgba(92,194,74,.22);color:#b8ff9a;outline:2px dashed rgba(142,224,106,.7);outline-offset:-3px}
 .grow .me.pick.zero{background:rgba(224,72,72,.14);color:#ff9a9a;outline-color:rgba(255,120,120,.5)}
 @media (hover:hover){.grow .me.pick:hover{background:rgba(92,194,74,.45)}}
 .grow .me.just,.grow .v.just{animation:flash 1.2s}
 @keyframes flash{0%,40%{background:var(--gold);color:var(--ink)}}
-.grow.bon{background:linear-gradient(180deg,#3a2414,#2e1c10)}
+.grow.bon{background:linear-gradient(180deg,#173a50,#122e42)}
 .grow.bon .lbl2{font-family:var(--f-title);font-size:16px;line-height:1}
 .grow.bon .lbl2{min-width:0;overflow:hidden}.grow.bon .lbl2 small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--f-ui);font-size:10px;color:var(--muted);font-weight:800}
 .ytag{font-size:10px;color:#ffcf6a;display:block;line-height:1}
-.gtot{display:grid;grid-template-columns:1fr 46px 50px;align-items:center;padding:6px;background:#1e130b;border-top:3px solid var(--ink);font-family:var(--f-title);font-size:15px}
+.gtot{display:grid;grid-template-columns:1fr 46px 50px;align-items:center;padding:6px;background:#0c1d2b;border-top:3px solid var(--ink);font-family:var(--f-title);font-size:15px}
 .gtot span{text-align:center;color:var(--gold)}.gtot span:first-child{text-align:left;color:var(--text);font-size:13px}.gtot span:last-child{color:#8ee06a}
 /* dés */
 .tray{flex:none;position:relative;padding:10px 8px 8px;border-radius:22px;border:4px solid var(--ink);
@@ -154,7 +154,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .pipsleft{display:flex;gap:4px}
 .pipsleft i{width:12px;height:12px;border-radius:50%;border:2.5px solid var(--ink);background:var(--gold)}
 .pipsleft i.off{background:rgba(0,0,0,.35)}
-.hint{margin:0;font-size:12.5px;color:#ffe0c8;text-align:center;min-height:1.2em}
+.hint{margin:0;font-size:12.5px;color:#d8fbf4;text-align:center;min-height:1.2em}
 .tbar{width:100%;height:6px;border-radius:4px;background:rgba(0,0,0,.4);overflow:hidden;border:2px solid var(--ink)}
 .tbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#ff9a3c);transform-origin:left;transition:transform .25s linear}
 @media (max-height:700px){.grow{min-height:28px}.vp .av{width:42px;height:42px}.vp .sc{font-size:22px}.die{width:clamp(44px,13vw,64px);height:clamp(44px,13vw,64px)}}
@@ -210,8 +210,8 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="skinDefs"></defs></svg>
 <div id="deco" aria-hidden="true">
-  <svg style="right:-18px;top:10vh;width:110px;height:150px" viewBox="0 0 80 110"><path d="M14 30h44v66a8 8 0 0 1-8 8H22a8 8 0 0 1-8-8z" fill="#f2c14e" stroke="#0d0705" stroke-width="4"/><path d="M58 44h8a8 8 0 0 1 8 8v20a8 8 0 0 1-8 8h-8" fill="none" stroke="#0d0705" stroke-width="7"/><path d="M58 44h8a8 8 0 0 1 8 8v20a8 8 0 0 1-8 8h-8" fill="none" stroke="#c8902a" stroke-width="3"/><path d="M10 30c0-12 8-18 16-14 4-10 18-10 22 0 8-4 16 2 14 14z" fill="#fff8e8" stroke="#0d0705" stroke-width="4"/><path d="M26 50v40M42 50v40" stroke="#c8902a" stroke-width="4"/></svg>
-  <svg style="left:-10px;bottom:12vh;width:70px;height:130px" viewBox="0 0 50 100"><rect x="14" y="40" width="22" height="56" rx="4" fill="#f3e7c9" stroke="#0d0705" stroke-width="4"/><path d="M25 38c-7-8-2-18 0-26 3 8 8 16 0 26z" fill="#ffb347" stroke="#0d0705" stroke-width="3"/><path d="M25 34c-3-4-1-8 0-12 2 4 3 8 0 12z" fill="#fff3b0"/></svg>
+  <svg style="left:-30px;bottom:6vh;width:190px;height:300px" viewBox="0 0 120 200"><path d="M58 200c-2-60 6-110 14-150" fill="none" stroke="#06101a" stroke-width="13" stroke-linecap="round"/><path d="M58 200c-2-60 6-110 14-150" fill="none" stroke="#8a5a2a" stroke-width="7" stroke-linecap="round"/><g fill="#1f8a5a" stroke="#06101a" stroke-width="4" stroke-linejoin="round"><path d="M72 50c-20-14-46-12-64 2 20-4 40 0 64-2z"/><path d="M72 50c14-20 38-24 50-14-18-2-34 4-50 14z"/><path d="M72 50c-8-20-26-34-46-36 16 8 32 20 46 36z"/><path d="M72 50c22-4 40 8 46 26-14-12-28-20-46-26z"/><path d="M72 50c-22 0-40 16-44 34 12-16 28-26 44-34z"/></g><circle cx="70" cy="56" r="6" fill="#8a5a2a" stroke="#06101a" stroke-width="3"/></svg>
+  <svg style="right:-6px;bottom:8vh;width:70px;height:210px" viewBox="0 0 40 120"><rect x="16" y="34" width="8" height="86" fill="#c98a3a" stroke="#06101a" stroke-width="3"/><path d="M12 22h16l-3 14H15z" fill="#8a5a2a" stroke="#06101a" stroke-width="3"/><path d="M20 22c-8-8-3-16 0-22 3 6 8 14 0 22z" fill="#ff9a3c" stroke="#06101a" stroke-width="2.5"/><path d="M20 18c-3-4-1-7 0-10 2 3 3 6 0 10z" fill="#ffe08a"/></svg>
 </div>
 
 <!-- ======== ACCUEIL ======== -->
@@ -447,12 +447,12 @@ $('#bRulesClose').onclick = () => { P.sfx('click'); $('#rules').hidden = true; }
 P.bindName($('#inName'));
 const nameOk = () => { if (P.needName($('#inName'))) return true; P.sfx('bad'); return false; };
 
-/* ---------- Musique : air de taverne (accordéon, guitare, tambourin), généré en direct ---------- */
+/* ---------- Musique : calypso tropical (steel drum, basse, bongos), générée en direct ---------- */
 const MU = { on: P.get('ym-music', '1') !== '0', ctx: null, bus: null, timer: 0, step: 0, nextT: 0, vol: 1, noise: null };
-const ST = 60 / 132 / 4;
+const ST = 60 / 112 / 4;
 const mf = m => 440 * Math.pow(2, (m - 69) / 12);
-const CH = [[45, 57, 60, 64], [43, 55, 59, 62], [41, 53, 57, 60], [40, 52, 56, 59]]; // Am G F E
-const MEL = [[69, -1, 72, 71, 69, -1, 67, -1, 69, -1, 64, -1, 67, 69, -1, -1], [67, -1, 71, 69, 67, -1, 66, -1, 67, -1, 62, -1, 66, 67, -1, -1], [65, -1, 69, 67, 65, -1, 64, -1, 65, -1, 60, -1, 64, 65, -1, -1], [64, -1, 68, 67, 66, -1, 64, -1, 71, -1, 68, -1, 64, -1, -1, -1]];
+const CH = [[48, 60, 64, 67], [53, 60, 65, 69], [55, 59, 62, 67], [48, 60, 64, 67]]; // C F G C
+const MEL = [[76, -1, 79, -1, 76, 74, -1, 72, -1, 74, 76, -1, 72, -1, -1, -1], [77, -1, 81, -1, 77, 76, -1, 74, -1, 72, 74, -1, 77, -1, -1, -1], [79, -1, 77, 76, 74, -1, 71, -1, 74, -1, 77, 76, 74, -1, -1, -1], [72, -1, 76, -1, 79, -1, 76, -1, 72, -1, -1, -1, 67, -1, -1, -1]];
 function muInit() {
   const ctx = P.audio(); if (!ctx || MU.ctx) return !!MU.ctx;
   MU.ctx = ctx; MU.bus = ctx.createGain(); MU.bus.gain.value = MU.on ? MU.vol * P.musicVol() : 0;
@@ -465,10 +465,11 @@ function osc(type, f, t, dur, g, det) { const o = MU.ctx.createOscillator(); o.t
 function shaker(t, vol) { const s = MU.ctx.createBufferSource(); s.buffer = MU.noise; const f = MU.ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 6000; const g = env(t, vol, 0.003, 0.07); s.connect(f); f.connect(g); s.start(t); s.stop(t + 0.1); }
 function muStep(st, t) {
   const bar = (st >> 4) % 4, s = st % 16, ch = CH[bar], part = (st >> 6) % 4;
-  if (s % 4 === 0) { const g = env(t, 0.18, 0.01, ST * 3); osc('triangle', mf(ch[0] - (s === 8 ? -7 : 0)), t, ST * 3, g); }
-  if (s % 4 === 2) ch.slice(1).forEach(m => { const g = env(t, 0.03, 0.01, ST * 1.6); osc('sawtooth', mf(m), t, ST * 1.6, g, -8); osc('sawtooth', mf(m), t, ST * 1.6, g, 8); });
-  if (part > 0) { const m = MEL[bar][s]; if (m > 0) { const g = env(t, 0.05, 0.02, ST * 3); osc('square', mf(m), t, ST * 3, g, 5); } }
-  if (s % 2 === 0) shaker(t, s % 4 === 2 ? 0.05 : 0.025);
+  if (s === 0 || s === 6 || s === 8 || s === 14) { const g = env(t, 0.2, 0.01, ST * 2.5); osc('sine', mf(ch[0] - 12 + (s >= 8 ? 7 : 0)), t, ST * 2.5, g); }
+  if (s === 2 || s === 5 || s === 10 || s === 13) ch.slice(1).forEach(m => { const g = env(t, 0.028, 0.005, ST * 1.2); osc('triangle', mf(m), t, ST * 1.2, g); });
+  if (part > 0) { const m = MEL[bar][s]; if (m > 0) { const g = env(t, 0.07, 0.004, ST * 3.5); osc('sine', mf(m), t, ST * 3.5, g); const g2 = env(t, 0.025, 0.003, ST * 1.2); osc('sine', mf(m) * 2.76, t, ST * 1.2, g2); } }
+  if (s === 4 || s === 12 || (part > 1 && s === 15)) { const o = MU.ctx.createOscillator(), g = env(t, 0.16, 0.003, 0.14); o.frequency.setValueAtTime(s === 15 ? 320 : 220, t); o.frequency.exponentialRampToValueAtTime(120, t + 0.12); o.connect(g); o.start(t); o.stop(t + 0.16); }
+  if (s % 2 === 0) shaker(t, s % 4 === 2 ? 0.04 : 0.02);
 }
 function muTick() {
   if (!MU.ctx) return; const now = MU.ctx.currentTime;
