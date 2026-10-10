@@ -108,7 +108,8 @@ h2.sec::after{content:"";flex:1;height:3px;border-radius:2px;background:var(--in
 
 .lb{padding:14px;display:flex;flex-direction:column;gap:12px}
 .lb-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.lb-head .nseg{flex:1;min-width:260px}
+.lb-head .nseg{flex:1 1 100%;min-width:0;max-width:100%}
+#lbTabs{flex-wrap:wrap}#lbTabs .btn{flex:1 1 auto;white-space:nowrap;padding:8px 9px 6px;font-size:14px}
 .partybox{padding:14px}
 .chatbox{padding:14px}
 #gchat{height:360px}

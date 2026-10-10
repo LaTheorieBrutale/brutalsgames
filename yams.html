@@ -148,13 +148,16 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .die.held{transform:translateY(-7px)}
 .die.held::after{content:"";position:absolute;left:12%;right:12%;bottom:-11px;height:5px;border-radius:3px;background:var(--gold);box-shadow:0 0 10px var(--gold)}
 .die:disabled{cursor:default}
-.die .dbody{display:block;width:100%;height:100%;position:relative;z-index:1;transform-origin:50% 80%;will-change:transform}
+.die .dbody{display:block;width:100%;height:100%;position:relative;z-index:1;isolation:isolate;transform-origin:50% 80%;will-change:transform}
 .die .dsh{position:absolute;left:10%;right:10%;bottom:-6px;height:9px;border-radius:50%;background:rgba(0,0,0,.45);filter:blur(2px);opacity:0;pointer-events:none}
 .die.anim .dsh{opacity:1}
 .die.anim svg{filter:drop-shadow(0 2px 0 rgba(0,0,0,.5))}
 .dicerow.busy .die{pointer-events:none}
-.tray.thud{animation:thud .18s}
-@keyframes thud{40%{transform:translateY(2px)}}
+.tray{overflow:hidden}
+.die .ghost{position:absolute;inset:0;z-index:2;pointer-events:none}.die .ghost svg{filter:none}
+.die .glow{position:absolute;inset:-14%;z-index:-1;border-radius:50%;pointer-events:none;opacity:0;
+  background:radial-gradient(circle,rgba(255,230,120,.0) 48%,rgba(255,214,80,.55) 58%,rgba(255,240,170,.95) 63%,rgba(255,200,60,.35) 68%,transparent 74%);filter:drop-shadow(0 0 8px rgba(255,210,80,.9))}
+.tray .spark{position:absolute;z-index:3;pointer-events:none;background:#fff3b0;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);filter:drop-shadow(0 0 3px #ffd34a)}
 #bRoll.shake{animation:shake .32s}
 @keyframes shake{20%{transform:rotate(-5deg)}40%{transform:rotate(5deg)}60%{transform:rotate(-3deg)}80%{transform:rotate(2deg)}}
 .die.blank svg{opacity:.3}
@@ -532,49 +535,55 @@ function sTick(delay, vol) {
 const ROLL_MS = 1050;
 let animEnd = 0, animTimer = 0;
 const animating = () => Date.now() < animEnd;
-function animateRoll(skin) {
-  const row = $('#dice'), dice = [...row.querySelectorAll('.die.rolling')];
-  if (!dice.length) return 0;
-  if (!Element.prototype.animate) return 0;
+function animateRoll(skin, prev) {
+  const row = $('#dice'), all = [...row.querySelectorAll('.die')], dice = all.filter(b => b.classList.contains('rolling'));
+  if (!dice.length || !Element.prototype.animate) return 0;
   row.classList.add('busy');
-  const rw = row.getBoundingClientRect();
+  const rw = row.getBoundingClientRect(), tray = row.closest('.tray'), tr = tray.getBoundingClientRect();
+  const OUT = 170, GAP = 125, FLY = 640;
   let longest = 0;
   dice.forEach((b, n) => {
-    const body = b.querySelector('.dbody'), sh = b.querySelector('.dsh'), fin = +b.dataset.v;
-    const delay = n * 70 + rnd() * 50, dur = ROLL_MS - 120 + rnd() * 160;
-    const br = b.getBoundingClientRect(), cx = br.left + br.width / 2 - (rw.left + rw.width / 2);
-    // les dés partent du bas du gobelet (au centre), retombent et rebondissent jusqu'à leur place
-    const x0 = -cx * 0.8 + (rnd() - 0.5) * 50, h = br.height, spin = (rnd() < 0.5 ? -1 : 1) * (540 + rnd() * 360);
-    const k = [
-      { offset: 0, transform: `translate(${x0}px, ${h * 1.1}px) rotate(0deg) scale(.55)`, opacity: 0, easing: 'cubic-bezier(.2,.7,.4,1)' },
-      { offset: .08, opacity: 1 },
-      { offset: .3, transform: `translate(${x0 * .55}px, ${-h * 1.35}px) rotate(${spin * .5}deg) scale(1.08)`, easing: 'cubic-bezier(.6,0,1,.6)' },
-      { offset: .52, transform: `translate(${x0 * .2}px, 0px) rotate(${spin * .82}deg) scale(1.12, .86)`, easing: 'cubic-bezier(0,.5,.5,1)' },
-      { offset: .66, transform: `translate(${x0 * .08}px, ${-h * .38}px) rotate(${spin * .94}deg) scale(1)`, easing: 'cubic-bezier(.6,0,1,.6)' },
-      { offset: .8, transform: `translate(0px, 0px) rotate(${spin + (rnd() - .5) * 20}deg) scale(1.07, .92)`, easing: 'cubic-bezier(0,.5,.5,1)' },
-      { offset: .9, transform: `translate(0px, ${-h * .08}px) rotate(${spin}deg) scale(1)`, easing: 'ease-in' },
-      { offset: 1, transform: `translate(0px, 0px) rotate(${spin}deg) scale(1)`, opacity: 1 }
-    ];
-    body.animate(k, { duration: dur, delay, fill: 'backwards' });
-    sh.animate([
-      { offset: 0, transform: 'scale(.3)', opacity: 0 }, { offset: .3, transform: 'scale(.45)', opacity: .35 },
-      { offset: .52, transform: 'scale(1.1)', opacity: 1 }, { offset: .66, transform: 'scale(.7)', opacity: .6 },
-      { offset: .8, transform: 'scale(1.05)', opacity: 1 }, { offset: 1, transform: 'scale(1)', opacity: 1 }
-    ], { duration: dur, delay, fill: 'backwards' });
-    // la face change en roulant, puis se fige sur le résultat au 2e rebond
-    const settle = delay + dur * .8, t0 = performance.now();
-    let last = 0;
-    const spinFace = () => {
+    const k = +b.dataset.die, body = b.querySelector('.dbody'), sh = b.querySelector('.dsh');
+    // 1) l'ancien dé rapetisse et disparaît sur place
+    if (prev && prev[k]) {
+      const g = document.createElement('span'); g.className = 'ghost'; g.innerHTML = prev[k]; b.appendChild(g);
+      g.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.22)', opacity: 1, offset: .7 }, { transform: 'scale(0)', opacity: 0 }], { duration: OUT, easing: 'ease-in', fill: 'forwards' }).onfinish = () => g.remove();
+    }
+    // 2) le nouveau arrive de la droite en roulant, avec un halo doré
+    const br = b.getBoundingClientRect(), dx = tr.right - br.left + 10, delay = OUT + n * GAP, h = br.height;
+    const turns = -(1 + Math.round(dx / (h * 3.1))) * 360 - 90 * Math.floor(rnd() * 4);
+    body.animate([
+      { transform: `translate(${dx}px,-${h * .08}px) rotate(${turns}deg)`, offset: 0 },
+      { transform: `translate(${dx * .45}px,${h * .03}px) rotate(${turns * .4}deg)`, offset: .45 },
+      { transform: `translate(${dx * .14}px,-${h * .1}px) rotate(${turns * .1}deg)`, offset: .72 },
+      { transform: `translate(-${h * .1}px,0) rotate(8deg)`, offset: .9 },
+      { transform: 'translate(0,0) rotate(0deg)', offset: 1 }
+    ], { duration: FLY, delay, easing: 'cubic-bezier(.25,.6,.35,1)', fill: 'backwards' });
+    sh.animate([{ transform: `translateX(${dx}px)`, opacity: .6 }, { transform: 'translateX(0)', opacity: 1 }], { duration: FLY, delay, easing: 'cubic-bezier(.25,.6,.35,1)', fill: 'backwards' });
+    const glow = document.createElement('span'); glow.className = 'glow'; body.prepend(glow);
+    glow.animate([{ opacity: 0, transform: 'scale(.85)' }, { opacity: 1, transform: 'scale(1)', offset: .12 }, { opacity: 1, transform: 'scale(1.05)', offset: .7 }, { opacity: 0, transform: 'scale(1.3)' }],
+      { duration: FLY + 260, delay, fill: 'both' }).onfinish = () => glow.remove();
+    // traînée d'étincelles derrière le dé
+    const t0 = performance.now(); let lastSp = 0;
+    const trail = () => {
       const el = performance.now() - t0;
-      if (el >= settle) { body.innerHTML = dieSVG(fin, skin); return; }
-      if (el > delay && el - last > 55 + (el / settle) * 70) { last = el; let v; do v = d6(); while (v === +body.dataset.f); body.dataset.f = v; body.innerHTML = dieSVG(v, skin); }
-      requestAnimationFrame(spinFace);
+      if (el > delay + FLY * .95) return;
+      if (el > delay && el - lastSp > 34) {
+        lastSp = el; const r = body.getBoundingClientRect();
+        if (r.left < tr.right) {
+          const sp = document.createElement('i'); sp.className = 'spark';
+          const x = r.right - tr.left - r.width * .1 + rnd() * r.width * .35, y = r.top - tr.top + r.height * (.15 + rnd() * .7);
+          sp.style.left = x + 'px'; sp.style.top = y + 'px'; const sz = 3 + rnd() * 5; sp.style.width = sp.style.height = sz + 'px';
+          tray.appendChild(sp);
+          sp.animate([{ transform: 'scale(.4) rotate(0deg)', opacity: 1 }, { transform: `translate(${10 + rnd() * 18}px,${(rnd() - .5) * 18}px) scale(1.2) rotate(90deg)`, opacity: .9, offset: .4 }, { transform: `translate(${20 + rnd() * 26}px,${(rnd() - .5) * 26}px) scale(0) rotate(180deg)`, opacity: 0 }], { duration: 420 + rnd() * 260, easing: 'ease-out' }).onfinish = () => sp.remove();
+        }
+      }
+      requestAnimationFrame(trail);
     };
-    requestAnimationFrame(spinFace);
-    sTick(delay + dur * .52, .32); sTick(delay + dur * .8, .2); sTick(delay + dur * .97, .08);
-    longest = Math.max(longest, delay + dur);
+    requestAnimationFrame(trail);
+    sTick(delay + FLY * .45, .12); sTick(delay + FLY * .88, .3);
+    longest = Math.max(longest, delay + FLY);
   });
-  setTimeout(() => { const tr = document.querySelector('.tray'); if (tr) { tr.classList.remove('thud'); void tr.offsetWidth; tr.classList.add('thud'); } }, 120 + ROLL_MS * .45);
   return longest;
 }
 
@@ -830,12 +839,13 @@ function render() {
   const rolled = V.rollId !== lastRoll; const firstSeen = lastRoll === -1; lastRoll = V.rollId;
   const canHold = mine && V.rolls > 0 && V.rolls < 3;
   const doAnim = rolled && !firstSeen && V.rolls;
+  const prevFaces = doAnim ? [...$('#dice').querySelectorAll('.die')].map(d => +d.dataset.v ? d.querySelector('.dbody').innerHTML : '') : null;
   if (doAnim || !animating()) {
     $('#dice').classList.remove('busy');
     $('#dice').innerHTML = V.dice.map((v, k) => `<button class="die${localHeld[k] ? ' held' : ''}${!v ? ' blank' : ''}${doAnim && v && !V.held[k] ? ' rolling anim' : ''}" data-die="${k}" data-v="${v}" ${canHold ? '' : 'disabled'} aria-label="${v || ''}"><span class="dbody">${dieSVG(v || 6, cur.skin)}</span><i class="dsh"></i></button>`).join('');
   }
   if (doAnim) {
-    const ms = animateRoll(cur.skin); animEnd = Date.now() + ms;
+    const ms = animateRoll(cur.skin, prevFaces); animEnd = Date.now() + ms;
     clearTimeout(animTimer); if (ms) animTimer = setTimeout(() => { animEnd = 0; render(); }, ms + 30);
     const c = counts(V.dice); if (c.includes(5)) setTimeout(() => { toast('🎲 ' + t('yams'), 'yams', 2600); P.sfx('win'); P.confetti($('#confetti')); }, ms + 150);
   }
