@@ -86,7 +86,9 @@ label,.lbl{font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:
 .pl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ---------- Partie ---------- */
-#game{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;gap:6px;padding:8px 10px;padding-block:calc(env(safe-area-inset-top,0px) + 6px) calc(env(safe-area-inset-bottom,0px) + 8px);max-width:580px;margin:0 auto}
+#game{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;gap:6px;padding:8px 10px;padding-block:calc(env(safe-area-inset-top,0px) + 6px) calc(env(safe-area-inset-bottom,0px) + 8px);max-width:var(--gw);margin:0 auto}
+:root{--gw:580px}
+@media (min-width:900px) and (min-aspect-ratio:5/4){:root{--gw:min(1100px,calc(100vw - 40px))}}
 #game>*{flex-shrink:0}
 .hud{display:flex;align-items:center;gap:7px;padding:4px 7px}
 .hud .mid{flex:1;min-width:0;text-align:center;line-height:1.05}
@@ -119,6 +121,7 @@ label,.lbl{font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:
 .miniframe span{position:absolute;top:-1px;left:50%;transform:translate(-50%,-50%);font-family:var(--f-title);font-size:15px;color:var(--gold);background:var(--wood3);border:2px solid var(--ink);border-radius:8px;padding:0 8px;white-space:nowrap;box-shadow:inset 0 0 0 1px rgba(224,176,78,.4)}
 .sinfo{position:absolute;display:flex;flex-direction:column;gap:6px;justify-content:center;font-size:13px;color:var(--muted);padding:6px}
 .sinfo b{color:var(--bone);font-size:16px}
+.sinfo.side{justify-content:flex-start;font-size:15px;gap:9px;padding:4px 6px}.sinfo.side b{font-size:19px}
 .sinfo .row2{display:flex;gap:5px;align-items:baseline;flex-wrap:wrap}
 .status{position:absolute;left:0;right:0;top:6px;text-align:center;font-family:var(--f-title);font-size:23px;color:var(--bone);text-shadow:0 2px 0 #000,0 0 10px rgba(0,0,0,.9);pointer-events:none;padding:0 8px}
 .status.good{color:var(--gold)}.status.bad{color:#ff8a7a}
@@ -184,7 +187,7 @@ label,.lbl{font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:
 @media (min-width:1150px){
   body.netlive #rc{display:flex!important;left:auto;right:18px;top:18px;bottom:18px;height:auto;width:330px;transform:none}
   body.netlive .chatbtn,body.netlive .chatbar,body.netlive #rcClose{display:none}
-  body.netlive #game{margin:0;left:max(10px,calc((100% - 366px - 580px) / 2));right:auto;width:580px}
+  body.netlive #game{margin:0;left:max(10px,calc((100vw - 366px - min(var(--gw),calc(100vw - 396px))) / 2));right:auto;width:min(var(--gw),calc(100vw - 396px));max-width:none}
 }
 #gchatHome{height:230px}
 .sheet{position:fixed;z-index:25;left:50%;top:50%;transform:translate(-50%,-50%);width:min(400px,calc(100% - 28px));max-height:calc(100% - 40px);overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;animation:fadeIn .2s}
@@ -881,13 +884,14 @@ function buildWater() {
   const geo = new THREE.PlaneGeometry(110, 60, 150, 80); geo.rotateX(-Math.PI / 2);
   const mat = new THREE.ShaderMaterial({
     uniforms: { uT: { value: 0 }, uFog: { value: new THREE.Color(G3.FOG) }, uC0: { value: new THREE.Vector2(BOARD_OFF[0].x, 0) }, uC1: { value: new THREE.Vector2(BOARD_OFF[1].x, 0) } },
-    vertexShader: `uniform float uT; varying vec3 vW; varying float vH;
+    vertexShader: `uniform float uT; uniform vec2 uC0; uniform vec2 uC1; varying vec3 vW; varying float vH;
       void main(){ vec3 p=position; float h=sin(p.x*1.15+uT*1.2)*0.06+sin(p.z*1.6+uT*1.5)*0.05+sin((p.x+p.z)*0.75-uT*0.9)*0.05+sin((p.x-p.z)*2.3+uT*2.1)*0.02;
-        p.y+=h; vH=h; vec4 w=modelMatrix*vec4(p,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w; }`,
+        vec3 wp=(modelMatrix*vec4(p,1.)).xyz; vec2 a=abs(wp.xz-uC0), b=abs(wp.xz-uC1); float dd=min(max(a.x,a.y),max(b.x,b.y));
+        float k=smoothstep(5.6,7.2,dd); h*=mix(0.4,1.,k); p.y+=h-(1.-k)*0.3; vH=h; vec4 w=modelMatrix*vec4(p,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w; }`,
     fragmentShader: `uniform float uT; uniform vec3 uFog; uniform vec2 uC0; uniform vec2 uC1; varying vec3 vW; varying float vH;
-      void main(){ vec3 deep=vec3(0.04,0.16,0.21), mid=vec3(0.08,0.29,0.35), foam=vec3(0.62,0.80,0.80);
-        float k=smoothstep(-0.12,0.15,vH); vec3 col=mix(deep,mid,k);
-        float f=sin(vW.x*3.1+uT*1.3+sin(vW.z*2.2+uT))*sin(vW.z*2.7-uT*1.1+sin(vW.x*1.7)); col=mix(col,foam,smoothstep(0.82,0.98,f)*0.35+smoothstep(0.1,0.17,vH)*0.25);
+      void main(){ vec3 deep=vec3(0.03,0.13,0.18), mid=vec3(0.07,0.25,0.31);
+        float k=smoothstep(-0.14,0.16,vH); vec3 col=mix(deep,mid,k);
+        float g=sin(vW.x*0.33+uT*0.16+sin(vW.z*0.27))*sin(vW.z*0.38-uT*0.13); col+=vec3(0.,0.025,0.03)*g;
         float d=min(distance(vW.xz,uC0),distance(vW.xz,uC1)); col=mix(col,uFog,smoothstep(8.5,17.,d));
         gl_FragColor=vec4(col,1.); }`
   });
@@ -961,7 +965,54 @@ function buildScenery() {
     const palm = add(new THREE.CylinderGeometry(0.08, 0.12, 1.8, 5), toon(0x4a3418, 'trunk'), o.x - 7.4, 0.6, o.z - 9.2, 1, 0); palm.rotation.z = 0.25;
     add(new THREE.DodecahedronGeometry(1.4, 0), rock, o.x - 7.4, -0.5, o.z - 9.2, 1, 0.2);
     const leaves = new THREE.Mesh(new THREE.ConeGeometry(0.9, 0.35, 6), toon(0x1f4a2a, 'leaf')); leaves.position.set(o.x - 7.15, 1.55, o.z - 9.2); G3.scene.add(withOutline(leaves, 1.08));
+    buildDecor(o);
   });
+}
+/* --- décor autour de la grille : épave, île au trésor, bouée, tonneaux et caisses qui flottent, pontons --- */
+function buildDecor(o) {
+  G3.floaters = G3.floaters || [];
+  const wood = toon(0x6b4424, 'barrel'), dark = toon(0x3a2312, 'plankSide'), iron = toon(0x1c1410, 'iron'), sand = toon(0xa8885a, 'sand'), gold = toon(0xe0b04e, 'gold', { emissive: 0x3a2400 });
+  const put = (mesh, x, y, z, ry, out, float) => { if (out) withOutline(mesh, out); mesh.position.set(o.x + x, y, o.z + z); mesh.rotation.y = ry || 0; G3.scene.add(mesh); if (float) G3.floaters.push({ m: mesh, y0: y, ph: Math.random() * 6, rz: mesh.rotation.z, rx: mesh.rotation.x }); return mesh; };
+  const grp = (x, y, z, ry, float) => { const g = new THREE.Group(); return put(g, x, y, z, ry, 0, float); };
+  const barrel = (g, x, y, z, lying) => { const b = withOutline(new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.5, 9), wood), 1.08); b.position.set(x, y, z); if (lying) b.rotation.z = Math.PI / 2;
+    [-0.16, 0.16].forEach(d => { const r = new THREE.Mesh(new THREE.CylinderGeometry(0.232, 0.232, 0.06, 9), iron); r.position.y = d; b.add(r); }); g.add(b); return b; };
+  const crate = (g, x, y, z, s, ry) => { const c = withOutline(new THREE.Mesh(new THREE.BoxGeometry(s, s, s), toon(0x8a5a2c, 'crate')), 1.07); c.position.set(x, y, z); c.rotation.y = ry || 0;
+    [[0, 0.5], [0.5, 0]].forEach(([a, b2]) => { const st = new THREE.Mesh(new THREE.BoxGeometry(s * 1.02, s * 0.14, s * 1.02), dark); st.position.y = (a - 0.25) * s; c.add(st); }); g.add(c); return c; };
+  // épave : mât brisé et coque qui dépassent de l'eau (en bas à gauche)
+  const wr = grp(-4.3, 0, 7.6, 0.4);
+  const hull = withOutline(new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.7, 1.1), dark), 1.05); hull.position.set(0, 0.05, 0); hull.rotation.z = 0.32; hull.rotation.x = 0.12; wr.add(hull);
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.08, 0.9), wood); deck.position.set(0, 0.42, 0); hull.add(deck);
+  const mast = withOutline(new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 2.4, 6), wood), 1.1); mast.position.set(0.3, 1.2, 0); mast.rotation.z = -0.45; wr.add(mast);
+  const yard = withOutline(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.5, 5), wood), 1.12); yard.position.set(0.75, 1.9, 0); yard.rotation.z = 0.9; wr.add(yard);
+  const rag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.7), new THREE.MeshLambertMaterial({ color: 0x1b1714, side: THREE.DoubleSide })); rag.position.set(0.75, 1.5, 0.05); rag.rotation.set(-0.5, 0.3, 0.9); wr.add(rag);
+  // île au trésor (en bas à droite) : sable, palmier, coffre
+  const ti = grp(4.2, 0, 7.9, -0.2);
+  const isl = withOutline(new THREE.Mesh(new THREE.DodecahedronGeometry(1.5, 0), sand), 1.04); isl.scale.set(1.3, 0.32, 1); isl.position.y = -0.15; ti.add(isl);
+  const trunk = withOutline(new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.11, 1.6, 5), toon(0x4a3418, 'trunk')), 1.1); trunk.position.set(-0.5, 0.95, -0.2); trunk.rotation.z = 0.3; ti.add(trunk);
+  for (let k = 0; k < 5; k++) { const lf = withOutline(new THREE.Mesh(new THREE.ConeGeometry(0.22, 1.1, 4), toon(0x2a6a34, 'leaf2')), 1.08); const a = k / 5 * Math.PI * 2; lf.position.set(-0.75 + Math.cos(a) * 0.4, 1.72, -0.2 + Math.sin(a) * 0.4); lf.rotation.set(Math.sin(a) * 1.2, 0, -Math.cos(a) * 1.2); ti.add(lf); }
+  const chest = withOutline(new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.34, 0.4), toon(0x7a4a22, 'chest')), 1.08); chest.position.set(0.45, 0.3, 0.15); chest.rotation.y = 0.4; ti.add(chest);
+  const lid = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.6, 8, 1, false, 0, Math.PI), toon(0x7a4a22, 'chest')); lid.rotation.z = Math.PI / 2; lid.position.y = 0.17; chest.add(lid);
+  const band = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.36, 0.06), gold); chest.add(band);
+  const coins = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.34, 0.12, 8), gold); coins.position.set(0.9, 0.1, 0.5); ti.add(coins);
+  // bouée rouge et blanche avec sa lumière (en haut à gauche)
+  const bu = grp(-3.6, 0, -7.6, 0, true);
+  const bb = withOutline(new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.42, 0.5, 8), toon(0xc8352a, 'buoyR')), 1.07); bb.position.y = 0.1; bu.add(bb);
+  const bw = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.38, 0.14, 8), toon(0xf1e2c2, 'buoyW')); bw.position.y = 0.18; bu.add(bw);
+  const bc = withOutline(new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.7, 8), toon(0xc8352a, 'buoyR')), 1.07); bc.position.y = 0.7; bu.add(bc);
+  const bl = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffd36a })); bl.position.y = 1.1; bu.add(bl);
+  const bh = new THREE.Sprite(new THREE.SpriteMaterial({ map: G3.softTex || (G3.softTex = softTex()), color: 0xffb455, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending })); bh.scale.set(1, 1, 1); bh.position.y = 1.1; bu.add(bh);
+  // pontons (pilotis reliés) en haut à droite
+  const pi = grp(8.2, 0, -5.6, 0.3);
+  [[-0.7, -0.4], [0, -0.4], [0.7, -0.4], [-0.7, 0.4], [0.7, 0.4]].forEach(([x, z], k) => { const p = withOutline(new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.13, 1 + (k % 2) * 0.3, 6), toon(0x4a2f1a, 'post')), 1.1); p.position.set(x, 0.3, z); pi.add(p); });
+  [-0.4, 0.4].forEach(z => { const pl = withOutline(new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.08, 0.3), wood), 1.06); pl.position.set(0, 0.62, z); pl.rotation.z = z > 0 ? -0.06 : 0.04; pi.add(pl); });
+  barrel(pi, 0.2, 0.9, -0.4);
+  // tonneaux et caisses qui flottent
+  const f1 = grp(7.9, 0.05, 1.1, 0.4, true); barrel(f1, 0, 0, 0, true); barrel(f1, 0.5, 0, 0.35, true); crate(f1, -0.25, 0.08, 0.6, 0.48, 0.5);
+  const f2 = grp(-8.1, 0.05, 0.6, -0.3, true); crate(f2, 0, 0.1, 0, 0.55, 0.3); barrel(f2, 0.55, 0, -0.4, true);
+  const f3 = grp(0.2, 0.05, 7.1, 0.8, true); barrel(f3, 0, 0, 0, true);
+  const f4 = grp(1.2, 0.05, -7.4, 0, true); crate(f4, 0, 0.08, 0, 0.45, 0.7);
+  // planches à la dérive
+  [[-1.8, 8.3, 0.4], [4.6, -7.3, -0.6], [8.9, 3.6, 1.2], [-8.6, -3.4, 0.2], [-6.2, -7.2, 0.9], [6.6, 8.6, -0.3]].forEach(([x, z, r]) => put(new THREE.Mesh(new THREE.BoxGeometry(1, 0.06, 0.22), wood), x, 0.03, z, r, 1.06, true));
 }
 
 /* --- navires low-poly (construits dans l'axe +x, proue vers +x, 1 unité = 1 case) --- */
@@ -1118,7 +1169,7 @@ function resetFx() { G3.emit = []; G3.sinking = []; [G3.fire, G3.smoke, G3.spray
 
 /* --- caméras et rendu (2 vues : grande grille + mini-flotte) --- */
 function camFor(b, w, h) {
-  const aspect = w / h, Wd = 13.6, Hd = 12.4;
+  const aspect = w / h, Wd = 12.9, Hd = 11.3;
   let hw, hh; if (aspect > Wd / Hd) { hh = Hd / 2; hw = hh * aspect; } else { hw = Wd / 2; hh = hw / aspect; }
   const cam = new THREE.OrthographicCamera(-hw, hw, hh, -hh, 0.1, 120), o = BOARD_OFF[b];
   const tgt = new THREE.Vector3(o.x - 0.15, 0, o.z + 0.35);
@@ -1129,13 +1180,21 @@ function layoutViews() {
   const st = $('#stage'), W = st.clientWidth, H = st.clientHeight, battle = V && V.ph !== 'place';
   G3.views = [];
   if (!battle) { G3.views.push({ b: 0, x: 0, y: 0, w: W, h: H }); $('#miniFrame').hidden = true; $('#sinfo').hidden = true; }
+  else if (W > H * 1.2) {
+    const top = 34, sw = Math.round(Math.max(170, Math.min(W * 0.3, 380, H - top - 90)));
+    G3.views.push({ b: 1, x: 0, y: top - 6, w: W - sw - 14, h: H - top + 6 });
+    const mx = W - sw - 4, my = top + 4;
+    G3.views.push({ b: 0, x: mx, y: my, w: sw, h: sw, mini: true });
+    const mf = $('#miniFrame'); mf.hidden = false; Object.assign(mf.style, { left: mx - 3 + 'px', top: my - 3 + 'px', width: sw + 6 + 'px', height: sw + 6 + 'px' });
+    const si = $('#sinfo'); si.hidden = false; si.classList.add('side'); Object.assign(si.style, { left: mx + 'px', top: my + sw + 14 + 'px', width: sw + 'px', height: Math.max(0, H - my - sw - 18) + 'px' });
+  }
   else {
     const top = 34, ms = Math.max(90, Math.min(W * 0.44, H * 0.3)), bigH = Math.max(160, H - ms - top - 14);
     G3.views.push({ b: 1, x: 0, y: top - 6, w: W, h: bigH + 6 });
     const my = H - ms - 6, mx = 8;
     G3.views.push({ b: 0, x: mx, y: my, w: ms, h: ms, mini: true });
     const mf = $('#miniFrame'); mf.hidden = false; Object.assign(mf.style, { left: mx - 3 + 'px', top: my - 3 + 'px', width: ms + 6 + 'px', height: ms + 6 + 'px' });
-    const si = $('#sinfo'); si.hidden = false; Object.assign(si.style, { left: mx + ms + 14 + 'px', top: my + 'px', width: Math.max(0, W - ms - mx - 22) + 'px', height: ms + 'px' });
+    const si = $('#sinfo'); si.hidden = false; si.classList.remove('side'); Object.assign(si.style, { left: mx + ms + 14 + 'px', top: my + 'px', width: Math.max(0, W - ms - mx - 22) + 'px', height: ms + 'px' });
   }
   G3.views.forEach(v => { v.cam = camFor(v.b, v.w, v.h); });
 }
@@ -1160,6 +1219,8 @@ function frame(dt) {
   G3.deb.count = n; G3.deb.instanceMatrix.needsUpdate = true;
   // effets temporaires
   G3.fx = G3.fx.filter(f => { f.age += dt; const k = Math.min(1, f.age / f.life); f.upd(k); if (k >= 1) { f.end && f.end(); return false; } return true; });
+  // décor qui flotte
+  (G3.floaters || []).forEach(f => { f.m.position.y = f.y0 + Math.sin(tm * 1.3 + f.ph) * 0.04; f.m.rotation.z = f.rz + Math.sin(tm * 0.9 + f.ph) * 0.05; f.m.rotation.x = f.rx + Math.cos(tm * 0.8 + f.ph) * 0.04; });
   // navires qui coulent
   G3.sinking.forEach(s => { s.age += dt; const k = Math.min(1, s.age / 1.4), e2 = 1 - Math.pow(1 - k, 2); s.obj.position.y = -0.3 * e2; s.obj.rotation.x = s.tilt * e2; });
   // navires qui tanguent, drapeaux, marqueurs, viseur
