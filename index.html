@@ -34,38 +34,37 @@
 /* Accueil « lobby de jeu mobile » : grande bannière illustrée, profil du joueur, jeu à la une, grille de jeux,
    groupe d'amis, classement et chat. Barre d'onglets en bas sur téléphone, colonne latérale sur grand écran. */
 :root{
-  --bg0:#0f0b22;--bg1:#1c1540;--panel:#2b2257;--panel2:#1f1844;--ink:#0b0716;--line:#3d3275;--bone:#fff6e4;--dim:#b3a7d6;
-  --orange:#ff9a3c;--orange2:#e8661c;--gold:#ffcf3f;--mint:#6ff2b0;--pink:#ff5a8a;--sky:#5cc8ff;
+  --bg0:#080305;--bg1:#17070b;--panel:#260a10;--panel2:#150508;--ink:#050102;--line:#5a1622;--bone:#fff4f0;--dim:#d4a6ab;--red:#ff2a40;
+  --orange:#ff2a40;--orange2:#a8001a;--gold:#ffcf3f;--mint:#6ff2b0;--pink:#ff5a8a;--sky:#5cc8ff;
   --f-display:"Titan One","Arial Black",system-ui,sans-serif;--f-ui:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{background:var(--bg0)}
 body{margin:0;min-height:100%;color:var(--bone);font-family:var(--f-ui);font-weight:700;-webkit-tap-highlight-color:transparent;
-  background:radial-gradient(1200px 700px at 50% -200px,#4b3a96 0,#2a2061 35%,transparent 70%) no-repeat,
-    radial-gradient(2px 2px at 12% 18%,#fff8 50%,transparent 51%),radial-gradient(2px 2px at 78% 12%,#fff8 50%,transparent 51%),radial-gradient(1.5px 1.5px at 40% 30%,#fff6 50%,transparent 51%),radial-gradient(1.5px 1.5px at 90% 40%,#fff6 50%,transparent 51%),radial-gradient(1.5px 1.5px at 22% 55%,#fff5 50%,transparent 51%),
-    linear-gradient(180deg,var(--bg1),var(--bg0) 60%) fixed;background-color:var(--bg0);
+  background:radial-gradient(1200px 700px at 50% -200px,#7a0c1c 0,#3a0610 35%,transparent 70%) no-repeat,radial-gradient(900px 600px at 100% 100%,rgba(160,0,24,.28),transparent 70%) fixed,
+        linear-gradient(180deg,var(--bg1),var(--bg0) 60%) fixed;background-color:var(--bg0);
   padding:0 0 calc(env(safe-area-inset-bottom,0px) + 96px)}
 [hidden]{display:none!important}
 a{color:inherit}
 #sparks{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-#sparks i{position:absolute;bottom:-12px;width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);opacity:.55;animation:rise linear infinite}
+#sparks i{position:absolute;bottom:-12px;width:6px;height:6px;border-radius:50%;background:#ff4a3a;box-shadow:0 0 10px #ff2a40,0 0 3px #ffb070;opacity:.6;animation:rise linear infinite}
 @keyframes rise{to{transform:translateY(-110vh) translateX(40px);opacity:0}}
 .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 14px}
 /* éléments de base */
-.frame{position:relative;background:linear-gradient(180deg,#3a2f72 0,var(--panel) 26%,var(--panel2) 100%);border:3px solid var(--ink);border-radius:22px;
+.frame{position:relative;background:linear-gradient(180deg,#3d0f19 0,var(--panel) 26%,var(--panel2) 100%);border:3px solid var(--ink);border-radius:22px;
   box-shadow:0 6px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.14),inset 0 0 0 2px rgba(255,255,255,.04)}
 .btn{position:relative;font-family:var(--f-display);font-weight:400;font-size:17px;color:var(--bone);cursor:pointer;line-height:1;letter-spacing:.02em;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  background:linear-gradient(180deg,#5b4bb0 0,#45379a 50%,#33287a 100%);border:3px solid var(--ink);border-radius:14px;padding:10px 14px 9px;box-shadow:0 4px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.25);text-shadow:0 2px 0 rgba(0,0,0,.35);transition:transform .08s,box-shadow .08s,filter .15s}
+  background:linear-gradient(180deg,#5a1a24 0,#3a1018 50%,#250a10 100%);border:3px solid var(--ink);border-radius:14px;padding:10px 14px 9px;box-shadow:0 4px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.25);text-shadow:0 2px 0 rgba(0,0,0,.35);transition:transform .08s,box-shadow .08s,filter .15s}
 .btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.25)}
 @media (hover:hover){.btn:hover{filter:brightness(1.1)}}
 .btn:focus-visible{outline:3px solid var(--mint);outline-offset:2px}
-.btn.orange{color:#2a1302;text-shadow:0 1px 0 rgba(255,255,255,.45);background:linear-gradient(180deg,#ffd29a 0,var(--orange) 50%,var(--orange2) 100%)}
+.btn.orange{color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.45);background:linear-gradient(180deg,#ff8a95 0,var(--orange) 48%,var(--orange2) 100%)}
 .btn.icon{padding:8px;border-radius:13px}
 .btn.icon svg{width:22px;height:22px}
 .field{font-family:var(--f-ui);font-weight:900;font-size:19px;color:var(--bone);background:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:9px 12px 8px;width:100%;min-width:0;outline:none;box-shadow:inset 0 3px 6px rgba(0,0,0,.5)}
 .field:focus{border-color:var(--orange)}
-.field::placeholder{color:#6f6596}
+.field::placeholder{color:#8f5b62}
 .nseg{display:flex;gap:6px}
 .nseg .btn{flex:1;padding:9px 6px 8px;font-size:15px;background:var(--ink);color:var(--dim);box-shadow:inset 0 2px 4px rgba(0,0,0,.4);text-shadow:none}
 .nseg .btn[aria-pressed="true"]{color:#2a1302;background:linear-gradient(180deg,#fff3c4,var(--gold) 55%,#e0a020);box-shadow:0 3px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.6)}
@@ -74,23 +73,37 @@ h2.sec{margin:6px 0 0;font-family:var(--f-display);font-weight:400;font-size:24p
 h2.sec .ico{width:34px;height:34px;flex:none;filter:drop-shadow(0 3px 0 var(--ink))}
 h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-gradient(90deg,var(--line),transparent)}
 
-/* bannière */
-.hero{position:relative;height:clamp(250px,46vw,380px);margin:0 -14px;overflow:hidden;border-bottom:4px solid var(--ink)}
-.hero svg.scene{position:absolute;inset:0;width:100%;height:100%}
-.hero .float{animation:bob 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
-.hero .f2{animation-delay:-1.3s}.hero .f3{animation-delay:-2.1s}.hero .f4{animation-delay:-.7s}.hero .f5{animation-delay:-2.8s}.hero .f6{animation-delay:-1.9s}
-@keyframes bob{50%{transform:translateY(-8px) rotate(-4deg)}}
-.hero .win{animation:flicker 3s infinite}.hero .win:nth-child(2n){animation-delay:-1.4s}
-@keyframes flicker{0%,100%{opacity:1}45%{opacity:.75}55%{opacity:1}}
-.brand{position:absolute;left:0;right:0;top:clamp(26px,7vw,54px);display:flex;flex-direction:column;align-items:center;pointer-events:none}
+/* bannière : rouge et noir, effets animés */
+.hero{position:relative;height:clamp(230px,40vw,340px);margin:0 -14px;overflow:hidden;border-bottom:4px solid var(--ink);background:#070203;isolation:isolate}
+.fx{position:absolute;inset:0;overflow:hidden;z-index:-1}
+.fx .blob{position:absolute;border-radius:50%;filter:blur(30px);mix-blend-mode:screen}
+.fx .b1{width:70%;aspect-ratio:1;left:-18%;top:-45%;background:radial-gradient(circle,#ff1f3d 0,rgba(255,31,61,0) 65%);animation:dr1 11s ease-in-out infinite alternate}
+.fx .b2{width:65%;aspect-ratio:1;right:-20%;top:-10%;background:radial-gradient(circle,#b0001c 0,rgba(176,0,28,0) 65%);animation:dr2 13s ease-in-out infinite alternate}
+.fx .b3{width:40%;aspect-ratio:1;left:32%;bottom:-38%;background:radial-gradient(circle,#ff5a2b 0,rgba(255,90,43,0) 62%);opacity:.75;animation:dr3 9s ease-in-out infinite alternate}
+@keyframes dr1{to{transform:translate(28%,22%) scale(1.15)}}
+@keyframes dr2{to{transform:translate(-30%,12%) scale(.9)}}
+@keyframes dr3{to{transform:translate(-40%,-20%) scale(1.25)}}
+.fx .rays{position:absolute;left:50%;top:46%;width:1600px;height:1600px;margin:-800px 0 0 -800px;background:repeating-conic-gradient(from 0deg,rgba(255,42,64,.22) 0 5deg,rgba(255,42,64,0) 5deg 15deg);
+  -webkit-mask-image:radial-gradient(circle,#000 0,rgba(0,0,0,.6) 12%,transparent 30%);mask-image:radial-gradient(circle,#000 0,rgba(0,0,0,.6) 12%,transparent 30%);animation:spin 50s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fx .grid{position:absolute;left:-60%;right:-60%;bottom:-2px;height:58%;background-image:linear-gradient(rgba(255,42,64,.55) 2px,transparent 2px),linear-gradient(90deg,rgba(255,42,64,.55) 2px,transparent 2px);background-size:56px 56px;
+  transform:perspective(260px) rotateX(62deg);transform-origin:50% 100%;animation:gridmv 1.4s linear infinite;-webkit-mask-image:linear-gradient(to top,#000 10%,transparent 90%);mask-image:linear-gradient(to top,#000 10%,transparent 90%)}
+@keyframes gridmv{to{background-position:0 56px,0 0}}
+.fx .streak{position:absolute;left:0;height:3px;width:34%;border-radius:3px;background:linear-gradient(90deg,transparent,#ff6a78,#fff,transparent);opacity:0;animation:streak 4.5s linear infinite}
+.fx .s1{top:22%}.fx .s2{top:58%;animation-delay:-1.6s;animation-duration:5.5s}.fx .s3{top:38%;animation-delay:-3.1s;animation-duration:3.8s;width:22%}
+@keyframes streak{0%{transform:translateX(-120%);opacity:0}10%{opacity:.9}60%{opacity:.9}100%{transform:translateX(420%);opacity:0}}
+.fx .vig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,transparent 40%,rgba(0,0,0,.65) 100%)}
+.brand{position:absolute;left:0;right:0;top:clamp(30px,8vw,62px);display:flex;flex-direction:column;align-items:center;pointer-events:none}
 .logo{font-family:var(--f-display);font-weight:400;font-size:clamp(46px,12.5vw,100px);line-height:.92;letter-spacing:.01em;text-align:center;
-  background:linear-gradient(180deg,#fffaf0 0,#ffe7a8 45%,#ffb347 70%,#e8661c 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;
-  filter:drop-shadow(0 6px 0 var(--ink)) drop-shadow(0 0 30px rgba(255,170,80,.35));animation:drop .8s cubic-bezier(.2,1.5,.4,1) both}
+  background:linear-gradient(110deg,rgba(255,255,255,0) 42%,rgba(255,255,255,.95) 50%,rgba(255,255,255,0) 58%) -150% 0/250% 100% no-repeat,linear-gradient(180deg,#fff 0,#ffd9dc 38%,#ff3348 68%,#9e0018 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;
+  filter:drop-shadow(0 6px 0 var(--ink)) drop-shadow(0 0 34px rgba(255,30,60,.55));animation:drop .8s cubic-bezier(.2,1.5,.4,1) both,shine 4.5s 1s ease-in-out infinite}
+@keyframes shine{0%{background-position:-150% 0,0 0}45%,100%{background-position:250% 0,0 0}}
 .logo span{display:block;font-size:.62em;letter-spacing:.12em;margin-top:2px}
 @keyframes drop{from{opacity:0;transform:translateY(-40px) scale(.75)}}
 .ribbon{margin-top:10px;transform:rotate(-2deg);position:relative}
-.ribbon b{position:relative;z-index:1;display:block;font-family:var(--f-display);font-weight:400;font-size:clamp(14px,3.8vw,19px);color:#2a1302;padding:6px 20px 5px;border:3px solid var(--ink);border-radius:9px;background:linear-gradient(180deg,#ffd29a,var(--orange) 55%,var(--orange2));box-shadow:0 4px 0 var(--ink);white-space:nowrap}
-.ribbon::before,.ribbon::after{content:"";position:absolute;top:9px;width:28px;height:100%;background:#b8501a;border:3px solid var(--ink)}
+.ribbon b{position:relative;z-index:1;display:block;font-family:var(--f-display);font-weight:400;font-size:clamp(14px,3.8vw,19px);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.45);padding:6px 20px 5px;border:3px solid var(--ink);border-radius:9px;background:linear-gradient(180deg,#ff8a95,var(--orange) 50%,var(--orange2));box-shadow:0 4px 0 var(--ink);white-space:nowrap}
+.ribbon::before,.ribbon::after{content:"";position:absolute;top:9px;width:28px;height:100%;background:#6e0012;border:3px solid var(--ink)}
 .ribbon::before{left:-18px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,35% 50%)}.ribbon::after{right:-18px;clip-path:polygon(0 0,100% 0,65% 50%,100% 100%,0 100%)}
 .hero .gear{position:absolute;right:14px;top:calc(env(safe-area-inset-top,0px) + 12px);z-index:3}
 
@@ -101,7 +114,45 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
 
 /* profil */
 .profile{display:flex;align-items:center;gap:12px;padding:12px 14px}
-.avatar{width:58px;height:58px;flex:none;border-radius:18px;border:3px solid var(--ink);display:grid;place-items:center;font-family:var(--f-display);font-size:30px;color:#2a1302;box-shadow:0 4px 0 var(--ink),inset 0 3px 0 rgba(255,255,255,.4);background:linear-gradient(180deg,#ffe7a8,var(--orange))}
+.avatar{all:unset;box-sizing:border-box;position:relative;width:66px;height:66px;flex:none;border-radius:20px;border:3px solid var(--ink);cursor:pointer;font-family:var(--f-display);font-size:32px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.4);box-shadow:0 4px 0 var(--ink);background:linear-gradient(180deg,#ff8a95,var(--orange) 55%,var(--orange2));transition:transform .15s cubic-bezier(.2,1.5,.4,1)}
+.avatar:active{transform:scale(.94)}
+.avatar:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+#avPic{position:absolute;inset:0;border-radius:17px;overflow:hidden;display:grid;place-items:center}
+#avPic svg{width:100%;height:100%;display:block}
+.avatar .pen{position:absolute;right:-7px;bottom:-7px;width:26px;height:26px;border-radius:50%;border:3px solid var(--ink);background:var(--gold);display:grid;place-items:center;box-shadow:0 2px 0 var(--ink)}
+.avatar .pen svg{width:14px;height:14px}
+.avatar.empty .pen{animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.18)}}
+/* éditeur de skin */
+.avback{position:fixed;inset:0;z-index:30;background:rgba(5,1,2,.7);backdrop-filter:blur(3px)}
+.aved{position:fixed;z-index:31;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100% - 20px));max-height:calc(100dvh - 24px);display:flex;flex-direction:column;gap:10px;padding:14px;animation:pop .25s cubic-bezier(.2,1.5,.4,1)}
+@keyframes pop{from{transform:translate(-50%,-46%) scale(.92);opacity:0}}
+.aved .sheet-head{font-size:24px}
+.av-top{display:flex;align-items:center;gap:14px}
+.av-big{width:128px;height:128px;flex:none;border-radius:30px;border:4px solid var(--ink);overflow:hidden;box-shadow:0 5px 0 var(--ink),0 0 30px rgba(255,42,64,.35)}
+.av-big svg{width:100%;height:100%;display:block}
+.av-side{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.av-side .who{font-family:var(--f-display);font-size:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.av-cats{display:flex;gap:5px;flex-wrap:wrap}
+.av-cats .btn{flex:1 1 auto;font-size:13px;padding:7px 8px 6px;border-radius:11px;box-shadow:0 3px 0 var(--ink)}
+.av-cats .btn[aria-pressed="true"]{color:#fff;background:linear-gradient(180deg,#ff8a95,var(--orange) 50%,var(--orange2))}
+.av-grp{grid-column:1/-1;font-family:var(--f-display);font-size:15px;color:var(--dim);padding:6px 2px 0;letter-spacing:.02em}
+.av-opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;overflow-y:auto;padding:4px 8px 10px;min-height:80px;max-height:340px;border-radius:14px;background:var(--ink)}
+.av-opts button{all:unset;box-sizing:border-box;aspect-ratio:1;border-radius:14px;border:3px solid #2a0a10;overflow:hidden;cursor:pointer;display:grid;place-items:center;transition:transform .12s}
+.av-opts button svg{width:100%;height:100%;display:block}
+.av-opts button:active{transform:scale(.92)}
+.av-opts button[aria-pressed="true"]{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold),0 0 14px rgba(255,207,63,.5)}
+.av-opts button.sw{border-radius:50%}
+.av-foot{display:flex;gap:8px}
+.av-foot .btn{flex:1}
+@media (max-width:520px){.aved{top:auto;bottom:0;transform:translateX(-50%);width:100%;border-radius:22px 22px 0 0;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}@keyframes pop{from{transform:translate(-50%,40%)}}.av-big{width:104px;height:104px;border-radius:26px}.av-opts{grid-template-columns:repeat(5,1fr);max-height:min(300px,38dvh)}}
+/* petits avatars du classement */
+.lbav{display:inline-grid;place-items:center;vertical-align:middle;width:26px;height:26px;margin-right:7px;border-radius:8px;overflow:hidden;border:2px solid #000;background:#3a1018;font-family:var(--f-display);font-size:13px;font-style:normal;color:var(--dim)}
+.lbav svg{width:100%;height:100%;display:block}
+/* bouton volume et invitations aux couleurs du menu */
+.bg-dock-btn{background:linear-gradient(180deg,#5a1a24,#2a0a10)!important;color:#ffd6da!important}
+.bg-dock-pop,.pty-inv{background:#1a0609!important}
+.pty-inv .no{background:#3a1018!important}
 .profile .pf{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--dim);background:var(--ink);border-radius:999px;padding:4px 10px 3px;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.06)}
@@ -137,7 +188,7 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
 .tile p{margin:0;font-size:12.5px;color:var(--dim);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tile .meta{margin-top:auto;display:flex;align-items:center;gap:6px}
 .tile .meta span{font-size:11.5px;color:var(--dim);background:var(--ink);border-radius:999px;padding:3px 8px 2px;white-space:nowrap}
-.tile .meta .go{margin-left:auto;width:34px;height:34px;flex:none;border-radius:11px;border:3px solid var(--ink);display:grid;place-items:center;background:linear-gradient(180deg,#ffd29a,var(--orange) 55%,var(--orange2));box-shadow:0 3px 0 var(--ink)}
+.tile .meta .go{margin-left:auto;width:34px;height:34px;flex:none;border-radius:11px;border:3px solid var(--ink);display:grid;place-items:center;background:linear-gradient(180deg,#ff8a95,var(--orange) 55%,var(--orange2));box-shadow:0 3px 0 var(--ink)}
 .tile .meta .go svg{width:16px;height:16px}
 
 /* panneaux */
@@ -179,7 +230,7 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
 
 /* barre d'onglets (téléphone) — laisse le coin gauche au bouton du volume */
 .tabbar{position:fixed;z-index:20;left:72px;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);display:flex;gap:4px;padding:5px;border-radius:18px;
-  background:linear-gradient(180deg,#3a2f72,var(--panel2));border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.12)}
+  background:linear-gradient(180deg,#3d0f19,var(--panel2));border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.12)}
 .tabbar button{all:unset;flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 2px 4px;border-radius:12px;cursor:pointer;font-size:10.5px;font-weight:900;color:var(--dim);letter-spacing:.02em}
 .tabbar button svg{width:24px;height:24px}
 .tabbar button.on{background:var(--ink);color:var(--bone)}
@@ -191,49 +242,18 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
 <div id="sparks" aria-hidden="true"></div>
 <div class="wrap">
   <header class="hero" id="top">
-    <svg class="scene" viewBox="0 0 1000 380" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <defs>
-        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1e66"/><stop offset=".55" stop-color="#4a2f8a"/><stop offset="1" stop-color="#b8487a"/></linearGradient>
-        <radialGradient id="moonG" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fffbe8"/><stop offset="1" stop-color="#ffd98a"/></radialGradient>
-      </defs>
-      <rect width="1000" height="380" fill="url(#sky)"/>
-      <g fill="#fff" opacity=".8"><circle cx="80" cy="40" r="2"/><circle cx="210" cy="90" r="1.6"/><circle cx="330" cy="30" r="2.2"/><circle cx="470" cy="70" r="1.5"/><circle cx="610" cy="24" r="1.8"/><circle cx="720" cy="95" r="1.6"/><circle cx="900" cy="50" r="2.2"/><circle cx="960" cy="120" r="1.4"/><circle cx="40" cy="140" r="1.4"/></g>
-      <circle cx="840" cy="78" r="38" fill="url(#moonG)" stroke="#0b0716" stroke-width="4"/><circle cx="828" cy="70" r="7" fill="#f0c86a" opacity=".6"/><circle cx="852" cy="92" r="5" fill="#f0c86a" opacity=".6"/>
-      <!-- collines -->
-      <path d="M0 300 C120 250 220 270 330 290 C440 310 520 260 640 270 C760 280 860 240 1000 262 V380 H0Z" fill="#3a2370" stroke="#0b0716" stroke-width="4"/>
-      <path d="M0 330 C160 300 300 320 420 334 C560 350 700 310 840 318 C920 322 960 330 1000 326 V380 H0Z" fill="#2a1a55" stroke="#0b0716" stroke-width="4"/>
-      <!-- la salle de jeux : château illuminé -->
-      <g stroke="#0b0716" stroke-width="5" stroke-linejoin="round">
-        <rect x="390" y="190" width="220" height="140" fill="#4a3488"/>
-        <rect x="350" y="150" width="70" height="180" fill="#563d9c"/><rect x="580" y="150" width="70" height="180" fill="#563d9c"/>
-        <path d="M342 152 385 92 428 152Z" fill="#e8394d"/><path d="M572 152 615 92 658 152Z" fill="#e8394d"/>
-        <rect x="455" y="130" width="90" height="70" fill="#5f45a8"/><path d="M447 132 500 70 553 132Z" fill="#ff9a3c"/>
-        <path d="M470 330v-62q30-30 60 0v62z" fill="#2a1a55"/>
-        <path d="M385 92v-30l26 9-26 9" fill="#ffcf3f" stroke-width="3"/><path d="M615 92v-30l26 9-26 9" fill="#6ff2b0" stroke-width="3"/><path d="M500 70v-32l28 10-28 10" fill="#ff5a8a" stroke-width="3"/>
-      </g>
-      <g fill="#ffd36a" stroke="#0b0716" stroke-width="3">
-        <rect class="win" x="370" y="180" width="28" height="34" rx="12"/><rect class="win" x="602" y="180" width="28" height="34" rx="12"/><rect class="win" x="370" y="240" width="28" height="34" rx="12"/><rect class="win" x="602" y="240" width="28" height="34" rx="12"/>
-        <rect class="win" x="483" y="150" width="34" height="30" rx="12"/><rect class="win" x="410" y="226" width="26" height="30" rx="10"/><rect class="win" x="564" y="226" width="26" height="30" rx="10"/>
-      </g>
-      <!-- les jeux qui flottent autour -->
-      <g class="float" transform="translate(120 170) rotate(-12)"><rect x="-34" y="-34" width="68" height="68" rx="16" fill="#fff" stroke="#0b0716" stroke-width="5"/><circle cx="-14" cy="-14" r="7" fill="#e8394d"/><circle cx="14" cy="14" r="7" fill="#e8394d"/><circle cx="0" cy="0" r="7" fill="#e8394d"/></g>
-      <g class="float f2" transform="translate(230 250) rotate(10)"><rect x="-30" y="-42" width="60" height="84" rx="9" fill="#fbf5e8" stroke="#0b0716" stroke-width="5"/><text x="-21" y="-16" font-family="Arial Black,sans-serif" font-size="20" fill="#e8394d">A</text><path d="M0 4c-12 10-14 18-6 22 3 1 5 0 6-2 1 2 3 3 6 2 8-4 6-12-6-22z" fill="#e8394d" stroke="#0b0716" stroke-width="2.5"/></g>
-      <g class="float f3" transform="translate(790 220)"><path d="M0-34C-21-34-34-19-34 0c0 11 6 20 14 24v12h40V24c8-4 14-13 14-24 0-19-13-34-34-34z" fill="#f3e7c9" stroke="#0b0716" stroke-width="5"/><ellipse cx="-13" cy="-2" rx="9" ry="10" fill="#1b1030"/><ellipse cx="13" cy="-2" rx="9" ry="10" fill="#1b1030"/></g>
-      <g class="float f4" transform="translate(905 270) rotate(-8) scale(.9)"><path d="M-60 6h120l-14 24h-92z" fill="#3a2416" stroke="#0b0716" stroke-width="5" stroke-linejoin="round"/><path d="M-10 6V-70M30 6V-50" stroke="#0b0716" stroke-width="5"/><path d="M-38-62q28 8 56 0v40q-28 8-56 0z" fill="#16120f" stroke="#0b0716" stroke-width="4"/><circle cx="-10" cy="-42" r="8" fill="#f1e2c2"/><path d="M10-46q20 6 40 0v30q-20 6-40 0z" fill="#16120f" stroke="#0b0716" stroke-width="4"/></g>
-      <g class="float f5" transform="translate(690 300) rotate(16)"><path d="M-6 30l26-50 8 4-26 50z" fill="#9b7bff" stroke="#0b0716" stroke-width="4" stroke-linejoin="round"/><path d="M20-20l6-12 8 4-6 12z" fill="#e8d0a8" stroke="#0b0716" stroke-width="4"/></g>
-      <g class="float f6" transform="translate(300 120) rotate(-6)"><circle r="26" fill="rgba(220,250,255,.35)" stroke="#0b0716" stroke-width="7"/><circle r="26" fill="none" stroke="#f3e7c9" stroke-width="3"/><path d="M18 18l22 22" stroke="#0b0716" stroke-width="14" stroke-linecap="round"/><path d="M18 18l22 22" stroke="#a8643a" stroke-width="8" stroke-linecap="round"/></g>
-    </svg>
+    <div class="fx" aria-hidden="true"><div class="rays"></div><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="grid"></div><i class="streak s1"></i><i class="streak s2"></i><i class="streak s3"></i><div class="vig"></div></div>
     <div class="brand">
       <div class="logo">Brutal’s<span>Games</span></div>
       <div class="ribbon"><b data-i18n="tagline">Salle de jeux entre amis</b></div>
     </div>
-    <button class="btn icon gear" id="bSet" data-i18n-aria="settings"><svg viewBox="0 0 24 24"><path d="M12 2.5l2 2.6 3.2-.6.8 3.1 3 1.4-1.1 3 1.1 3-3 1.4-.8 3.1-3.2-.6-2 2.6-2-2.6-3.2.6-.8-3.1-3-1.4 1.1-3-1.1-3 3-1.4.8-3.1 3.2.6z" fill="currentColor" stroke="#0b0716" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.4" fill="#2b2257" stroke="#0b0716" stroke-width="1.6"/></svg></button>
+    <button class="btn icon gear" id="bSet" data-i18n-aria="settings"><svg viewBox="0 0 24 24"><path d="M12 2.5l2 2.6 3.2-.6.8 3.1 3 1.4-1.1 3 1.1 3-3 1.4-.8 3.1-3.2-.6-2 2.6-2-2.6-3.2.6-.8-3.1-3-1.4 1.1-3-1.1-3 3-1.4.8-3.1 3.2.6z" fill="currentColor" stroke="#0b0716" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.4" fill="#260a10" stroke="#0b0716" stroke-width="1.6"/></svg></button>
   </header>
 
   <div class="layout">
     <div class="maincol">
       <section class="frame profile">
-        <div class="avatar" id="avatar">?</div>
+        <button class="avatar" id="avatar" type="button" data-i18n-aria="avEdit"><span id="avPic">?</span><i class="pen"><svg viewBox="0 0 24 24"><path d="M4 20l1-5L16 4l4 4L9 19z" fill="#fff" stroke="#050102" stroke-width="2.2" stroke-linejoin="round"/></svg></i></button>
         <div class="pf">
           <input class="field" id="inName" maxlength="14" autocomplete="off" data-i18n-ph="namePh" aria-label="pseudo">
           <div class="chips" id="myStat"></div>
@@ -310,7 +330,7 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
         </div>
       </a>
 
-      <h2 class="sec" id="s-games"><svg class="ico" viewBox="0 0 40 40"><rect x="3" y="11" width="34" height="22" rx="11" fill="#9b7bff" stroke="#0b0716" stroke-width="3"/><path d="M12 17v10M7 22h10" stroke="#0b0716" stroke-width="3.4" stroke-linecap="round"/><circle cx="27" cy="19" r="2.6" fill="#ffcf3f" stroke="#0b0716" stroke-width="2"/><circle cx="31" cy="25" r="2.6" fill="#ff5a8a" stroke="#0b0716" stroke-width="2"/></svg><span data-i18n="ourGames">Nos jeux</span></h2>
+      <h2 class="sec" id="s-games"><svg class="ico" viewBox="0 0 40 40"><rect x="3" y="11" width="34" height="22" rx="11" fill="#ff2a40" stroke="#0b0716" stroke-width="3"/><path d="M12 17v10M7 22h10" stroke="#0b0716" stroke-width="3.4" stroke-linecap="round"/><circle cx="27" cy="19" r="2.6" fill="#ffcf3f" stroke="#0b0716" stroke-width="2"/><circle cx="31" cy="25" r="2.6" fill="#ff5a8a" stroke="#0b0716" stroke-width="2"/></svg><span data-i18n="ourGames">Nos jeux</span></h2>
       <section class="games" id="games"></section>
 
       <h2 class="sec" id="s-lb"><svg class="ico" viewBox="0 0 40 40"><path d="M11 6h18v9a9 9 0 0 1-18 0z" fill="#ffcf3f" stroke="#0b0716" stroke-width="3"/><path d="M11 9H5a6 6 0 0 0 6 7M29 9h6a6 6 0 0 1-6 7" fill="none" stroke="#0b0716" stroke-width="3"/><path d="M20 24v5M13 35h14l-2-6H15z" fill="#e0a020" stroke="#0b0716" stroke-width="3" stroke-linejoin="round"/></svg><span data-i18n="leaderboard">Classement</span></h2>
@@ -343,6 +363,13 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
   <button data-go="s-chat"><svg viewBox="0 0 40 40"><path d="M5 8h30v19H17l-8 7v-7H5z" fill="currentColor" stroke="#0b0716" stroke-width="3" stroke-linejoin="round"/></svg><span data-i18n="chat">Chat</span></button>
 </nav>
 
+<div class="avback" id="avBack" hidden></div>
+<div class="frame aved" id="avEd" role="dialog" aria-modal="true" hidden>
+  <div class="sheet-head"><span data-i18n="avTitle">Choisis ton skin</span><button class="btn icon" id="avClose" data-i18n-aria="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="av-top"><div class="av-big" id="avBig"></div><div class="av-side"><div class="who" id="avWho"></div><button class="btn" id="avRnd"><span aria-hidden="true">🎲</span> <span data-i18n="avRnd">Aléatoire</span></button></div></div>
+  <div class="av-opts" id="avOpts"></div>
+  <div class="av-foot"><button class="btn" id="avCancel" data-i18n="avCancel">Annuler</button><button class="btn orange" id="avSave" data-i18n="avSave">Valider</button></div>
+</div>
 <div class="frame sheet" id="settings" hidden>
   <div class="sheet-head"><span data-i18n="settings">Réglages</span><button class="btn icon" id="bSetClose" data-i18n-aria="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   <span class="lbl" data-i18n="sound">Sons</span><div class="nseg" id="sndSeg"></div>
@@ -377,9 +404,9 @@ P.addStrings({
     install: 'Na iPhonu: <b>Sdílet</b> → <b>Přidat na plochu</b> a Brutal&#39;s Games budeš mít jako aplikaci.' }
 });
 P.addStrings({
-  fr: { party: 'Groupe d’amis', isNew: 'NOUVEAU', featured: 'À LA UNE', tGames: 'Jeux', tFriends: 'Amis', tLb: 'Classement', stWins: 'victoires', stGames: 'parties', stRank: 'rang' },
-  en: { party: 'Friends group', isNew: 'NEW', featured: 'FEATURED', tGames: 'Games', tFriends: 'Friends', tLb: 'Ranking', stWins: 'wins', stGames: 'games', stRank: 'rank' },
-  cs: { party: 'Skupina přátel', isNew: 'NOVINKA', featured: 'DOPORUČUJEME', tGames: 'Hry', tFriends: 'Přátelé', tLb: 'Žebříček', stWins: 'výhry', stGames: 'hry', stRank: 'pořadí' }
+  fr: { avTitle: 'Choisis ton skin', avEdit: 'Modifier mon skin', avRnd: 'Aléatoire', avSave: 'Valider', avCancel: 'Annuler', avBg: 'Fond', avSkin: 'Peau', avFace: 'Visage', avEyes: 'Yeux', avMouth: 'Bouche', avHair: 'Coiffure', avHairc: 'Couleur', avAcc: 'Accessoire', party: 'Groupe d’amis', isNew: 'NOUVEAU', featured: 'À LA UNE', tGames: 'Jeux', tFriends: 'Amis', tLb: 'Classement', stWins: 'victoires', stGames: 'parties', stRank: 'rang' },
+  en: { avTitle: 'Choose your skin', avEdit: 'Edit my skin', avRnd: 'Random', avSave: 'Save', avCancel: 'Cancel', avBg: 'Background', avSkin: 'Skin', avFace: 'Face', avEyes: 'Eyes', avMouth: 'Mouth', avHair: 'Hair', avHairc: 'Colour', avAcc: 'Extra', party: 'Friends group', isNew: 'NEW', featured: 'FEATURED', tGames: 'Games', tFriends: 'Friends', tLb: 'Ranking', stWins: 'wins', stGames: 'games', stRank: 'rank' },
+  cs: { avTitle: 'Vyber si skin', avEdit: 'Upravit můj skin', avRnd: 'Náhodně', avSave: 'Uložit', avCancel: 'Zrušit', avBg: 'Pozadí', avSkin: 'Pleť', avFace: 'Obličej', avEyes: 'Oči', avMouth: 'Ústa', avHair: 'Účes', avHairc: 'Barva', avAcc: 'Doplněk', party: 'Skupina přátel', isNew: 'NOVINKA', featured: 'DOPORUČUJEME', tGames: 'Hry', tFriends: 'Přátelé', tLb: 'Žebříček', stWins: 'výhry', stGames: 'hry', stRank: 'pořadí' }
 });
 // Jiskry
 for (let i = 0; i < 16; i++) { const e = document.createElement('i'); e.style.left = Math.random() * 100 + '%'; e.style.animationDuration = 9 + Math.random() * 10 + 's'; e.style.animationDelay = -Math.random() * 18 + 's'; e.style.transform = `scale(${0.5 + Math.random()})`; $('#sparks').appendChild(e); }
@@ -395,7 +422,7 @@ const LIST = [
   { href: 'yams', name: 'gn_ym', desc: 'yDesc', tags: ['tag18', 'tagOnline'], art: "<div class=\"tbg\" style=\"position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,#a8283a,#5a1219)\"><svg viewBox=\"0 0 300 150\" preserveAspectRatio=\"xMidYMid slice\"> <rect x=\"-10\" y=\"-10\" width=\"320\" height=\"170\" fill=\"none\" stroke=\"#7a4a26\" stroke-width=\"22\"/> <g transform=\"rotate(-14 90 80)\"><rect x=\"60\" y=\"48\" width=\"62\" height=\"62\" rx=\"14\" fill=\"#fff\" stroke=\"#0d0705\" stroke-width=\"5\"/><circle cx=\"76\" cy=\"64\" r=\"6\" fill=\"#1c1620\"/><circle cx=\"106\" cy=\"64\" r=\"6\" fill=\"#1c1620\"/><circle cx=\"91\" cy=\"79\" r=\"6\" fill=\"#1c1620\"/><circle cx=\"76\" cy=\"94\" r=\"6\" fill=\"#1c1620\"/><circle cx=\"106\" cy=\"94\" r=\"6\" fill=\"#1c1620\"/></g> <g transform=\"rotate(10 160 70)\"><rect x=\"128\" y=\"36\" width=\"62\" height=\"62\" rx=\"14\" fill=\"#f2c14e\" stroke=\"#0d0705\" stroke-width=\"5\"/><circle cx=\"144\" cy=\"52\" r=\"6\" fill=\"#6a4200\"/><circle cx=\"174\" cy=\"52\" r=\"6\" fill=\"#6a4200\"/><circle cx=\"159\" cy=\"67\" r=\"6\" fill=\"#6a4200\"/><circle cx=\"144\" cy=\"82\" r=\"6\" fill=\"#6a4200\"/><circle cx=\"174\" cy=\"82\" r=\"6\" fill=\"#6a4200\"/></g> <g transform=\"rotate(-6 228 86)\"><rect x=\"196\" y=\"56\" width=\"62\" height=\"62\" rx=\"14\" fill=\"#e04848\" stroke=\"#0d0705\" stroke-width=\"5\"/><circle cx=\"212\" cy=\"72\" r=\"6\" fill=\"#fff\"/><circle cx=\"242\" cy=\"72\" r=\"6\" fill=\"#fff\"/><circle cx=\"227\" cy=\"87\" r=\"6\" fill=\"#fff\"/><circle cx=\"212\" cy=\"102\" r=\"6\" fill=\"#fff\"/><circle cx=\"242\" cy=\"102\" r=\"6\" fill=\"#fff\"/></g> <g transform=\"translate(18 16)\"><rect width=\"84\" height=\"28\" rx=\"14\" fill=\"#3a2416\" stroke=\"#0d0705\" stroke-width=\"3\"/><text x=\"42\" y=\"20\" text-anchor=\"middle\" font-family=\"Arial Black,sans-serif\" font-size=\"15\" fill=\"#f2c14e\">YAM'S!</text></g> </svg></div>" },
   { href: 'bataille', name: 'gn_bn', desc: 'nDesc', tags: ['tag12', 'tagOnline'], art: "<svg viewBox=\"0 0 600 300\" preserveAspectRatio=\"xMidYMid slice\" aria-hidden=\"true\"> <defs> <linearGradient id=\"bnSky\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#0d1a33\"/><stop offset=\".6\" stop-color=\"#23365e\"/><stop offset=\"1\" stop-color=\"#6a4a6e\"/></linearGradient> <linearGradient id=\"bnSea\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#14546a\"/><stop offset=\"1\" stop-color=\"#082436\"/></linearGradient> <radialGradient id=\"bnMoon\" cx=\"40%\" cy=\"35%\" r=\"70%\"><stop offset=\"0\" stop-color=\"#fffbe8\"/><stop offset=\"1\" stop-color=\"#f3d58e\"/></radialGradient> <radialGradient id=\"bnFire\" cx=\"50%\" cy=\"60%\" r=\"60%\"><stop offset=\"0\" stop-color=\"#fff3b0\"/><stop offset=\".45\" stop-color=\"#ffb02e\"/><stop offset=\"1\" stop-color=\"#e8401c\" stop-opacity=\"0\"/></radialGradient> <radialGradient id=\"bnFlash\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#fffbe0\"/><stop offset=\".4\" stop-color=\"#ffd24a\"/><stop offset=\"1\" stop-color=\"#ff7a1c\" stop-opacity=\"0\"/></radialGradient> </defs> <rect width=\"600\" height=\"300\" fill=\"url(#bnSky)\"/> <g fill=\"#fff\" opacity=\".75\"><circle cx=\"40\" cy=\"30\" r=\"1.6\"/><circle cx=\"120\" cy=\"70\" r=\"1.3\"/><circle cx=\"210\" cy=\"22\" r=\"1.8\"/><circle cx=\"300\" cy=\"55\" r=\"1.2\"/><circle cx=\"380\" cy=\"18\" r=\"1.5\"/><circle cx=\"560\" cy=\"40\" r=\"1.6\"/><circle cx=\"520\" cy=\"95\" r=\"1.2\"/><circle cx=\"70\" cy=\"110\" r=\"1.2\"/></g> <circle cx=\"470\" cy=\"62\" r=\"30\" fill=\"url(#bnMoon)\" stroke=\"#07101e\" stroke-width=\"4\"/> <circle cx=\"461\" cy=\"55\" r=\"5\" fill=\"#e8c473\" opacity=\".6\"/><circle cx=\"480\" cy=\"74\" r=\"4\" fill=\"#e8c473\" opacity=\".6\"/> <!-- \u00eele au loin --> <path d=\"M0 196q40-26 78-12 30-30 64-6 22-8 40 18z\" fill=\"#1a2c45\" stroke=\"#07101e\" stroke-width=\"4\" stroke-linejoin=\"round\"/> <path d=\"M44 186c2-22 6-34 14-42M58 144c-14-2-22 4-26 10M58 144c10-8 22-6 28 0M58 144c-4-10-14-12-20-10\" fill=\"none\" stroke=\"#07101e\" stroke-width=\"4\" stroke-linecap=\"round\"/> <!-- mer --> <rect y=\"190\" width=\"600\" height=\"110\" fill=\"url(#bnSea)\"/> <path d=\"M0 190H600\" stroke=\"#07101e\" stroke-width=\"4\"/> <g fill=\"none\" stroke=\"#7fe0e6\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\".55\"><path d=\"M30 222q12-7 24 0t24 0\"/><path d=\"M250 262q12-7 24 0t24 0\"/><path d=\"M500 236q12-7 24 0t24 0\"/><path d=\"M120 280q12-7 24 0t24 0\"/><path d=\"M420 284q12-7 24 0t24 0\"/></g> <!-- navire ennemi en feu (droite) --> <g transform=\"translate(440 150) rotate(9)\"> <ellipse cx=\"40\" cy=\"38\" rx=\"70\" ry=\"44\" fill=\"url(#bnFire)\" opacity=\".8\"/> <path d=\"M-10 52h104l-14 30H6z\" fill=\"#4a2a18\" stroke=\"#07101e\" stroke-width=\"5\" stroke-linejoin=\"round\"/> <path d=\"M2 62h80\" stroke=\"#2c170c\" stroke-width=\"3\"/> <path d=\"M40 52V-8\" stroke=\"#07101e\" stroke-width=\"5\"/> <path d=\"M40-2q26 6 30 26-12 4-30 2z\" fill=\"#c9b48e\" stroke=\"#07101e\" stroke-width=\"4\" stroke-linejoin=\"round\"/> <path d=\"M16 46q4-22 14-28 2 14 8 18 4-12 12-16-2 14 6 24z\" fill=\"#ffb02e\" stroke=\"#07101e\" stroke-width=\"3\" stroke-linejoin=\"round\"/> <path d=\"M24 46q2-12 8-16 2 8 6 10 3-6 8-8-1 8 3 14z\" fill=\"#fff0a0\"/> <g fill=\"#3a3346\" stroke=\"#07101e\" stroke-width=\"3\" opacity=\".9\"><circle cx=\"34\" cy=\"-22\" r=\"14\"/><circle cx=\"52\" cy=\"-36\" r=\"18\"/><circle cx=\"76\" cy=\"-50\" r=\"22\"/></g> </g> <!-- boulet + tra\u00een\u00e9e --> <path d=\"M262 104q80-60 168 22\" fill=\"none\" stroke=\"#fff3c4\" stroke-width=\"4\" stroke-dasharray=\"2 10\" stroke-linecap=\"round\" opacity=\".8\"/> <circle cx=\"396\" cy=\"80\" r=\"8\" fill=\"#1b1b22\" stroke=\"#07101e\" stroke-width=\"3\"/> <!-- galion pirate (gauche) --> <g transform=\"translate(108 92)\"> <path d=\"M0 98h210l-22 46H24z\" fill=\"#6b3d22\" stroke=\"#07101e\" stroke-width=\"6\" stroke-linejoin=\"round\"/> <path d=\"M-8 90h56v12H-8zM170 82h52v20h-52z\" fill=\"#7d4a2a\" stroke=\"#07101e\" stroke-width=\"5\" stroke-linejoin=\"round\"/> <path d=\"M14 114h184\" stroke=\"#3e2112\" stroke-width=\"4\"/> <path d=\"M18 124h170\" stroke=\"#d9a441\" stroke-width=\"3\"/> <g fill=\"#07101e\"><circle cx=\"54\" cy=\"113\" r=\"5\"/><circle cx=\"86\" cy=\"113\" r=\"5\"/><circle cx=\"118\" cy=\"113\" r=\"5\"/><circle cx=\"150\" cy=\"113\" r=\"5\"/></g> <!-- \u00e9clair de canon --> <circle cx=\"232\" cy=\"104\" r=\"26\" fill=\"url(#bnFlash)\"/> <path d=\"M208 104l38-14-10 14 16 6-26 2z\" fill=\"#fff6c8\" stroke=\"#07101e\" stroke-width=\"2.5\" stroke-linejoin=\"round\"/> <path d=\"M60 98V-28M140 98V-10M204 82 236 30\" stroke=\"#07101e\" stroke-width=\"6\" stroke-linecap=\"round\"/> <path d=\"M56 -28h8\" stroke=\"#07101e\" stroke-width=\"6\"/> <!-- voiles noires --> <path d=\"M24 -14q36-8 72 0q6 26 0 52q-36-8-72 0q-6-26 0-52z\" fill=\"#16131c\" stroke=\"#07101e\" stroke-width=\"5\" stroke-linejoin=\"round\"/> <path d=\"M20 46q40-8 80 0q6 22 0 44q-40-8-80 0q-6-22 0-44z\" fill=\"#16131c\" stroke=\"#07101e\" stroke-width=\"5\" stroke-linejoin=\"round\"/> <path d=\"M110 4q30-6 60 0q5 24 0 48q-30-6-60 0q-5-24 0-48z\" fill=\"#16131c\" stroke=\"#07101e\" stroke-width=\"5\" stroke-linejoin=\"round\"/> <path d=\"M146 98q-6-24 0-36 22 6 30 30z\" fill=\"#e9dcc0\" stroke=\"#07101e\" stroke-width=\"4\" stroke-linejoin=\"round\"/> <!-- t\u00eate de mort --> <g transform=\"translate(60 12)\"><path d=\"M-12 0a12 12 0 1 1 24 0c0 5-2 8-5 9v5h-14v-5c-3-1-5-4-5-9z\" fill=\"#f3ead6\"/><circle cx=\"-5\" cy=\"1\" r=\"3.4\" fill=\"#16131c\"/><circle cx=\"5\" cy=\"1\" r=\"3.4\" fill=\"#16131c\"/><path d=\"M-20 18l40 12M20 18l-40 12\" stroke=\"#f3ead6\" stroke-width=\"4\" stroke-linecap=\"round\"/></g> <!-- drapeau --> <path d=\"M60 -28V-56\" stroke=\"#07101e\" stroke-width=\"5\"/> <path d=\"M62 -56h30l-6 8 6 8H62z\" fill=\"#e8394d\" stroke=\"#07101e\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/> <!-- lanternes --> <circle cx=\"-2\" cy=\"84\" r=\"6\" fill=\"#ffd36a\" stroke=\"#07101e\" stroke-width=\"3\"/><circle cx=\"214\" cy=\"74\" r=\"6\" fill=\"#ffd36a\" stroke=\"#07101e\" stroke-width=\"3\"/> </g> <!-- \u00e9cume autour du galion --> <path d=\"M120 236q20-10 40 0t40 0 40 0 40 0 40 0\" fill=\"none\" stroke=\"#dff8f6\" stroke-width=\"5\" stroke-linecap=\"round\"/> <!-- \u00e9claboussure --> <g transform=\"translate(540 214)\" fill=\"#dff8f6\" stroke=\"#07101e\" stroke-width=\"3\" stroke-linejoin=\"round\"><path d=\"M-18 8q4-26 10-30 2 16 8 18 2-22 10-28 4 22 2 40z\"/></g> </svg>", isNew: true }
 ];
-const GO = '<svg viewBox="0 0 24 24"><path d="M8 4l12 8-12 8z" fill="#2a1302" stroke="#2a1302" stroke-width="2" stroke-linejoin="round"/></svg>';
+const GO = '<svg viewBox="0 0 24 24"><path d="M8 4l12 8-12 8z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>';
 function renderGames() {
   $('#games').innerHTML = LIST.map(g => `<a class="frame tile card" href="${g.href}.html"><div class="thumb">${g.isNew ? `<span class="badge-new sm">${t('isNew')}</span>` : ''}${g.art}</div>
     <div class="tb"><h3>${esc(t(g.name))}</h3><p>${esc(t(g.desc))}</p><div class="meta"><span>${esc(t(g.tags[0]))}</span><span class="go">${GO}</span></div></div></a>`).join('');
@@ -425,7 +452,7 @@ function render() {
   $('#lbTabs').innerHTML = GAMES.map(([k, l]) => `<button class="btn" data-tab="${k}" aria-pressed="${k === tab}">${k === 'all' ? t('all') : esc(t(l))}</button>`).join('');
   const rows = P.ranking(matches, tab === 'all' ? null : tab);
   const me = P.name().toLowerCase();
-  $('#lbList').innerHTML = rows.length ? rows.slice(0, 30).map((r, i) => `<div class="lb-row${r.name.toLowerCase() === me ? ' me' : ''}"><span class="rank${i < 3 ? ' r' + (i + 1) : ''}">${i + 1}</span><span class="nm">${esc(r.name)}${r.ai ? `<small>${t('aiTag')}</small>` : ''}</span><span>${r.w}</span><span>${r.g}</span><span>${Math.round(100 * r.w / r.g)}%</span></div>`).join('')
+  $('#lbList').innerHTML = rows.length ? rows.slice(0, 30).map((r, i) => `<div class="lb-row${r.name.toLowerCase() === me ? ' me' : ''}"><span class="rank${i < 3 ? ' r' + (i + 1) : ''}">${i + 1}</span><span class="nm">${lbAv(r.name)}${esc(r.name)}${r.ai ? `<small>${t('aiTag')}</small>` : ''}</span><span>${r.w}</span><span>${r.g}</span><span>${Math.round(100 * r.w / r.g)}%</span></div>`).join('')
     : `<div class="empty">${t('lbEmpty')}</div>`;
   const fmt = new Intl.DateTimeFormat(t('locale'), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   const hist = matches.filter(m => tab === 'all' || m.g === tab).slice(-8).reverse();
@@ -434,17 +461,49 @@ function render() {
   const all = P.ranking(matches), mi = all.findIndex(r => r.name.toLowerCase() === me);
   $('#myStat').innerHTML = mi >= 0 ? `<span class="chip gold">🏆 <b>${all[mi].w}</b> ${t('stWins')}</span><span class="chip">🎮 <b>${all[mi].g}</b> ${t('stGames')}</span><span class="chip">${t('stRank')} <b>#${mi + 1}</b></span>`
     : `<span class="chip hint">${t('myStat0')}</span>`;
-  const nm = P.hasName() ? P.name() : ''; $('#avatar').textContent = nm ? nm[0].toUpperCase() : '?';
+  renderMyAv();
   $('#dbDot').className = dbState === 'on' ? 'on' : dbState === 'off' ? 'off' : '';
   $('#dbTxt').textContent = dbState === 'on' ? t('dbOn', { n: matches.length, games: P.gamesWord(matches.length) }) : dbState === 'off' ? t('dbOff') : t('dbLoad');
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) { P.unlockAudio(); P.sfx('click'); tab = b.dataset.tab; P.set('hub-tab', tab); render(); } });
 async function load() {
+  const av = P.fetchAvatars();
   try { matches = await P.fetchMatches(); dbState = 'on'; } catch (e) { dbState = 'off'; }
+  await av;
   render();
 }
 setInterval(() => { if (!document.hidden) load(); }, 20000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+
+/* --- skin du joueur --- */
+const lbAv = n => { const a = P.avatarOf(n); return a ? `<i class="lbav">${P.avatarSVG(a)}</i>` : `<i class="lbav">${esc(String(n || '?')[0].toUpperCase())}</i>`; };
+function renderMyAv() {
+  const a = P.myAvatar(), nm = P.hasName() ? P.name() : '';
+  $('#avPic').innerHTML = a ? P.avatarSVG(a) : esc(nm ? nm[0].toUpperCase() : '?');
+  $('#avatar').classList.toggle('empty', !a);
+}
+let avDraft = null;
+const avRand = () => P.SKINS[Math.floor(Math.random() * P.SKINS.length)].id;
+const AVG = [['qd', 'gn_qd'], ['uc', 'gn_uc'], ['cn', 'gn_cn'], ['bn', 'gn_bn']];
+function renderAvEd() {
+  $('#avBig').innerHTML = P.avatarSVG(avDraft);
+  $('#avWho').textContent = P.hasName() ? P.name() : '';
+  $('#avOpts').innerHTML = AVG.map(([g, k]) => `<div class="av-grp">${esc(t(k))}</div>` + P.SKINS.filter(x => x.g === g).map(x => `<button data-avo="${x.id}" aria-pressed="${avDraft === x.id}">${x.svg()}</button>`).join('')).join('');
+}
+function openAvEd() {
+  P.unlockAudio(); P.sfx('click');
+  avDraft = P.myAvatar() || P.SKINS[0].id;
+  $('#avBack').hidden = $('#avEd').hidden = false; renderAvEd();
+}
+function closeAvEd() { $('#avBack').hidden = $('#avEd').hidden = true; }
+$('#avatar').onclick = openAvEd;
+$('#avClose').onclick = $('#avCancel').onclick = $('#avBack').onclick = () => { P.sfx('click'); closeAvEd(); };
+$('#avRnd').onclick = () => { P.sfx('click'); avDraft = avRand(); renderAvEd(); };
+$('#avSave').onclick = () => { P.sfx('good'); P.setMyAvatar(avDraft); closeAvEd(); renderMyAv(); render(); };
+$('#avOpts').addEventListener('click', e => { const b = e.target.closest('[data-avo]'); if (!b) return; P.sfx('click'); avDraft = b.dataset.avo; const sc = $('#avOpts').scrollTop; renderAvEd(); $('#avOpts').scrollTop = sc; });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#avEd').hidden) closeAvEd(); });
+$('#inName').addEventListener('change', () => P.pushAvatar());
+P.pushAvatar();
 
 P.bindName($('#inName'));
 $('#inName').addEventListener('input', () => render());
@@ -464,7 +523,7 @@ const gc = GChat.mount($('#gchat'), { db: P.DB_URL, lang: P.lang, name: () => P.
 Party.mountPanel($('#party'));
 // Bouton volume (réglages communs : la musique de chaque jeu et les bruitages)
 P.audioDock({ on: () => P.musicVol() > 0.01, set: () => {}, vol: () => {} });
-P.onLang(() => { renderGames(); render(); renderSnd(); gc.refresh(); Party.refresh(); });
+P.onLang(() => { renderGames(); render(); renderSnd(); gc.refresh(); Party.refresh(); if (!$('#avEd').hidden) renderAvEd(); });
 P.applyStatic(); renderGames(); renderSnd(); render(); load();
 })();
 </script>
