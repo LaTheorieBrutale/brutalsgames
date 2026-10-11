@@ -31,322 +31,317 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titan+One&family=Nunito:wght@600;700;800;900&display=swap">
 <style>
-/* Layout : une colonne centrée — logo, pseudo, cartes des jeux, classement général et par jeu. */
+/* Accueil « lobby de jeu mobile » : grande bannière illustrée, profil du joueur, jeu à la une, grille de jeux,
+   groupe d'amis, classement et chat. Barre d'onglets en bas sur téléphone, colonne latérale sur grand écran. */
 :root{
-  --void:#1a1a2e;--panel:#2a2148;--panel-2:#3b2d66;--ink:#0c0816;--bone:#f3e7c9;--bone-dim:#a69bbb;
-  --torch:#ff9a3c;--slime:#86f2a0;--blood:#e8394d;--gold:#ffcf3f;--rivet:#cbbf9f;
-  --f-display:"Titan One","Arial Black",system-ui,sans-serif;
-  --f-ui:"Titan One","Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;
-  --f-text:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --bg0:#0f0b22;--bg1:#1c1540;--panel:#2b2257;--panel2:#1f1844;--ink:#0b0716;--line:#3d3275;--bone:#fff6e4;--dim:#b3a7d6;
+  --orange:#ff9a3c;--orange2:#e8661c;--gold:#ffcf3f;--mint:#6ff2b0;--pink:#ff5a8a;--sky:#5cc8ff;
+  --f-display:"Titan One","Arial Black",system-ui,sans-serif;--f-ui:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html{background:var(--void)}
-body{margin:0;min-height:100%;color:var(--bone);font-family:var(--f-ui);-webkit-tap-highlight-color:transparent;
-  background:radial-gradient(ellipse at 50% -10%,#4a3a7a 0,#2a1f4a 30%,var(--void) 65%) fixed,var(--void);
-  padding-inline:16px;padding-block:calc(env(safe-area-inset-top,0px) + 14px) calc(env(safe-area-inset-bottom,0px) + 28px)}
+html{background:var(--bg0)}
+body{margin:0;min-height:100%;color:var(--bone);font-family:var(--f-ui);font-weight:700;-webkit-tap-highlight-color:transparent;
+  background:radial-gradient(1200px 700px at 50% -200px,#4b3a96 0,#2a2061 35%,transparent 70%) no-repeat,
+    radial-gradient(2px 2px at 12% 18%,#fff8 50%,transparent 51%),radial-gradient(2px 2px at 78% 12%,#fff8 50%,transparent 51%),radial-gradient(1.5px 1.5px at 40% 30%,#fff6 50%,transparent 51%),radial-gradient(1.5px 1.5px at 90% 40%,#fff6 50%,transparent 51%),radial-gradient(1.5px 1.5px at 22% 55%,#fff5 50%,transparent 51%),
+    linear-gradient(180deg,var(--bg1),var(--bg0) 60%) fixed;background-color:var(--bg0);
+  padding:0 0 calc(env(safe-area-inset-bottom,0px) + 96px)}
 [hidden]{display:none!important}
-#embers{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-#embers i{position:absolute;bottom:-10px;width:5px;height:5px;border-radius:50%;background:var(--torch);box-shadow:0 0 8px var(--torch);opacity:.7;animation:rise linear infinite}
-@keyframes rise{to{transform:translateY(-110vh) translateX(30px);opacity:0}}
-main{position:relative;z-index:1;max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
-.frame{position:relative;background:linear-gradient(180deg,color-mix(in srgb,var(--panel) 84%,#fff 16%) 0,var(--panel) 34%,color-mix(in srgb,var(--panel) 82%,#000) 100%);
-  border:3px solid var(--ink);border-radius:20px;box-shadow:0 6px 0 var(--ink),inset 0 0 0 2px color-mix(in srgb,var(--panel) 70%,#fff 14%)}
-.frame::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:
-  radial-gradient(circle at 9px 9px,var(--rivet) 2.4px,var(--ink) 3px 4.2px,transparent 4.6px),radial-gradient(circle at calc(100% - 9px) 9px,var(--rivet) 2.4px,var(--ink) 3px 4.2px,transparent 4.6px),
-  radial-gradient(circle at 9px calc(100% - 9px),var(--rivet) 2.4px,var(--ink) 3px 4.2px,transparent 4.6px),radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),var(--rivet) 2.4px,var(--ink) 3px 4.2px,transparent 4.6px)}
-.btn{position:relative;font-family:var(--f-ui);font-size:17px;color:var(--bone);cursor:pointer;line-height:1;letter-spacing:.02em;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--panel-2) 72%,#fff 28%) 0,var(--panel-2) 46%,color-mix(in srgb,var(--panel-2) 78%,#000) 100%);
-  border:3px solid var(--ink);border-radius:14px;padding:10px 14px 8px;box-shadow:0 4px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.28),inset 0 -3px 0 rgba(0,0,0,.2);text-shadow:0 2px 0 rgba(0,0,0,.35);transition:transform .07s,box-shadow .07s,filter .15s}
-.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.28)}
-@media (hover:hover){.btn:hover{filter:brightness(1.08)}}
-.btn:focus-visible{outline:3px solid var(--slime);outline-offset:2px}
-.btn.orange{color:var(--ink);text-shadow:0 1px 0 rgba(255,255,255,.45);background:linear-gradient(180deg,color-mix(in srgb,var(--torch) 55%,#fff 45%) 0,var(--torch) 48%,color-mix(in srgb,var(--torch) 78%,#000) 100%)}
-.btn.icon{padding:7px;border-radius:12px}
+a{color:inherit}
+#sparks{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+#sparks i{position:absolute;bottom:-12px;width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);opacity:.55;animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-110vh) translateX(40px);opacity:0}}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 14px}
+/* éléments de base */
+.frame{position:relative;background:linear-gradient(180deg,#3a2f72 0,var(--panel) 26%,var(--panel2) 100%);border:3px solid var(--ink);border-radius:22px;
+  box-shadow:0 6px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.14),inset 0 0 0 2px rgba(255,255,255,.04)}
+.btn{position:relative;font-family:var(--f-display);font-weight:400;font-size:17px;color:var(--bone);cursor:pointer;line-height:1;letter-spacing:.02em;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(180deg,#5b4bb0 0,#45379a 50%,#33287a 100%);border:3px solid var(--ink);border-radius:14px;padding:10px 14px 9px;box-shadow:0 4px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.25);text-shadow:0 2px 0 rgba(0,0,0,.35);transition:transform .08s,box-shadow .08s,filter .15s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.25)}
+@media (hover:hover){.btn:hover{filter:brightness(1.1)}}
+.btn:focus-visible{outline:3px solid var(--mint);outline-offset:2px}
+.btn.orange{color:#2a1302;text-shadow:0 1px 0 rgba(255,255,255,.45);background:linear-gradient(180deg,#ffd29a 0,var(--orange) 50%,var(--orange2) 100%)}
+.btn.icon{padding:8px;border-radius:13px}
 .btn.icon svg{width:22px;height:22px}
-.field{font-family:var(--f-ui);font-size:19px;color:var(--bone);background:var(--ink);border:3px solid var(--ink);border-radius:13px;padding:10px 12px 8px;width:100%;min-width:0;outline:none;box-shadow:inset 0 3px 6px rgba(0,0,0,.45)}
-.field:focus{border-color:var(--torch)}
+.field{font-family:var(--f-ui);font-weight:900;font-size:19px;color:var(--bone);background:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:9px 12px 8px;width:100%;min-width:0;outline:none;box-shadow:inset 0 3px 6px rgba(0,0,0,.5)}
+.field:focus{border-color:var(--orange)}
+.field::placeholder{color:#6f6596}
 .nseg{display:flex;gap:6px}
-.nseg .btn{flex:1;padding:9px 6px 7px;font-size:15px;background:var(--ink);color:var(--bone-dim);box-shadow:inset 0 2px 4px rgba(0,0,0,.4);text-shadow:none}
-.nseg .btn[aria-pressed="true"]{color:var(--ink);background:linear-gradient(180deg,#fffaf0,var(--bone) 55%,#cbb98e);box-shadow:0 3px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.6)}
-label,.lbl{font-size:13px;color:var(--bone-dim);letter-spacing:.07em;text-transform:uppercase}
+.nseg .btn{flex:1;padding:9px 6px 8px;font-size:15px;background:var(--ink);color:var(--dim);box-shadow:inset 0 2px 4px rgba(0,0,0,.4);text-shadow:none}
+.nseg .btn[aria-pressed="true"]{color:#2a1302;background:linear-gradient(180deg,#fff3c4,var(--gold) 55%,#e0a020);box-shadow:0 3px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.6)}
+label,.lbl{font-size:12px;color:var(--dim);letter-spacing:.09em;text-transform:uppercase;font-weight:900}
+h2.sec{margin:6px 0 0;font-family:var(--f-display);font-weight:400;font-size:24px;letter-spacing:.01em;text-shadow:0 3px 0 var(--ink);display:flex;align-items:center;gap:10px;scroll-margin-top:16px}
+h2.sec .ico{width:34px;height:34px;flex:none;filter:drop-shadow(0 3px 0 var(--ink))}
+h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-gradient(90deg,var(--line),transparent)}
 
-header{display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
-header .gear{position:absolute;right:0;top:0}
-.logo{font-family:var(--f-display);font-size:clamp(64px,19vw,120px);line-height:.9;letter-spacing:.03em;margin-top:6px;
-  background:linear-gradient(180deg,#fffaf0,var(--bone) 42%,#d9b46a 74%,#a87a32);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:2.5px var(--ink);
-  filter:drop-shadow(0 6px 0 var(--ink)) drop-shadow(0 0 26px rgba(255,154,60,.4));animation:drop .8s cubic-bezier(.2,1.5,.4,1) both,float 4s ease-in-out .8s infinite}
-@keyframes drop{from{opacity:0;transform:translateY(-50px) scale(.7)}}
-@keyframes float{50%{transform:translateY(-5px) rotate(-.8deg)}}
-.ribbon{position:relative;margin-top:-4px;transform:rotate(-2.5deg)}
-.ribbon span{position:relative;z-index:1;display:block;font-size:clamp(16px,4.6vw,21px);color:var(--ink);padding:6px 22px 5px;border:3px solid var(--ink);border-radius:8px;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--torch) 50%,#fff 50%),var(--torch) 55%,color-mix(in srgb,var(--torch) 80%,#000));box-shadow:0 4px 0 var(--ink);white-space:nowrap}
-.ribbon::before,.ribbon::after{content:"";position:absolute;top:9px;width:30px;height:100%;background:color-mix(in srgb,var(--torch) 60%,#000);border:3px solid var(--ink)}
-.ribbon::before{left:-20px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,35% 50%)}
-.ribbon::after{right:-20px;clip-path:polygon(0 0,100% 0,65% 50%,100% 100%,0 100%)}
-.who{max-width:440px;width:100%;margin:0 auto;padding:14px;display:flex;flex-direction:column;gap:8px}
-.who .row{display:flex;gap:10px;align-items:center}
-.who .stat{font-family:var(--f-text);font-size:13px;color:var(--bone-dim);margin:0}
-.who .stat b{color:var(--torch);font-family:var(--f-ui);font-weight:400;font-size:15px}
+/* bannière */
+.hero{position:relative;height:clamp(250px,46vw,380px);margin:0 -14px;overflow:hidden;border-bottom:4px solid var(--ink)}
+.hero svg.scene{position:absolute;inset:0;width:100%;height:100%}
+.hero .float{animation:bob 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.hero .f2{animation-delay:-1.3s}.hero .f3{animation-delay:-2.1s}.hero .f4{animation-delay:-.7s}.hero .f5{animation-delay:-2.8s}.hero .f6{animation-delay:-1.9s}
+@keyframes bob{50%{transform:translateY(-8px) rotate(-4deg)}}
+.hero .win{animation:flicker 3s infinite}.hero .win:nth-child(2n){animation-delay:-1.4s}
+@keyframes flicker{0%,100%{opacity:1}45%{opacity:.75}55%{opacity:1}}
+.brand{position:absolute;left:0;right:0;top:clamp(26px,7vw,54px);display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.logo{font-family:var(--f-display);font-weight:400;font-size:clamp(46px,12.5vw,100px);line-height:.92;letter-spacing:.01em;text-align:center;
+  background:linear-gradient(180deg,#fffaf0 0,#ffe7a8 45%,#ffb347 70%,#e8661c 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;
+  filter:drop-shadow(0 6px 0 var(--ink)) drop-shadow(0 0 30px rgba(255,170,80,.35));animation:drop .8s cubic-bezier(.2,1.5,.4,1) both}
+.logo span{display:block;font-size:.62em;letter-spacing:.12em;margin-top:2px}
+@keyframes drop{from{opacity:0;transform:translateY(-40px) scale(.75)}}
+.ribbon{margin-top:10px;transform:rotate(-2deg);position:relative}
+.ribbon b{position:relative;z-index:1;display:block;font-family:var(--f-display);font-weight:400;font-size:clamp(14px,3.8vw,19px);color:#2a1302;padding:6px 20px 5px;border:3px solid var(--ink);border-radius:9px;background:linear-gradient(180deg,#ffd29a,var(--orange) 55%,var(--orange2));box-shadow:0 4px 0 var(--ink);white-space:nowrap}
+.ribbon::before,.ribbon::after{content:"";position:absolute;top:9px;width:28px;height:100%;background:#b8501a;border:3px solid var(--ink)}
+.ribbon::before{left:-18px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,35% 50%)}.ribbon::after{right:-18px;clip-path:polygon(0 0,100% 0,65% 50%,100% 100%,0 100%)}
+.hero .gear{position:absolute;right:14px;top:calc(env(safe-area-inset-top,0px) + 12px);z-index:3}
 
-h2.sec{margin:0;font-weight:400;font-size:24px;letter-spacing:.02em;text-shadow:0 2px 0 rgba(0,0,0,.4);display:flex;align-items:center;gap:10px}
-h2.sec::after{content:"";flex:1;height:3px;border-radius:2px;background:var(--ink)}
-.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
-.card{display:flex;flex-direction:column;overflow:hidden;text-decoration:none;color:inherit;transition:transform .2s cubic-bezier(.2,1.5,.4,1)}
-@media (hover:hover){.card:hover{transform:translateY(-4px) rotate(-.4deg)}}
-.thumb{height:150px;border-bottom:3px solid var(--ink);position:relative;overflow:hidden}
-.thumb svg{position:absolute;inset:0;width:100%;height:100%}
-.card-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
-.card h3{margin:0;font-weight:400;font-size:24px;text-shadow:0 2px 0 rgba(0,0,0,.4)}
-.card p{margin:0;font-family:var(--f-text);font-size:14px;line-height:1.45;color:var(--bone-dim)}
-.tags{display:flex;gap:6px;flex-wrap:wrap}
-.tags span{font-size:12px;background:var(--ink);border-radius:999px;padding:4px 9px 3px;color:var(--bone-dim)}
-.card .btn{margin-top:auto;align-self:stretch}
-.card.soon{border-style:dashed;box-shadow:none;background:transparent;align-items:center;justify-content:center;text-align:center;min-height:200px;padding:20px;gap:8px;color:var(--bone-dim)}
-.card.soon::before{display:none}
-.card.soon b{font-weight:400;font-size:20px;color:var(--bone)}
+/* mise en page */
+.layout{display:grid;grid-template-columns:1fr;gap:18px;margin-top:-34px;position:relative;z-index:2}
+.maincol,.sidecol{display:flex;flex-direction:column;gap:16px;min-width:0}
+@media (min-width:1100px){.layout{grid-template-columns:minmax(0,1fr) 370px;align-items:start}.sidecol{position:sticky;top:16px}}
 
-.lb{padding:14px;display:flex;flex-direction:column;gap:12px}
-.lb-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.lb-head .nseg{flex:1 1 100%;min-width:0;max-width:100%}
-#lbTabs{flex-wrap:wrap}#lbTabs .btn{flex:1 1 auto;white-space:nowrap;padding:8px 9px 6px;font-size:14px}
-.partybox{padding:14px}
-.chatbox{padding:14px}
-#gchat{height:360px}
-/* Grand écran : chat en colonne fixe à droite, le reste se recentre à gauche */
-@media (min-width:1400px){
-  body{padding-right:400px}
-  h2.chat-h{display:none}
-  .chatbox{position:fixed;z-index:5;top:24px;right:24px;bottom:24px;width:360px;display:flex;flex-direction:column}
-  #gchat{height:auto;flex:1;min-height:0}
-}
+/* profil */
+.profile{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.avatar{width:58px;height:58px;flex:none;border-radius:18px;border:3px solid var(--ink);display:grid;place-items:center;font-family:var(--f-display);font-size:30px;color:#2a1302;box-shadow:0 4px 0 var(--ink),inset 0 3px 0 rgba(255,255,255,.4);background:linear-gradient(180deg,#ffe7a8,var(--orange))}
+.profile .pf{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--dim);background:var(--ink);border-radius:999px;padding:4px 10px 3px;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.06)}
+.chip b{font-family:var(--f-display);font-weight:400;color:var(--bone);font-size:14px}
+.chip.gold b{color:var(--gold)}
+.chip.hint{font-size:12.5px}
+
+/* jeu à la une */
+.feat{display:grid;grid-template-columns:1fr;overflow:hidden;text-decoration:none;transition:transform .2s cubic-bezier(.2,1.5,.4,1)}
+@media (hover:hover){.feat:hover{transform:translateY(-3px)}}
+.feat .art{position:relative;height:clamp(170px,40vw,250px);border-bottom:3px solid var(--ink);overflow:hidden}
+.feat .art svg{position:absolute;inset:0;width:100%;height:100%}
+.feat .fb{padding:12px 14px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.feat .fb .tx{flex:1;min-width:200px;display:flex;flex-direction:column;gap:4px}
+.feat h3{margin:0;font-family:var(--f-display);font-weight:400;font-size:28px;text-shadow:0 3px 0 var(--ink)}
+.feat p{margin:0;font-size:14px;color:var(--dim);line-height:1.4;font-weight:700}
+.feat .btn{font-size:22px;padding:12px 26px 11px}
+.badge-new{position:absolute;top:12px;left:12px;font-family:var(--f-display);font-size:14px;color:#2a1302;background:linear-gradient(180deg,#fff3c4,var(--gold));border:3px solid var(--ink);border-radius:10px;padding:5px 10px 4px;box-shadow:0 3px 0 var(--ink);transform:rotate(-4deg);z-index:2}
+.badge-new.sm{top:8px;left:8px;font-size:11px;padding:3px 7px 2px}
+.feat .kicker{font-family:var(--f-display);font-size:13px;color:var(--gold);letter-spacing:.06em}
+@media (min-width:760px){.feat{grid-template-columns:1.35fr 1fr}.feat .art{height:auto;min-height:250px;border-bottom:0;border-right:3px solid var(--ink)}.feat .fb{flex-direction:column;align-items:stretch;justify-content:center;padding:18px}.feat .fb .tx{min-width:0}}
+
+/* grille des jeux */
+.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (min-width:640px){.games{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
+@media (min-width:1100px){.games{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tile{display:flex;flex-direction:column;overflow:hidden;text-decoration:none;transition:transform .2s cubic-bezier(.2,1.5,.4,1)}
+@media (hover:hover){.tile:hover{transform:translateY(-4px) rotate(-.5deg)}}
+.tile .thumb{position:relative;aspect-ratio:2/1;border-bottom:3px solid var(--ink);overflow:hidden}
+.tile .thumb svg{position:absolute;inset:0;width:100%;height:100%}
+.tile .tb{padding:9px 10px 10px;display:flex;flex-direction:column;gap:6px;flex:1}
+.tile h3{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(16px,4.4vw,20px);line-height:1.05;text-shadow:0 2px 0 var(--ink)}
+.tile p{margin:0;font-size:12.5px;color:var(--dim);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tile .meta{margin-top:auto;display:flex;align-items:center;gap:6px}
+.tile .meta span{font-size:11.5px;color:var(--dim);background:var(--ink);border-radius:999px;padding:3px 8px 2px;white-space:nowrap}
+.tile .meta .go{margin-left:auto;width:34px;height:34px;flex:none;border-radius:11px;border:3px solid var(--ink);display:grid;place-items:center;background:linear-gradient(180deg,#ffd29a,var(--orange) 55%,var(--orange2));box-shadow:0 3px 0 var(--ink)}
+.tile .meta .go svg{width:16px;height:16px}
+
+/* panneaux */
+.partybox,.chatbox,.lb{padding:14px}
+#gchat{height:380px}
+@media (min-width:1100px){#gchat{height:calc(100vh - 420px);min-height:300px}}
+.lb{display:flex;flex-direction:column;gap:12px}
+.lb-head{display:flex;flex-direction:column;gap:8px}
+#lbTabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;flex-wrap:nowrap}
+#lbTabs::-webkit-scrollbar{display:none}
+#lbTabs .btn{flex:none;white-space:nowrap;padding:8px 11px 7px;font-size:14px}
 .lb-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+@media (max-width:760px){.lb-grid{grid-template-columns:1fr}}
 .lb-cols,.lb-row{display:grid;grid-template-columns:30px 1fr 44px 44px 46px;align-items:center;gap:6px}
-.lb-cols{font-size:11px;color:var(--bone-dim);letter-spacing:.08em;text-transform:uppercase;padding:0 8px}
+.lb-cols{font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;padding:0 8px;font-weight:900}
 .lb-cols span:nth-child(n+3),.lb-row span:nth-child(n+3){text-align:right;font-variant-numeric:tabular-nums}
-.lb-list{display:flex;flex-direction:column;gap:4px;margin-top:6px}
-.lb-row{background:var(--ink);border-radius:12px;padding:7px 8px 6px;font-size:16px}
-.lb-row:first-child{background:linear-gradient(90deg,color-mix(in srgb,var(--gold) 22%,var(--ink)),var(--ink) 70%)}
-.lb-row.me{box-shadow:inset 0 0 0 2px var(--torch)}
+.lb-list{display:flex;flex-direction:column;gap:5px;margin-top:6px}
+.lb-row{background:var(--ink);border-radius:13px;padding:8px 8px 7px;font-size:15px;font-weight:900}
+.lb-row:first-child{background:linear-gradient(90deg,rgba(255,207,63,.25),var(--ink) 70%)}
+.lb-row.me{box-shadow:inset 0 0 0 2px var(--orange)}
 .lb-row .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lb-row .nm small{font-size:11px;color:var(--bone-dim);margin-left:4px}
-.rank{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:14px;color:var(--bone-dim);border:2px solid transparent}
+.lb-row .nm small{font-size:10.5px;color:var(--dim);margin-left:5px;background:rgba(255,255,255,.08);border-radius:6px;padding:1px 5px}
+.rank{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;color:var(--dim);border:2px solid transparent;font-family:var(--f-display)}
 .rank.r1{background:radial-gradient(circle at 35% 30%,#fff2a8,var(--gold));color:#3a2600;border-color:var(--ink)}
 .rank.r2{background:radial-gradient(circle at 35% 30%,#fff,#c9d0de);color:#22283a;border-color:var(--ink)}
 .rank.r3{background:radial-gradient(circle at 35% 30%,#ffc08a,#c9783a);color:#2e1606;border-color:var(--ink)}
-.hist{display:flex;flex-direction:column;gap:4px;font-family:var(--f-text);font-size:13px;margin-top:6px}
-.hist div{display:flex;align-items:center;gap:8px;color:var(--bone-dim);padding:6px 8px;border-radius:10px;background:color-mix(in srgb,var(--ink) 60%,transparent)}
+.hist{display:flex;flex-direction:column;gap:5px;font-size:13px;margin-top:6px}
+.hist div{display:flex;align-items:center;gap:8px;color:var(--dim);padding:6px 8px;border-radius:11px;background:rgba(11,7,22,.6)}
 .hist .gi{width:22px;height:22px;flex:none}
-.hist b{color:var(--bone);font-weight:600}
+.hist b{color:var(--bone)}
 .hist span:nth-child(2){flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.empty{font-family:var(--f-text);font-size:14px;color:var(--bone-dim);padding:10px;border-radius:12px;background:var(--ink)}
-.dbline{font-family:var(--f-text);font-size:12px;color:var(--bone-dim);display:flex;align-items:center;gap:7px}
-.dbline i{width:9px;height:9px;border-radius:50%;background:var(--bone-dim)}
-.dbline i.on{background:var(--slime);box-shadow:0 0 8px var(--slime)}.dbline i.off{background:var(--blood)}
-.install{font-family:var(--f-text);font-size:13px;color:var(--bone-dim);text-align:center;line-height:1.5;margin:0}
+.empty{font-size:14px;color:var(--dim);padding:10px;border-radius:12px;background:var(--ink)}
+.dbline{font-size:12px;color:var(--dim);display:flex;align-items:center;gap:7px}
+.dbline i{width:9px;height:9px;border-radius:50%;background:var(--dim)}
+.dbline i.on{background:var(--mint);box-shadow:0 0 8px var(--mint)}.dbline i.off{background:var(--pink)}
+.install{font-size:13px;color:var(--dim);text-align:center;line-height:1.5;margin:4px 0 0}
 .sheet{position:fixed;z-index:15;left:50%;top:50%;transform:translate(-50%,-50%);width:min(360px,calc(100% - 32px));padding:14px;display:flex;flex-direction:column;gap:10px}
-.sheet-head{display:flex;justify-content:space-between;align-items:center;font-size:21px}
-@media (max-width:760px){.lb-grid{grid-template-columns:1fr}}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;font-family:var(--f-display);font-size:22px}
+
+/* barre d'onglets (téléphone) — laisse le coin gauche au bouton du volume */
+.tabbar{position:fixed;z-index:20;left:72px;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);display:flex;gap:4px;padding:5px;border-radius:18px;
+  background:linear-gradient(180deg,#3a2f72,var(--panel2));border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.12)}
+.tabbar button{all:unset;flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 2px 4px;border-radius:12px;cursor:pointer;font-size:10.5px;font-weight:900;color:var(--dim);letter-spacing:.02em}
+.tabbar button svg{width:24px;height:24px}
+.tabbar button.on{background:var(--ink);color:var(--bone)}
+@media (min-width:1100px){.tabbar{display:none}body{padding-bottom:40px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<div id="embers" aria-hidden="true"></div>
-<main>
-  <header>
-    <button class="btn icon gear" id="bSet" data-i18n-aria="settings"><svg viewBox="0 0 24 24"><path d="M12 2.5l2 2.6 3.2-.6.8 3.1 3 1.4-1.1 3 1.1 3-3 1.4-.8 3.1-3.2-.6-2 2.6-2-2.6-3.2.6-.8-3.1-3-1.4 1.1-3-1.1-3 3-1.4.8-3.1 3.2.6z" fill="currentColor" stroke="#0c0816" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.3" fill="#0c0816"/></svg></button>
-    <div class="logo">Brutal&#39;s Games</div>
-    <div class="ribbon"><span data-i18n="tagline">Salle de jeux entre amis</span></div>
+<div id="sparks" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="hero" id="top">
+    <svg class="scene" viewBox="0 0 1000 380" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1e66"/><stop offset=".55" stop-color="#4a2f8a"/><stop offset="1" stop-color="#b8487a"/></linearGradient>
+        <radialGradient id="moonG" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fffbe8"/><stop offset="1" stop-color="#ffd98a"/></radialGradient>
+      </defs>
+      <rect width="1000" height="380" fill="url(#sky)"/>
+      <g fill="#fff" opacity=".8"><circle cx="80" cy="40" r="2"/><circle cx="210" cy="90" r="1.6"/><circle cx="330" cy="30" r="2.2"/><circle cx="470" cy="70" r="1.5"/><circle cx="610" cy="24" r="1.8"/><circle cx="720" cy="95" r="1.6"/><circle cx="900" cy="50" r="2.2"/><circle cx="960" cy="120" r="1.4"/><circle cx="40" cy="140" r="1.4"/></g>
+      <circle cx="840" cy="78" r="38" fill="url(#moonG)" stroke="#0b0716" stroke-width="4"/><circle cx="828" cy="70" r="7" fill="#f0c86a" opacity=".6"/><circle cx="852" cy="92" r="5" fill="#f0c86a" opacity=".6"/>
+      <!-- collines -->
+      <path d="M0 300 C120 250 220 270 330 290 C440 310 520 260 640 270 C760 280 860 240 1000 262 V380 H0Z" fill="#3a2370" stroke="#0b0716" stroke-width="4"/>
+      <path d="M0 330 C160 300 300 320 420 334 C560 350 700 310 840 318 C920 322 960 330 1000 326 V380 H0Z" fill="#2a1a55" stroke="#0b0716" stroke-width="4"/>
+      <!-- la salle de jeux : château illuminé -->
+      <g stroke="#0b0716" stroke-width="5" stroke-linejoin="round">
+        <rect x="390" y="190" width="220" height="140" fill="#4a3488"/>
+        <rect x="350" y="150" width="70" height="180" fill="#563d9c"/><rect x="580" y="150" width="70" height="180" fill="#563d9c"/>
+        <path d="M342 152 385 92 428 152Z" fill="#e8394d"/><path d="M572 152 615 92 658 152Z" fill="#e8394d"/>
+        <rect x="455" y="130" width="90" height="70" fill="#5f45a8"/><path d="M447 132 500 70 553 132Z" fill="#ff9a3c"/>
+        <path d="M470 330v-62q30-30 60 0v62z" fill="#2a1a55"/>
+        <path d="M385 92v-30l26 9-26 9" fill="#ffcf3f" stroke-width="3"/><path d="M615 92v-30l26 9-26 9" fill="#6ff2b0" stroke-width="3"/><path d="M500 70v-32l28 10-28 10" fill="#ff5a8a" stroke-width="3"/>
+      </g>
+      <g fill="#ffd36a" stroke="#0b0716" stroke-width="3">
+        <rect class="win" x="370" y="180" width="28" height="34" rx="12"/><rect class="win" x="602" y="180" width="28" height="34" rx="12"/><rect class="win" x="370" y="240" width="28" height="34" rx="12"/><rect class="win" x="602" y="240" width="28" height="34" rx="12"/>
+        <rect class="win" x="483" y="150" width="34" height="30" rx="12"/><rect class="win" x="410" y="226" width="26" height="30" rx="10"/><rect class="win" x="564" y="226" width="26" height="30" rx="10"/>
+      </g>
+      <!-- les jeux qui flottent autour -->
+      <g class="float" transform="translate(120 170) rotate(-12)"><rect x="-34" y="-34" width="68" height="68" rx="16" fill="#fff" stroke="#0b0716" stroke-width="5"/><circle cx="-14" cy="-14" r="7" fill="#e8394d"/><circle cx="14" cy="14" r="7" fill="#e8394d"/><circle cx="0" cy="0" r="7" fill="#e8394d"/></g>
+      <g class="float f2" transform="translate(230 250) rotate(10)"><rect x="-30" y="-42" width="60" height="84" rx="9" fill="#fbf5e8" stroke="#0b0716" stroke-width="5"/><text x="-21" y="-16" font-family="Arial Black,sans-serif" font-size="20" fill="#e8394d">A</text><path d="M0 4c-12 10-14 18-6 22 3 1 5 0 6-2 1 2 3 3 6 2 8-4 6-12-6-22z" fill="#e8394d" stroke="#0b0716" stroke-width="2.5"/></g>
+      <g class="float f3" transform="translate(790 220)"><path d="M0-34C-21-34-34-19-34 0c0 11 6 20 14 24v12h40V24c8-4 14-13 14-24 0-19-13-34-34-34z" fill="#f3e7c9" stroke="#0b0716" stroke-width="5"/><ellipse cx="-13" cy="-2" rx="9" ry="10" fill="#1b1030"/><ellipse cx="13" cy="-2" rx="9" ry="10" fill="#1b1030"/></g>
+      <g class="float f4" transform="translate(905 270) rotate(-8) scale(.9)"><path d="M-60 6h120l-14 24h-92z" fill="#3a2416" stroke="#0b0716" stroke-width="5" stroke-linejoin="round"/><path d="M-10 6V-70M30 6V-50" stroke="#0b0716" stroke-width="5"/><path d="M-38-62q28 8 56 0v40q-28 8-56 0z" fill="#16120f" stroke="#0b0716" stroke-width="4"/><circle cx="-10" cy="-42" r="8" fill="#f1e2c2"/><path d="M10-46q20 6 40 0v30q-20 6-40 0z" fill="#16120f" stroke="#0b0716" stroke-width="4"/></g>
+      <g class="float f5" transform="translate(690 300) rotate(16)"><path d="M-6 30l26-50 8 4-26 50z" fill="#9b7bff" stroke="#0b0716" stroke-width="4" stroke-linejoin="round"/><path d="M20-20l6-12 8 4-6 12z" fill="#e8d0a8" stroke="#0b0716" stroke-width="4"/></g>
+      <g class="float f6" transform="translate(300 120) rotate(-6)"><circle r="26" fill="rgba(220,250,255,.35)" stroke="#0b0716" stroke-width="7"/><circle r="26" fill="none" stroke="#f3e7c9" stroke-width="3"/><path d="M18 18l22 22" stroke="#0b0716" stroke-width="14" stroke-linecap="round"/><path d="M18 18l22 22" stroke="#a8643a" stroke-width="8" stroke-linecap="round"/></g>
+    </svg>
+    <div class="brand">
+      <div class="logo">Brutal’s<span>Games</span></div>
+      <div class="ribbon"><b data-i18n="tagline">Salle de jeux entre amis</b></div>
+    </div>
+    <button class="btn icon gear" id="bSet" data-i18n-aria="settings"><svg viewBox="0 0 24 24"><path d="M12 2.5l2 2.6 3.2-.6.8 3.1 3 1.4-1.1 3 1.1 3-3 1.4-.8 3.1-3.2-.6-2 2.6-2-2.6-3.2.6-.8-3.1-3-1.4 1.1-3-1.1-3 3-1.4.8-3.1 3.2.6z" fill="currentColor" stroke="#0b0716" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.4" fill="#2b2257" stroke="#0b0716" stroke-width="1.6"/></svg></button>
   </header>
 
-  <section class="frame who">
-    <label for="inName" data-i18n="nick">Ton pseudo</label>
-    <input class="field" id="inName" maxlength="14" autocomplete="off" data-i18n-ph="namePh">
-    <p class="stat" id="myStat"></p>
-  </section>
+  <div class="layout">
+    <div class="maincol">
+      <section class="frame profile">
+        <div class="avatar" id="avatar">?</div>
+        <div class="pf">
+          <input class="field" id="inName" maxlength="14" autocomplete="off" data-i18n-ph="namePh" aria-label="pseudo">
+          <div class="chips" id="myStat"></div>
+        </div>
+      </section>
 
-  <h2 class="sec" data-i18n="party">Groupe d'amis</h2>
-  <section class="frame partybox"><div id="party"></div></section>
+      <a class="frame feat card" href="bataille.html">
+        <div class="art"><span class="badge-new" data-i18n="isNew">NOUVEAU</span><svg viewBox="0 0 600 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<defs>
+<linearGradient id="bnSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1a33"/><stop offset=".6" stop-color="#23365e"/><stop offset="1" stop-color="#6a4a6e"/></linearGradient>
+<linearGradient id="bnSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14546a"/><stop offset="1" stop-color="#082436"/></linearGradient>
+<radialGradient id="bnMoon" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fffbe8"/><stop offset="1" stop-color="#f3d58e"/></radialGradient>
+<radialGradient id="bnFire" cx="50%" cy="60%" r="60%"><stop offset="0" stop-color="#fff3b0"/><stop offset=".45" stop-color="#ffb02e"/><stop offset="1" stop-color="#e8401c" stop-opacity="0"/></radialGradient>
+<radialGradient id="bnFlash" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fffbe0"/><stop offset=".4" stop-color="#ffd24a"/><stop offset="1" stop-color="#ff7a1c" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="600" height="300" fill="url(#bnSky)"/>
+<g fill="#fff" opacity=".75"><circle cx="40" cy="30" r="1.6"/><circle cx="120" cy="70" r="1.3"/><circle cx="210" cy="22" r="1.8"/><circle cx="300" cy="55" r="1.2"/><circle cx="380" cy="18" r="1.5"/><circle cx="560" cy="40" r="1.6"/><circle cx="520" cy="95" r="1.2"/><circle cx="70" cy="110" r="1.2"/></g>
+<circle cx="470" cy="62" r="30" fill="url(#bnMoon)" stroke="#07101e" stroke-width="4"/>
+<circle cx="461" cy="55" r="5" fill="#e8c473" opacity=".6"/><circle cx="480" cy="74" r="4" fill="#e8c473" opacity=".6"/>
+<!-- île au loin -->
+<path d="M0 196q40-26 78-12 30-30 64-6 22-8 40 18z" fill="#1a2c45" stroke="#07101e" stroke-width="4" stroke-linejoin="round"/>
+<path d="M44 186c2-22 6-34 14-42M58 144c-14-2-22 4-26 10M58 144c10-8 22-6 28 0M58 144c-4-10-14-12-20-10" fill="none" stroke="#07101e" stroke-width="4" stroke-linecap="round"/>
+<!-- mer -->
+<rect y="190" width="600" height="110" fill="url(#bnSea)"/>
+<path d="M0 190H600" stroke="#07101e" stroke-width="4"/>
+<g fill="none" stroke="#7fe0e6" stroke-width="3" stroke-linecap="round" opacity=".55"><path d="M30 222q12-7 24 0t24 0"/><path d="M250 262q12-7 24 0t24 0"/><path d="M500 236q12-7 24 0t24 0"/><path d="M120 280q12-7 24 0t24 0"/><path d="M420 284q12-7 24 0t24 0"/></g>
+<!-- navire ennemi en feu (droite) -->
+<g transform="translate(440 150) rotate(9)">
+<ellipse cx="40" cy="38" rx="70" ry="44" fill="url(#bnFire)" opacity=".8"/>
+<path d="M-10 52h104l-14 30H6z" fill="#4a2a18" stroke="#07101e" stroke-width="5" stroke-linejoin="round"/>
+<path d="M2 62h80" stroke="#2c170c" stroke-width="3"/>
+<path d="M40 52V-8" stroke="#07101e" stroke-width="5"/>
+<path d="M40-2q26 6 30 26-12 4-30 2z" fill="#c9b48e" stroke="#07101e" stroke-width="4" stroke-linejoin="round"/>
+<path d="M16 46q4-22 14-28 2 14 8 18 4-12 12-16-2 14 6 24z" fill="#ffb02e" stroke="#07101e" stroke-width="3" stroke-linejoin="round"/>
+<path d="M24 46q2-12 8-16 2 8 6 10 3-6 8-8-1 8 3 14z" fill="#fff0a0"/>
+<g fill="#3a3346" stroke="#07101e" stroke-width="3" opacity=".9"><circle cx="34" cy="-22" r="14"/><circle cx="52" cy="-36" r="18"/><circle cx="76" cy="-50" r="22"/></g>
+</g>
+<!-- boulet + traînée -->
+<path d="M262 104q80-60 168 22" fill="none" stroke="#fff3c4" stroke-width="4" stroke-dasharray="2 10" stroke-linecap="round" opacity=".8"/>
+<circle cx="396" cy="80" r="8" fill="#1b1b22" stroke="#07101e" stroke-width="3"/>
+<!-- galion pirate (gauche) -->
+<g transform="translate(108 92)">
+<path d="M0 98h210l-22 46H24z" fill="#6b3d22" stroke="#07101e" stroke-width="6" stroke-linejoin="round"/>
+<path d="M-8 90h56v12H-8zM170 82h52v20h-52z" fill="#7d4a2a" stroke="#07101e" stroke-width="5" stroke-linejoin="round"/>
+<path d="M14 114h184" stroke="#3e2112" stroke-width="4"/>
+<path d="M18 124h170" stroke="#d9a441" stroke-width="3"/>
+<g fill="#07101e"><circle cx="54" cy="113" r="5"/><circle cx="86" cy="113" r="5"/><circle cx="118" cy="113" r="5"/><circle cx="150" cy="113" r="5"/></g>
+<!-- éclair de canon -->
+<circle cx="232" cy="104" r="26" fill="url(#bnFlash)"/>
+<path d="M208 104l38-14-10 14 16 6-26 2z" fill="#fff6c8" stroke="#07101e" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M60 98V-28M140 98V-10M204 82 236 30" stroke="#07101e" stroke-width="6" stroke-linecap="round"/>
+<path d="M56 -28h8" stroke="#07101e" stroke-width="6"/>
+<!-- voiles noires -->
+<path d="M24 -14q36-8 72 0q6 26 0 52q-36-8-72 0q-6-26 0-52z" fill="#16131c" stroke="#07101e" stroke-width="5" stroke-linejoin="round"/>
+<path d="M20 46q40-8 80 0q6 22 0 44q-40-8-80 0q-6-22 0-44z" fill="#16131c" stroke="#07101e" stroke-width="5" stroke-linejoin="round"/>
+<path d="M110 4q30-6 60 0q5 24 0 48q-30-6-60 0q-5-24 0-48z" fill="#16131c" stroke="#07101e" stroke-width="5" stroke-linejoin="round"/>
+<path d="M146 98q-6-24 0-36 22 6 30 30z" fill="#e9dcc0" stroke="#07101e" stroke-width="4" stroke-linejoin="round"/>
+<!-- tête de mort -->
+<g transform="translate(60 12)"><path d="M-12 0a12 12 0 1 1 24 0c0 5-2 8-5 9v5h-14v-5c-3-1-5-4-5-9z" fill="#f3ead6"/><circle cx="-5" cy="1" r="3.4" fill="#16131c"/><circle cx="5" cy="1" r="3.4" fill="#16131c"/><path d="M-20 18l40 12M20 18l-40 12" stroke="#f3ead6" stroke-width="4" stroke-linecap="round"/></g>
+<!-- drapeau -->
+<path d="M60 -28V-56" stroke="#07101e" stroke-width="5"/>
+<path d="M62 -56h30l-6 8 6 8H62z" fill="#e8394d" stroke="#07101e" stroke-width="3.5" stroke-linejoin="round"/>
+<!-- lanternes -->
+<circle cx="-2" cy="84" r="6" fill="#ffd36a" stroke="#07101e" stroke-width="3"/><circle cx="214" cy="74" r="6" fill="#ffd36a" stroke="#07101e" stroke-width="3"/>
+</g>
+<!-- écume autour du galion -->
+<path d="M120 236q20-10 40 0t40 0 40 0 40 0 40 0" fill="none" stroke="#dff8f6" stroke-width="5" stroke-linecap="round"/>
+<!-- éclaboussure -->
+<g transform="translate(540 214)" fill="#dff8f6" stroke="#07101e" stroke-width="3" stroke-linejoin="round"><path d="M-18 8q4-26 10-30 2 16 8 18 2-22 10-28 4 22 2 40z"/></g>
+</svg></div>
+        <div class="fb">
+          <div class="tx"><span class="kicker" data-i18n="featured">À LA UNE</span><h3 data-i18n="gn_bn">Bataille navale</h3><p data-i18n="nDesc"></p></div>
+          <span class="btn orange" data-i18n="play">Jouer</span>
+        </div>
+      </a>
 
-  <h2 class="sec" data-i18n="ourGames">Nos jeux</h2>
-  <section class="games">
-    <a class="frame card" href="quoridor.html">
-      <div class="thumb" style="background:linear-gradient(180deg,#3b2d66,#1a1a2e)">
-        <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">
-          <g transform="translate(150 86) scale(1 .55) rotate(45)">
-            <rect x="-80" y="-80" width="160" height="160" rx="8" fill="#5a4f86" stroke="#0c0816" stroke-width="5"/>
-            <g fill="#8a7cbf" stroke="#0c0816" stroke-width="2.5">
-              <rect x="-72" y="-72" width="30" height="30" rx="4"/><rect x="-36" y="-72" width="30" height="30" rx="4"/><rect x="0" y="-72" width="30" height="30" rx="4"/><rect x="36" y="-72" width="30" height="30" rx="4"/>
-              <rect x="-72" y="-36" width="30" height="30" rx="4"/><rect x="-36" y="-36" width="30" height="30" rx="4"/><rect x="0" y="-36" width="30" height="30" rx="4"/><rect x="36" y="-36" width="30" height="30" rx="4"/>
-              <rect x="-72" y="0" width="30" height="30" rx="4"/><rect x="-36" y="0" width="30" height="30" rx="4"/><rect x="0" y="0" width="30" height="30" rx="4"/><rect x="36" y="0" width="30" height="30" rx="4"/>
-              <rect x="-72" y="36" width="30" height="30" rx="4"/><rect x="-36" y="36" width="30" height="30" rx="4"/><rect x="0" y="36" width="30" height="30" rx="4"/><rect x="36" y="36" width="30" height="30" rx="4"/>
-            </g>
-          </g>
-          <g transform="translate(118 58)"><rect x="0" y="0" width="64" height="11" rx="5" fill="#f3e7c9" stroke="#0c0816" stroke-width="3"/><circle cx="2" cy="1" r="6" fill="#f3e7c9" stroke="#0c0816" stroke-width="3"/><circle cx="2" cy="10" r="6" fill="#f3e7c9" stroke="#0c0816" stroke-width="3"/><circle cx="62" cy="1" r="6" fill="#f3e7c9" stroke="#0c0816" stroke-width="3"/><circle cx="62" cy="10" r="6" fill="#f3e7c9" stroke="#0c0816" stroke-width="3"/></g>
-          <g transform="translate(96 76) scale(1.3)"><path d="M20 4C11 4 5 10.5 5 18.5c0 5 2.4 8.6 6 10.6V34h18v-4.9c3.6-2 6-5.6 6-10.6C35 10.5 29 4 20 4z" fill="#f3e7c9" stroke="#0c0816" stroke-width="2.5"/><ellipse cx="14" cy="19" rx="5" ry="5.6" fill="#1b1030"/><ellipse cx="26" cy="19" rx="5" ry="5.6" fill="#1b1030"/><circle cx="12.6" cy="17.4" r="1.7" fill="#fff"/><circle cx="24.6" cy="17.4" r="1.7" fill="#fff"/></g>
-          <g transform="translate(160 10) scale(1.2)"><path d="M9 14L5 3l9 7M31 14l4-11-9 7" fill="#f3e3b5" stroke="#0c0816" stroke-width="2.2" stroke-linejoin="round"/><path d="M20 8l13 7 2 12-15 9-15-9 2-12z" fill="#e8394d" stroke="#0c0816" stroke-width="2.5" stroke-linejoin="round"/><circle cx="14.5" cy="19" r="3.6" fill="#ffd84a" stroke="#0c0816" stroke-width="1.6"/><circle cx="25.5" cy="19" r="3.6" fill="#ffd84a" stroke="#0c0816" stroke-width="1.6"/><path d="M13 26h14l-2 4H15z" fill="#0c0816"/></g>
-        </svg>
-      </div>
-      <div class="card-body">
-        <h3>Quoridor</h3>
-        <p data-i18n="qDesc">Atteins l'autre côté du donjon en bloquant tes adversaires avec des os.</p>
-        <div class="tags"><span data-i18n="tagStrat">Stratégie</span><span data-i18n="tag14">1 à 4 joueurs</span><span data-i18n="tagOnline">En ligne</span></div>
-        <span class="btn orange" data-i18n="play">Jouer</span>
-      </div>
-    </a>
-    <a class="frame card" href="differences.html">
-      <div class="thumb" style="background:linear-gradient(180deg,#2a6a9a,#1a1a2e)">
-        <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">
-          <g transform="rotate(-6 85 75)"><rect x="25" y="28" width="120" height="90" rx="10" fill="#3ac6e8" stroke="#0c0816" stroke-width="5"/><circle cx="55" cy="58" r="12" fill="#ffcf3f" stroke="#0c0816" stroke-width="3.5"/><path d="M30 112l34-30 22 18 18-14 36 26z" fill="#3fae5a" stroke="#0c0816" stroke-width="3.5" stroke-linejoin="round"/><ellipse cx="110" cy="62" rx="12" ry="8" fill="#ff9a3c" stroke="#0c0816" stroke-width="3"/></g>
-          <g transform="rotate(5 215 75)"><rect x="155" y="28" width="120" height="90" rx="10" fill="#3ac6e8" stroke="#0c0816" stroke-width="5"/><circle cx="185" cy="58" r="12" fill="#ff7aa0" stroke="#0c0816" stroke-width="3.5"/><path d="M160 112l34-30 22 18 18-14 36 26z" fill="#3fae5a" stroke="#0c0816" stroke-width="3.5" stroke-linejoin="round"/><circle cx="185" cy="58" r="22" fill="none" stroke="#0c0816" stroke-width="8"/><circle cx="185" cy="58" r="22" fill="none" stroke="#86f2a0" stroke-width="4.5"/></g>
-          <circle cx="232" cy="98" r="22" fill="rgba(220,250,255,.35)" stroke="#0c0816" stroke-width="6"/><path d="M248 114l18 18" stroke="#0c0816" stroke-width="13" stroke-linecap="round"/><path d="M248 114l18 18" stroke="#a8643a" stroke-width="7" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="card-body">
-        <h3>7 Différences</h3>
-        <p data-i18n="dDesc">Repère les différences entre deux images avant tes amis. Une nouvelle scène à chaque partie.</p>
-        <div class="tags"><span data-i18n="tagObs">Observation</span><span data-i18n="tag110">1 à 10 joueurs</span><span data-i18n="tagOnline">En ligne</span></div>
-        <span class="btn orange" data-i18n="play">Jouer</span>
-      </div>
-    </a>
-    <a class="frame card" href="undercover.html">
-      <div class="thumb" style="background:linear-gradient(180deg,#141a33,#2a2350)">
-        <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">
-          <circle cx="250" cy="34" r="18" fill="#ffe08a"/>
-          <g fill="#0c1024"><rect x="0" y="80" width="46" height="70"/><rect x="50" y="62" width="38" height="88"/><rect x="92" y="90" width="40" height="60"/><rect x="196" y="70" width="44" height="80"/><rect x="244" y="88" width="56" height="62"/></g>
-          <g fill="#ffd25a"><rect x="10" y="92" width="7" height="9"/><rect x="28" y="108" width="7" height="9"/><rect x="60" y="76" width="7" height="9"/><rect x="74" y="98" width="7" height="9"/><rect x="104" y="104" width="7" height="9"/><rect x="206" y="84" width="7" height="9"/><rect x="222" y="104" width="7" height="9"/><rect x="258" y="100" width="7" height="9"/><rect x="278" y="118" width="7" height="9"/></g>
-          <g transform="translate(110 22) scale(1.6)" stroke="#0b0e1c" stroke-width="3"><path d="M8 64c2-12 11-17 24-17s22 5 24 17z" fill="#e5484d"/><path d="M26 48l6 9 6-9" fill="#f1eee6" stroke-width="2.5" stroke-linejoin="round"/><circle cx="32" cy="33" r="14" fill="#f3c9a0"/><rect x="20" y="29" width="10" height="6" rx="2" fill="#0b0e1c" stroke="none"/><rect x="34" y="29" width="10" height="6" rx="2" fill="#0b0e1c" stroke="none"/><path d="M30 31h4" stroke-width="2.5"/><path d="M25 41q3.5-3 7 0q3.5-3 7 0q-3.5 3-7 1q-3.5 2-7-1z" fill="#3a2414" stroke-width="2"/><path d="M14 25h36l-3-4H17z" fill="#0b0e1c" stroke="none"/><path d="M19 22c0-9 4-13 13-13s13 4 13 13z" fill="#2b2f45"/><path d="M19 19h26" stroke="#e5484d" stroke-width="4"/><path d="M11 25.5h42" stroke-width="4" stroke-linecap="round"/></g>
-          <g transform="rotate(-10 56 118)"><rect x="14" y="106" width="84" height="24" rx="5" fill="rgba(20,26,51,.85)" stroke="#e5484d" stroke-width="3"/><text x="56" y="124" text-anchor="middle" font-family="Impact,Arial Black,sans-serif" font-size="15" fill="#e5484d" letter-spacing="1">TOP SECRET</text></g>
-        </svg>
-      </div>
-      <div class="card-body">
-        <h3>Undercover</h3>
-        <p data-i18n="uDesc">Tout le monde a le même mot… sauf l’intrus. Donne des indices, vote, et démasque les espions.</p>
-        <div class="tags"><span data-i18n="tagBluff">Bluff</span><span data-i18n="tag310">3 à 10 joueurs</span><span data-i18n="tagOnline">En ligne</span></div>
-        <span class="btn orange" data-i18n="play">Jouer</span>
-      </div>
-    </a>
-    <a class="frame card" href="codenames.html">
-      <div class="thumb" style="background:linear-gradient(180deg,#0b0e2a,#251a4e)">
-        <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">
-          <g fill="#fff"><circle cx="20" cy="20" r="1.6"/><circle cx="90" cy="12" r="1.2"/><circle cx="170" cy="26" r="1.5"/><circle cx="280" cy="16" r="1.3"/><circle cx="250" cy="130" r="1.4"/><circle cx="12" cy="120" r="1.2"/></g>
-          <circle cx="262" cy="40" r="22" fill="#ff8a5a" stroke="#0a0718" stroke-width="4"/><ellipse cx="262" cy="42" rx="34" ry="8" fill="none" stroke="#ffd27a" stroke-width="4"/>
-          <g stroke="#0a0718" stroke-width="4" stroke-linejoin="round">
-            <rect x="40" y="34" width="64" height="44" rx="8" fill="#ff5a5f" transform="rotate(-6 72 56)"/>
-            <rect x="116" y="28" width="64" height="44" rx="8" fill="#cdbf9f"/>
-            <rect x="192" y="40" width="64" height="44" rx="8" fill="#4aa3ff" transform="rotate(5 224 62)"/>
-            <rect x="72" y="86" width="64" height="44" rx="8" fill="#4aa3ff" transform="rotate(4 104 108)"/>
-            <rect x="152" y="88" width="64" height="44" rx="8" fill="#16121f" transform="rotate(-4 184 110)"/>
-          </g>
-          <circle cx="184" cy="110" r="11" fill="none" stroke="#b48aff" stroke-width="4"/><circle cx="184" cy="110" r="4" fill="#b48aff"/>
-          <g fill="#2a2014" font-family="Arial Black,sans-serif" font-size="11" text-anchor="middle"><text x="148" y="54">LUNE</text></g>
-        </svg>
-      </div>
-      <div class="card-body">
-        <h3>Codenames</h3>
-        <p data-i18n="cDesc">Deux équipages, un capitaine chacun : devine les mots de ton équipe grâce à un seul indice… et évite le trou noir !</p>
-        <div class="tags"><span data-i18n="tagTeam">Équipes</span><span data-i18n="tag410">4 à 10 joueurs</span><span data-i18n="tagOnline">En ligne</span></div>
-        <span class="btn orange" data-i18n="play">Jouer</span>
-      </div>
-    </a>
-    <a class="frame card" href="dessin.html">
-      <div class="thumb" style="background:linear-gradient(180deg,#2a1c30,#1a1322)">
-        <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">
-          <rect x="62" y="18" width="150" height="112" rx="8" fill="#efe6d2" stroke="#120c18" stroke-width="5" transform="rotate(-4 137 74)"/>
-          <g transform="rotate(-4 137 74)" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M92 100c0-24 16-40 34-40s34 16 34 40z" fill="#ffc93c" stroke="#120c18" stroke-width="4"/>
-            <circle cx="114" cy="80" r="4" fill="#120c18"/><circle cx="138" cy="80" r="4" fill="#120c18"/>
-            <path d="M118 92q8 6 16 0" stroke="#120c18" stroke-width="3.5"/>
-            <path d="M100 62l-8-16 18 10M152 62l8-16-18 10" fill="#ffc93c" stroke="#120c18" stroke-width="4"/>
-            <path d="M172 44c10 4 16 12 16 22" stroke="#ff6b5a" stroke-width="5"/>
-          </g>
-          <path d="M214 132l40-66 9 6-36 68z" fill="#9b7bff" stroke="#120c18" stroke-width="4" stroke-linejoin="round"/>
-          <path d="M254 66l7-13 10 7-8 12z" fill="#e8d0a8" stroke="#120c18" stroke-width="4" stroke-linejoin="round"/>
-          <circle cx="32" cy="38" r="9" fill="#3ad0b0" opacity=".7"/><circle cx="270" cy="24" r="6" fill="#ff6b5a" opacity=".7"/><circle cx="24" cy="118" r="12" fill="#ff6b5a" opacity=".5"/>
-          <g transform="translate(232 18)"><rect width="56" height="26" rx="13" fill="#30243c" stroke="#120c18" stroke-width="3"/><text x="28" y="18" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="12" fill="#5cd65c">CHAT!</text></g>
-        </svg>
-      </div>
-      <div class="card-body">
-        <h3>Dessine &amp; Devine</h3>
-        <p data-i18n="rDesc">Un joueur dessine, les autres devinent dans le chat. Plus tu trouves vite, plus tu marques !</p>
-        <div class="tags"><span data-i18n="tagDraw">Dessin</span><span data-i18n="tag210">2 à 10 joueurs</span><span data-i18n="tagOnline">En ligne</span></div>
-        <span class="btn orange" data-i18n="play">Jouer</span>
-      </div>
-    </a>
-    <a class="frame card" href="blackjack.html">
-      <div class="thumb" style="background:radial-gradient(ellipse at 50% 40%,#1a7a50,#0b4a30)">
-        <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">
-          <ellipse cx="150" cy="170" rx="190" ry="80" fill="none" stroke="#6a3c20" stroke-width="14"/>
-          <g transform="rotate(-12 110 75)"><rect x="80" y="28" width="62" height="88" rx="9" fill="#fbf5e8" stroke="#0a0806" stroke-width="5"/><text x="88" y="54" font-family="Arial Black,sans-serif" font-size="22" fill="#1c1620">A</text><text x="111" y="96" text-anchor="middle" font-size="36" fill="#1c1620">♠</text></g>
-          <g transform="rotate(10 178 72)"><rect x="146" y="26" width="62" height="88" rx="9" fill="#fbf5e8" stroke="#0a0806" stroke-width="5"/><text x="153" y="52" font-family="Arial Black,sans-serif" font-size="22" fill="#cf2f3a">K</text><text x="177" y="94" text-anchor="middle" font-size="36" fill="#cf2f3a">♥</text></g>
-          <g stroke="#0a0806" stroke-width="4"><circle cx="240" cy="112" r="17" fill="#e04848"/><circle cx="252" cy="100" r="17" fill="#4aa3ff"/><circle cx="52" cy="108" r="17" fill="#f2c14e"/></g>
-          <g transform="translate(206 20)"><rect width="74" height="28" rx="14" fill="#2a1c14" stroke="#0a0806" stroke-width="3"/><text x="37" y="20" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="15" fill="#f2c14e">21!</text></g>
-        </svg>
-      </div>
-      <div class="card-body">
-        <h3>Blackjack</h3>
-        <p data-i18n="bDesc">Mise tes jetons et approche-toi de 21 sans dépasser. Bats le croupier avec tes amis !</p>
-        <div class="tags"><span data-i18n="tagCasino">Casino</span><span data-i18n="tag17">1 à 7 joueurs</span><span data-i18n="tagOnline">En ligne</span></div>
-        <span class="btn orange" data-i18n="play">Jouer</span>
-      </div>
-    </a>
-    <a class="frame card" href="yams.html">
-      <div class="thumb" style="background:radial-gradient(ellipse at 50% 45%,#a8283a,#5a1219)">
-        <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">
-          <rect x="-10" y="-10" width="320" height="170" fill="none" stroke="#7a4a26" stroke-width="22"/>
-          <g transform="rotate(-14 90 80)"><rect x="60" y="48" width="62" height="62" rx="14" fill="#fff" stroke="#0d0705" stroke-width="5"/><circle cx="76" cy="64" r="6" fill="#1c1620"/><circle cx="106" cy="64" r="6" fill="#1c1620"/><circle cx="91" cy="79" r="6" fill="#1c1620"/><circle cx="76" cy="94" r="6" fill="#1c1620"/><circle cx="106" cy="94" r="6" fill="#1c1620"/></g>
-          <g transform="rotate(10 160 70)"><rect x="128" y="36" width="62" height="62" rx="14" fill="#f2c14e" stroke="#0d0705" stroke-width="5"/><circle cx="144" cy="52" r="6" fill="#6a4200"/><circle cx="174" cy="52" r="6" fill="#6a4200"/><circle cx="159" cy="67" r="6" fill="#6a4200"/><circle cx="144" cy="82" r="6" fill="#6a4200"/><circle cx="174" cy="82" r="6" fill="#6a4200"/></g>
-          <g transform="rotate(-6 228 86)"><rect x="196" y="56" width="62" height="62" rx="14" fill="#e04848" stroke="#0d0705" stroke-width="5"/><circle cx="212" cy="72" r="6" fill="#fff"/><circle cx="242" cy="72" r="6" fill="#fff"/><circle cx="227" cy="87" r="6" fill="#fff"/><circle cx="212" cy="102" r="6" fill="#fff"/><circle cx="242" cy="102" r="6" fill="#fff"/></g>
-          <g transform="translate(18 16)"><rect width="84" height="28" rx="14" fill="#3a2416" stroke="#0d0705" stroke-width="3"/><text x="42" y="20" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="15" fill="#f2c14e">YAM'S!</text></g>
-        </svg>
-      </div>
-      <div class="card-body">
-        <h3>Yam's</h3>
-        <p data-i18n="yDesc">Lance 5 dés, garde les meilleurs et remplis ta feuille de score. Choisis ton skin de dés !</p>
-        <div class="tags"><span data-i18n="tagDice">Dés</span><span data-i18n="tag18">1 à 8 joueurs</span><span data-i18n="tagOnline">En ligne</span></div>
-        <span class="btn orange" data-i18n="play">Jouer</span>
-      </div>
-    </a>
-    <a class="frame card" href="bataille.html">
-      <div class="thumb" style="background:linear-gradient(160deg,#3ab4e6,#1872b8)">
-        <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">
-          <g stroke="rgba(255,255,255,.25)" stroke-width="2"><path d="M0 30H300M0 60H300M0 90H300M0 120H300M30 0V150M60 0V150M90 0V150M120 0V150M150 0V150M180 0V150M210 0V150M240 0V150M270 0V150"/></g>
-          <g transform="translate(40 52)"><path d="M8 25C8 11 16 8 28 8H150C172 8 186 17 188 25 186 33 172 42 150 42H28C16 42 8 39 8 25Z" fill="#a9b7c4" stroke="#0a1426" stroke-width="5" stroke-linejoin="round"/>
-            <circle cx="40" cy="25" r="8" fill="#8d9cab" stroke="#0a1426" stroke-width="3.5"/><rect x="20" y="22" width="16" height="6" rx="2" fill="#6c7d8d" stroke="#0a1426" stroke-width="2.5"/>
-            <rect x="70" y="15" width="40" height="20" rx="5" fill="#c3cfda" stroke="#0a1426" stroke-width="3.5"/><rect x="75" y="19" width="30" height="5" rx="2" fill="#4aa3ff" stroke="#0a1426" stroke-width="2"/>
-            <circle cx="140" cy="25" r="8" fill="#8d9cab" stroke="#0a1426" stroke-width="3.5"/><rect x="144" y="22" width="16" height="6" rx="2" fill="#6c7d8d" stroke="#0a1426" stroke-width="2.5"/>
-            <path d="M126 4C131 12 137 15 135 23 134 29 130 32 126 32 121 32 117 29 117 23 117 17 122 15 122 10 124 13 124 16 126 18 128 13 126 8 126 4Z" fill="#ff5a2a" stroke="#0a1426" stroke-width="3" stroke-linejoin="round"/><path d="M126 16C128 20 131 22 130 26 129 28 128 29 126 29 124 29 122 27 122 25 122 23 124 21 126 16Z" fill="#ffd23f"/></g>
-          <g transform="translate(232 104)"><circle r="13" fill="none" stroke="#fff" stroke-width="4"/><circle r="7" fill="#eaf8ff" stroke="#0a1426" stroke-width="3"/><circle cx="-18" cy="-12" r="3.5" fill="#eaf8ff" stroke="#0a1426" stroke-width="2"/><circle cx="18" cy="-10" r="3" fill="#eaf8ff" stroke="#0a1426" stroke-width="2"/></g>
-          <g transform="translate(250 26)" fill="none" stroke="#ffcf3f" stroke-width="4"><circle r="16"/><path d="M-24 0H-8M8 0H24M0 -24V-8M0 8V24"/></g>
-          <g transform="translate(18 116)"><rect width="104" height="26" rx="13" fill="#143257" stroke="#0a1426" stroke-width="3"/><text x="52" y="18" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="13" fill="#ffcf3f">COULÉ !</text></g>
-        </svg>
-      </div>
-      <div class="card-body">
-        <h3 data-i18n="nTitle">Bataille navale</h3>
-        <p data-i18n="nDesc">Cache tes 5 navires, puis tire sur la grille adverse. Le premier qui coule toute la flotte gagne !</p>
-        <div class="tags"><span data-i18n="tagStrat">Stratégie</span><span data-i18n="tag12">1 contre 1</span><span data-i18n="tagOnline">En ligne</span></div>
-        <span class="btn orange" data-i18n="play">Jouer</span>
-      </div>
-    </a>
-  </section>
+      <h2 class="sec" id="s-games"><svg class="ico" viewBox="0 0 40 40"><rect x="3" y="11" width="34" height="22" rx="11" fill="#9b7bff" stroke="#0b0716" stroke-width="3"/><path d="M12 17v10M7 22h10" stroke="#0b0716" stroke-width="3.4" stroke-linecap="round"/><circle cx="27" cy="19" r="2.6" fill="#ffcf3f" stroke="#0b0716" stroke-width="2"/><circle cx="31" cy="25" r="2.6" fill="#ff5a8a" stroke="#0b0716" stroke-width="2"/></svg><span data-i18n="ourGames">Nos jeux</span></h2>
+      <section class="games" id="games"></section>
 
-  <h2 class="sec" id="classement" data-i18n="leaderboard">Classement</h2>
-  <section class="frame lb">
-    <div class="lb-head">
-      <div class="nseg" id="lbTabs"></div>
-      <div class="dbline"><i id="dbDot"></i><span id="dbTxt"></span></div>
+      <h2 class="sec" id="s-lb"><svg class="ico" viewBox="0 0 40 40"><path d="M11 6h18v9a9 9 0 0 1-18 0z" fill="#ffcf3f" stroke="#0b0716" stroke-width="3"/><path d="M11 9H5a6 6 0 0 0 6 7M29 9h6a6 6 0 0 1-6 7" fill="none" stroke="#0b0716" stroke-width="3"/><path d="M20 24v5M13 35h14l-2-6H15z" fill="#e0a020" stroke="#0b0716" stroke-width="3" stroke-linejoin="round"/></svg><span data-i18n="leaderboard">Classement</span></h2>
+      <section class="frame lb">
+        <div class="lb-head">
+          <div id="lbTabs"></div>
+          <div class="dbline"><i id="dbDot"></i><span id="dbTxt"></span></div>
+        </div>
+        <div class="lb-grid">
+          <div><div class="lb-cols"><span>#</span><span data-i18n="colPlayer">Joueur</span><span data-i18n="colW">V</span><span data-i18n="colG">P</span><span>%</span></div><div class="lb-list" id="lbList"></div></div>
+          <div><span class="lbl" data-i18n="lastGames">Dernières parties</span><div class="hist" id="hist"></div></div>
+        </div>
+      </section>
     </div>
-    <div class="lb-grid">
-      <div><div class="lb-cols"><span>#</span><span data-i18n="colPlayer">Joueur</span><span data-i18n="colW">V</span><span data-i18n="colG">P</span><span>%</span></div><div class="lb-list" id="lbList"></div></div>
-      <div><span class="lbl" data-i18n="lastGames">Dernières parties</span><div class="hist" id="hist"></div></div>
-    </div>
-  </section>
 
-  <h2 class="sec chat-h" data-i18n="chat">Chat</h2>
-  <section class="frame chatbox"><div id="gchat"></div></section>
+    <aside class="sidecol">
+      <h2 class="sec" id="s-party"><svg class="ico" viewBox="0 0 40 40"><circle cx="14" cy="14" r="7" fill="#6ff2b0" stroke="#0b0716" stroke-width="3"/><circle cx="27" cy="16" r="6" fill="#5cc8ff" stroke="#0b0716" stroke-width="3"/><path d="M3 34c1-8 6-12 11-12s10 4 11 12zM20 34c1-7 4-10 8-10s8 3 9 10z" fill="#9b7bff" stroke="#0b0716" stroke-width="3" stroke-linejoin="round"/></svg><span data-i18n="party">Groupe d’amis</span></h2>
+      <section class="frame partybox"><div id="party"></div></section>
+      <h2 class="sec" id="s-chat"><svg class="ico" viewBox="0 0 40 40"><path d="M5 8h30v19H17l-8 7v-7H5z" fill="#ff9a3c" stroke="#0b0716" stroke-width="3" stroke-linejoin="round"/><circle cx="13" cy="17.5" r="2.4" fill="#0b0716"/><circle cx="20" cy="17.5" r="2.4" fill="#0b0716"/><circle cx="27" cy="17.5" r="2.4" fill="#0b0716"/></svg><span data-i18n="chat">Chat</span></h2>
+      <section class="frame chatbox"><div id="gchat"></div></section>
+      <p class="install" data-i18n-html="install"></p>
+    </aside>
+  </div>
+</div>
 
-  <p class="install" data-i18n-html="install">Sur iPhone : <b>Partager</b> → <b>Sur l'écran d'accueil</b> pour installer Brutal&#39;s Games comme une app.</p>
-</main>
+<nav class="tabbar" id="tabbar">
+  <button data-go="s-games" class="on"><svg viewBox="0 0 40 40"><rect x="3" y="11" width="34" height="22" rx="11" fill="currentColor" stroke="#0b0716" stroke-width="3"/><path d="M12 17v10M7 22h10" stroke="#0b0716" stroke-width="3.4" stroke-linecap="round"/></svg><span data-i18n="tGames">Jeux</span></button>
+  <button data-go="s-party"><svg viewBox="0 0 40 40"><circle cx="14" cy="14" r="7" fill="currentColor" stroke="#0b0716" stroke-width="3"/><circle cx="27" cy="16" r="6" fill="currentColor" stroke="#0b0716" stroke-width="3"/><path d="M3 34c1-8 6-12 11-12s10 4 11 12zM20 34c1-7 4-10 8-10s8 3 9 10z" fill="currentColor" stroke="#0b0716" stroke-width="3" stroke-linejoin="round"/></svg><span data-i18n="tFriends">Amis</span></button>
+  <button data-go="s-lb"><svg viewBox="0 0 40 40"><path d="M11 6h18v9a9 9 0 0 1-18 0z" fill="currentColor" stroke="#0b0716" stroke-width="3"/><path d="M11 9H5a6 6 0 0 0 6 7M29 9h6a6 6 0 0 1-6 7" fill="none" stroke="#0b0716" stroke-width="3"/><path d="M20 24v5M13 35h14l-2-6H15z" fill="currentColor" stroke="#0b0716" stroke-width="3" stroke-linejoin="round"/></svg><span data-i18n="tLb">Classement</span></button>
+  <button data-go="s-chat"><svg viewBox="0 0 40 40"><path d="M5 8h30v19H17l-8 7v-7H5z" fill="currentColor" stroke="#0b0716" stroke-width="3" stroke-linejoin="round"/></svg><span data-i18n="chat">Chat</span></button>
+</nav>
 
 <div class="frame sheet" id="settings" hidden>
   <div class="sheet-head"><span data-i18n="settings">Réglages</span><button class="btn icon" id="bSetClose" data-i18n-aria="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
@@ -381,12 +376,35 @@ P.addStrings({
     dbOn: 'Online žebříček · {n} {games}', dbOff: 'Žebříček je offline', dbLoad: 'Načítání…',
     install: 'Na iPhonu: <b>Sdílet</b> → <b>Přidat na plochu</b> a Brutal&#39;s Games budeš mít jako aplikaci.' }
 });
-// Braises
-for (let i = 0; i < 18; i++) { const e = document.createElement('i'); e.style.left = Math.random() * 100 + '%'; e.style.animationDuration = 8 + Math.random() * 10 + 's'; e.style.animationDelay = -Math.random() * 18 + 's'; e.style.transform = `scale(${0.5 + Math.random()})`; $('#embers').appendChild(e); }
+P.addStrings({
+  fr: { party: 'Groupe d’amis', isNew: 'NOUVEAU', featured: 'À LA UNE', tGames: 'Jeux', tFriends: 'Amis', tLb: 'Classement', stWins: 'victoires', stGames: 'parties', stRank: 'rang' },
+  en: { party: 'Friends group', isNew: 'NEW', featured: 'FEATURED', tGames: 'Games', tFriends: 'Friends', tLb: 'Ranking', stWins: 'wins', stGames: 'games', stRank: 'rank' },
+  cs: { party: 'Skupina přátel', isNew: 'NOVINKA', featured: 'DOPORUČUJEME', tGames: 'Hry', tFriends: 'Přátelé', tLb: 'Žebříček', stWins: 'výhry', stGames: 'hry', stRank: 'pořadí' }
+});
+// Jiskry
+for (let i = 0; i < 16; i++) { const e = document.createElement('i'); e.style.left = Math.random() * 100 + '%'; e.style.animationDuration = 9 + Math.random() * 10 + 's'; e.style.animationDelay = -Math.random() * 18 + 's'; e.style.transform = `scale(${0.5 + Math.random()})`; $('#sparks').appendChild(e); }
 
+/* --- les jeux --- */
+const LIST = [
+  { href: 'quoridor', name: 'gn_qd', desc: 'qDesc', tags: ['tag14', 'tagOnline'], art: "<div class=\"tbg\" style=\"position:absolute;inset:0;background:linear-gradient(180deg,#3b2d66,#1a1a2e)\"><svg viewBox=\"0 0 300 150\" preserveAspectRatio=\"xMidYMid slice\"> <g transform=\"translate(150 86) scale(1 .55) rotate(45)\"> <rect x=\"-80\" y=\"-80\" width=\"160\" height=\"160\" rx=\"8\" fill=\"#5a4f86\" stroke=\"#0c0816\" stroke-width=\"5\"/> <g fill=\"#8a7cbf\" stroke=\"#0c0816\" stroke-width=\"2.5\"> <rect x=\"-72\" y=\"-72\" width=\"30\" height=\"30\" rx=\"4\"/><rect x=\"-36\" y=\"-72\" width=\"30\" height=\"30\" rx=\"4\"/><rect x=\"0\" y=\"-72\" width=\"30\" height=\"30\" rx=\"4\"/><rect x=\"36\" y=\"-72\" width=\"30\" height=\"30\" rx=\"4\"/> <rect x=\"-72\" y=\"-36\" width=\"30\" height=\"30\" rx=\"4\"/><rect x=\"-36\" y=\"-36\" width=\"30\" height=\"30\" rx=\"4\"/><rect x=\"0\" y=\"-36\" width=\"30\" height=\"30\" rx=\"4\"/><rect x=\"36\" y=\"-36\" width=\"30\" height=\"30\" rx=\"4\"/> <rect x=\"-72\" y=\"0\" width=\"30\" height=\"30\" rx=\"4\"/><rect x=\"-36\" y=\"0\" width=\"30\" height=\"30\" rx=\"4\"/><rect x=\"0\" y=\"0\" width=\"30\" height=\"30\" rx=\"4\"/><rect x=\"36\" y=\"0\" width=\"30\" height=\"30\" rx=\"4\"/> <rect x=\"-72\" y=\"36\" width=\"30\" height=\"30\" rx=\"4\"/><rect x=\"-36\" y=\"36\" width=\"30\" height=\"30\" rx=\"4\"/><rect x=\"0\" y=\"36\" width=\"30\" height=\"30\" rx=\"4\"/><rect x=\"36\" y=\"36\" width=\"30\" height=\"30\" rx=\"4\"/> </g> </g> <g transform=\"translate(118 58)\"><rect x=\"0\" y=\"0\" width=\"64\" height=\"11\" rx=\"5\" fill=\"#f3e7c9\" stroke=\"#0c0816\" stroke-width=\"3\"/><circle cx=\"2\" cy=\"1\" r=\"6\" fill=\"#f3e7c9\" stroke=\"#0c0816\" stroke-width=\"3\"/><circle cx=\"2\" cy=\"10\" r=\"6\" fill=\"#f3e7c9\" stroke=\"#0c0816\" stroke-width=\"3\"/><circle cx=\"62\" cy=\"1\" r=\"6\" fill=\"#f3e7c9\" stroke=\"#0c0816\" stroke-width=\"3\"/><circle cx=\"62\" cy=\"10\" r=\"6\" fill=\"#f3e7c9\" stroke=\"#0c0816\" stroke-width=\"3\"/></g> <g transform=\"translate(96 76) scale(1.3)\"><path d=\"M20 4C11 4 5 10.5 5 18.5c0 5 2.4 8.6 6 10.6V34h18v-4.9c3.6-2 6-5.6 6-10.6C35 10.5 29 4 20 4z\" fill=\"#f3e7c9\" stroke=\"#0c0816\" stroke-width=\"2.5\"/><ellipse cx=\"14\" cy=\"19\" rx=\"5\" ry=\"5.6\" fill=\"#1b1030\"/><ellipse cx=\"26\" cy=\"19\" rx=\"5\" ry=\"5.6\" fill=\"#1b1030\"/><circle cx=\"12.6\" cy=\"17.4\" r=\"1.7\" fill=\"#fff\"/><circle cx=\"24.6\" cy=\"17.4\" r=\"1.7\" fill=\"#fff\"/></g> <g transform=\"translate(160 10) scale(1.2)\"><path d=\"M9 14L5 3l9 7M31 14l4-11-9 7\" fill=\"#f3e3b5\" stroke=\"#0c0816\" stroke-width=\"2.2\" stroke-linejoin=\"round\"/><path d=\"M20 8l13 7 2 12-15 9-15-9 2-12z\" fill=\"#e8394d\" stroke=\"#0c0816\" stroke-width=\"2.5\" stroke-linejoin=\"round\"/><circle cx=\"14.5\" cy=\"19\" r=\"3.6\" fill=\"#ffd84a\" stroke=\"#0c0816\" stroke-width=\"1.6\"/><circle cx=\"25.5\" cy=\"19\" r=\"3.6\" fill=\"#ffd84a\" stroke=\"#0c0816\" stroke-width=\"1.6\"/><path d=\"M13 26h14l-2 4H15z\" fill=\"#0c0816\"/></g> </svg></div>" },
+  { href: 'differences', name: 'gn_df', desc: 'dDesc', tags: ['tag110', 'tagOnline'], art: "<div class=\"tbg\" style=\"position:absolute;inset:0;background:linear-gradient(180deg,#2a6a9a,#1a1a2e)\"><svg viewBox=\"0 0 300 150\" preserveAspectRatio=\"xMidYMid slice\"> <g transform=\"rotate(-6 85 75)\"><rect x=\"25\" y=\"28\" width=\"120\" height=\"90\" rx=\"10\" fill=\"#3ac6e8\" stroke=\"#0c0816\" stroke-width=\"5\"/><circle cx=\"55\" cy=\"58\" r=\"12\" fill=\"#ffcf3f\" stroke=\"#0c0816\" stroke-width=\"3.5\"/><path d=\"M30 112l34-30 22 18 18-14 36 26z\" fill=\"#3fae5a\" stroke=\"#0c0816\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/><ellipse cx=\"110\" cy=\"62\" rx=\"12\" ry=\"8\" fill=\"#ff9a3c\" stroke=\"#0c0816\" stroke-width=\"3\"/></g> <g transform=\"rotate(5 215 75)\"><rect x=\"155\" y=\"28\" width=\"120\" height=\"90\" rx=\"10\" fill=\"#3ac6e8\" stroke=\"#0c0816\" stroke-width=\"5\"/><circle cx=\"185\" cy=\"58\" r=\"12\" fill=\"#ff7aa0\" stroke=\"#0c0816\" stroke-width=\"3.5\"/><path d=\"M160 112l34-30 22 18 18-14 36 26z\" fill=\"#3fae5a\" stroke=\"#0c0816\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/><circle cx=\"185\" cy=\"58\" r=\"22\" fill=\"none\" stroke=\"#0c0816\" stroke-width=\"8\"/><circle cx=\"185\" cy=\"58\" r=\"22\" fill=\"none\" stroke=\"#86f2a0\" stroke-width=\"4.5\"/></g> <circle cx=\"232\" cy=\"98\" r=\"22\" fill=\"rgba(220,250,255,.35)\" stroke=\"#0c0816\" stroke-width=\"6\"/><path d=\"M248 114l18 18\" stroke=\"#0c0816\" stroke-width=\"13\" stroke-linecap=\"round\"/><path d=\"M248 114l18 18\" stroke=\"#a8643a\" stroke-width=\"7\" stroke-linecap=\"round\"/> </svg></div>" },
+  { href: 'undercover', name: 'gn_uc', desc: 'uDesc', tags: ['tag310', 'tagOnline'], art: "<div class=\"tbg\" style=\"position:absolute;inset:0;background:linear-gradient(180deg,#141a33,#2a2350)\"><svg viewBox=\"0 0 300 150\" preserveAspectRatio=\"xMidYMid slice\"> <circle cx=\"250\" cy=\"34\" r=\"18\" fill=\"#ffe08a\"/> <g fill=\"#0c1024\"><rect x=\"0\" y=\"80\" width=\"46\" height=\"70\"/><rect x=\"50\" y=\"62\" width=\"38\" height=\"88\"/><rect x=\"92\" y=\"90\" width=\"40\" height=\"60\"/><rect x=\"196\" y=\"70\" width=\"44\" height=\"80\"/><rect x=\"244\" y=\"88\" width=\"56\" height=\"62\"/></g> <g fill=\"#ffd25a\"><rect x=\"10\" y=\"92\" width=\"7\" height=\"9\"/><rect x=\"28\" y=\"108\" width=\"7\" height=\"9\"/><rect x=\"60\" y=\"76\" width=\"7\" height=\"9\"/><rect x=\"74\" y=\"98\" width=\"7\" height=\"9\"/><rect x=\"104\" y=\"104\" width=\"7\" height=\"9\"/><rect x=\"206\" y=\"84\" width=\"7\" height=\"9\"/><rect x=\"222\" y=\"104\" width=\"7\" height=\"9\"/><rect x=\"258\" y=\"100\" width=\"7\" height=\"9\"/><rect x=\"278\" y=\"118\" width=\"7\" height=\"9\"/></g> <g transform=\"translate(110 22) scale(1.6)\" stroke=\"#0b0e1c\" stroke-width=\"3\"><path d=\"M8 64c2-12 11-17 24-17s22 5 24 17z\" fill=\"#e5484d\"/><path d=\"M26 48l6 9 6-9\" fill=\"#f1eee6\" stroke-width=\"2.5\" stroke-linejoin=\"round\"/><circle cx=\"32\" cy=\"33\" r=\"14\" fill=\"#f3c9a0\"/><rect x=\"20\" y=\"29\" width=\"10\" height=\"6\" rx=\"2\" fill=\"#0b0e1c\" stroke=\"none\"/><rect x=\"34\" y=\"29\" width=\"10\" height=\"6\" rx=\"2\" fill=\"#0b0e1c\" stroke=\"none\"/><path d=\"M30 31h4\" stroke-width=\"2.5\"/><path d=\"M25 41q3.5-3 7 0q3.5-3 7 0q-3.5 3-7 1q-3.5 2-7-1z\" fill=\"#3a2414\" stroke-width=\"2\"/><path d=\"M14 25h36l-3-4H17z\" fill=\"#0b0e1c\" stroke=\"none\"/><path d=\"M19 22c0-9 4-13 13-13s13 4 13 13z\" fill=\"#2b2f45\"/><path d=\"M19 19h26\" stroke=\"#e5484d\" stroke-width=\"4\"/><path d=\"M11 25.5h42\" stroke-width=\"4\" stroke-linecap=\"round\"/></g> <g transform=\"rotate(-10 56 118)\"><rect x=\"14\" y=\"106\" width=\"84\" height=\"24\" rx=\"5\" fill=\"rgba(20,26,51,.85)\" stroke=\"#e5484d\" stroke-width=\"3\"/><text x=\"56\" y=\"124\" text-anchor=\"middle\" font-family=\"Impact,Arial Black,sans-serif\" font-size=\"15\" fill=\"#e5484d\" letter-spacing=\"1\">TOP SECRET</text></g> </svg></div>" },
+  { href: 'codenames', name: 'gn_cn', desc: 'cDesc', tags: ['tag410', 'tagOnline'], art: "<div class=\"tbg\" style=\"position:absolute;inset:0;background:linear-gradient(180deg,#0b0e2a,#251a4e)\"><svg viewBox=\"0 0 300 150\" preserveAspectRatio=\"xMidYMid slice\"> <g fill=\"#fff\"><circle cx=\"20\" cy=\"20\" r=\"1.6\"/><circle cx=\"90\" cy=\"12\" r=\"1.2\"/><circle cx=\"170\" cy=\"26\" r=\"1.5\"/><circle cx=\"280\" cy=\"16\" r=\"1.3\"/><circle cx=\"250\" cy=\"130\" r=\"1.4\"/><circle cx=\"12\" cy=\"120\" r=\"1.2\"/></g> <circle cx=\"262\" cy=\"40\" r=\"22\" fill=\"#ff8a5a\" stroke=\"#0a0718\" stroke-width=\"4\"/><ellipse cx=\"262\" cy=\"42\" rx=\"34\" ry=\"8\" fill=\"none\" stroke=\"#ffd27a\" stroke-width=\"4\"/> <g stroke=\"#0a0718\" stroke-width=\"4\" stroke-linejoin=\"round\"> <rect x=\"40\" y=\"34\" width=\"64\" height=\"44\" rx=\"8\" fill=\"#ff5a5f\" transform=\"rotate(-6 72 56)\"/> <rect x=\"116\" y=\"28\" width=\"64\" height=\"44\" rx=\"8\" fill=\"#cdbf9f\"/> <rect x=\"192\" y=\"40\" width=\"64\" height=\"44\" rx=\"8\" fill=\"#4aa3ff\" transform=\"rotate(5 224 62)\"/> <rect x=\"72\" y=\"86\" width=\"64\" height=\"44\" rx=\"8\" fill=\"#4aa3ff\" transform=\"rotate(4 104 108)\"/> <rect x=\"152\" y=\"88\" width=\"64\" height=\"44\" rx=\"8\" fill=\"#16121f\" transform=\"rotate(-4 184 110)\"/> </g> <circle cx=\"184\" cy=\"110\" r=\"11\" fill=\"none\" stroke=\"#b48aff\" stroke-width=\"4\"/><circle cx=\"184\" cy=\"110\" r=\"4\" fill=\"#b48aff\"/> <g fill=\"#2a2014\" font-family=\"Arial Black,sans-serif\" font-size=\"11\" text-anchor=\"middle\"><text x=\"148\" y=\"54\">LUNE</text></g> </svg></div>" },
+  { href: 'dessin', name: 'gn_dr', desc: 'rDesc', tags: ['tag210', 'tagOnline'], art: "<div class=\"tbg\" style=\"position:absolute;inset:0;background:linear-gradient(180deg,#2a1c30,#1a1322)\"><svg viewBox=\"0 0 300 150\" preserveAspectRatio=\"xMidYMid slice\"> <rect x=\"62\" y=\"18\" width=\"150\" height=\"112\" rx=\"8\" fill=\"#efe6d2\" stroke=\"#120c18\" stroke-width=\"5\" transform=\"rotate(-4 137 74)\"/> <g transform=\"rotate(-4 137 74)\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"> <path d=\"M92 100c0-24 16-40 34-40s34 16 34 40z\" fill=\"#ffc93c\" stroke=\"#120c18\" stroke-width=\"4\"/> <circle cx=\"114\" cy=\"80\" r=\"4\" fill=\"#120c18\"/><circle cx=\"138\" cy=\"80\" r=\"4\" fill=\"#120c18\"/> <path d=\"M118 92q8 6 16 0\" stroke=\"#120c18\" stroke-width=\"3.5\"/> <path d=\"M100 62l-8-16 18 10M152 62l8-16-18 10\" fill=\"#ffc93c\" stroke=\"#120c18\" stroke-width=\"4\"/> <path d=\"M172 44c10 4 16 12 16 22\" stroke=\"#ff6b5a\" stroke-width=\"5\"/> </g> <path d=\"M214 132l40-66 9 6-36 68z\" fill=\"#9b7bff\" stroke=\"#120c18\" stroke-width=\"4\" stroke-linejoin=\"round\"/> <path d=\"M254 66l7-13 10 7-8 12z\" fill=\"#e8d0a8\" stroke=\"#120c18\" stroke-width=\"4\" stroke-linejoin=\"round\"/> <circle cx=\"32\" cy=\"38\" r=\"9\" fill=\"#3ad0b0\" opacity=\".7\"/><circle cx=\"270\" cy=\"24\" r=\"6\" fill=\"#ff6b5a\" opacity=\".7\"/><circle cx=\"24\" cy=\"118\" r=\"12\" fill=\"#ff6b5a\" opacity=\".5\"/> <g transform=\"translate(232 18)\"><rect width=\"56\" height=\"26\" rx=\"13\" fill=\"#30243c\" stroke=\"#120c18\" stroke-width=\"3\"/><text x=\"28\" y=\"18\" text-anchor=\"middle\" font-family=\"Arial Black,sans-serif\" font-size=\"12\" fill=\"#5cd65c\">CHAT!</text></g> </svg></div>" },
+  { href: 'blackjack', name: 'gn_bj', desc: 'bDesc', tags: ['tag17', 'tagOnline'], art: "<div class=\"tbg\" style=\"position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#1a7a50,#0b4a30)\"><svg viewBox=\"0 0 300 150\" preserveAspectRatio=\"xMidYMid slice\"> <ellipse cx=\"150\" cy=\"170\" rx=\"190\" ry=\"80\" fill=\"none\" stroke=\"#6a3c20\" stroke-width=\"14\"/> <g transform=\"rotate(-12 110 75)\"><rect x=\"80\" y=\"28\" width=\"62\" height=\"88\" rx=\"9\" fill=\"#fbf5e8\" stroke=\"#0a0806\" stroke-width=\"5\"/><text x=\"88\" y=\"54\" font-family=\"Arial Black,sans-serif\" font-size=\"22\" fill=\"#1c1620\">A</text><text x=\"111\" y=\"96\" text-anchor=\"middle\" font-size=\"36\" fill=\"#1c1620\">\u2660</text></g> <g transform=\"rotate(10 178 72)\"><rect x=\"146\" y=\"26\" width=\"62\" height=\"88\" rx=\"9\" fill=\"#fbf5e8\" stroke=\"#0a0806\" stroke-width=\"5\"/><text x=\"153\" y=\"52\" font-family=\"Arial Black,sans-serif\" font-size=\"22\" fill=\"#cf2f3a\">K</text><text x=\"177\" y=\"94\" text-anchor=\"middle\" font-size=\"36\" fill=\"#cf2f3a\">\u2665</text></g> <g stroke=\"#0a0806\" stroke-width=\"4\"><circle cx=\"240\" cy=\"112\" r=\"17\" fill=\"#e04848\"/><circle cx=\"252\" cy=\"100\" r=\"17\" fill=\"#4aa3ff\"/><circle cx=\"52\" cy=\"108\" r=\"17\" fill=\"#f2c14e\"/></g> <g transform=\"translate(206 20)\"><rect width=\"74\" height=\"28\" rx=\"14\" fill=\"#2a1c14\" stroke=\"#0a0806\" stroke-width=\"3\"/><text x=\"37\" y=\"20\" text-anchor=\"middle\" font-family=\"Arial Black,sans-serif\" font-size=\"15\" fill=\"#f2c14e\">21!</text></g> </svg></div>" },
+  { href: 'yams', name: 'gn_ym', desc: 'yDesc', tags: ['tag18', 'tagOnline'], art: "<div class=\"tbg\" style=\"position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,#a8283a,#5a1219)\"><svg viewBox=\"0 0 300 150\" preserveAspectRatio=\"xMidYMid slice\"> <rect x=\"-10\" y=\"-10\" width=\"320\" height=\"170\" fill=\"none\" stroke=\"#7a4a26\" stroke-width=\"22\"/> <g transform=\"rotate(-14 90 80)\"><rect x=\"60\" y=\"48\" width=\"62\" height=\"62\" rx=\"14\" fill=\"#fff\" stroke=\"#0d0705\" stroke-width=\"5\"/><circle cx=\"76\" cy=\"64\" r=\"6\" fill=\"#1c1620\"/><circle cx=\"106\" cy=\"64\" r=\"6\" fill=\"#1c1620\"/><circle cx=\"91\" cy=\"79\" r=\"6\" fill=\"#1c1620\"/><circle cx=\"76\" cy=\"94\" r=\"6\" fill=\"#1c1620\"/><circle cx=\"106\" cy=\"94\" r=\"6\" fill=\"#1c1620\"/></g> <g transform=\"rotate(10 160 70)\"><rect x=\"128\" y=\"36\" width=\"62\" height=\"62\" rx=\"14\" fill=\"#f2c14e\" stroke=\"#0d0705\" stroke-width=\"5\"/><circle cx=\"144\" cy=\"52\" r=\"6\" fill=\"#6a4200\"/><circle cx=\"174\" cy=\"52\" r=\"6\" fill=\"#6a4200\"/><circle cx=\"159\" cy=\"67\" r=\"6\" fill=\"#6a4200\"/><circle cx=\"144\" cy=\"82\" r=\"6\" fill=\"#6a4200\"/><circle cx=\"174\" cy=\"82\" r=\"6\" fill=\"#6a4200\"/></g> <g transform=\"rotate(-6 228 86)\"><rect x=\"196\" y=\"56\" width=\"62\" height=\"62\" rx=\"14\" fill=\"#e04848\" stroke=\"#0d0705\" stroke-width=\"5\"/><circle cx=\"212\" cy=\"72\" r=\"6\" fill=\"#fff\"/><circle cx=\"242\" cy=\"72\" r=\"6\" fill=\"#fff\"/><circle cx=\"227\" cy=\"87\" r=\"6\" fill=\"#fff\"/><circle cx=\"212\" cy=\"102\" r=\"6\" fill=\"#fff\"/><circle cx=\"242\" cy=\"102\" r=\"6\" fill=\"#fff\"/></g> <g transform=\"translate(18 16)\"><rect width=\"84\" height=\"28\" rx=\"14\" fill=\"#3a2416\" stroke=\"#0d0705\" stroke-width=\"3\"/><text x=\"42\" y=\"20\" text-anchor=\"middle\" font-family=\"Arial Black,sans-serif\" font-size=\"15\" fill=\"#f2c14e\">YAM'S!</text></g> </svg></div>" },
+  { href: 'bataille', name: 'gn_bn', desc: 'nDesc', tags: ['tag12', 'tagOnline'], art: "<svg viewBox=\"0 0 600 300\" preserveAspectRatio=\"xMidYMid slice\" aria-hidden=\"true\"> <defs> <linearGradient id=\"bnSky\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#0d1a33\"/><stop offset=\".6\" stop-color=\"#23365e\"/><stop offset=\"1\" stop-color=\"#6a4a6e\"/></linearGradient> <linearGradient id=\"bnSea\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#14546a\"/><stop offset=\"1\" stop-color=\"#082436\"/></linearGradient> <radialGradient id=\"bnMoon\" cx=\"40%\" cy=\"35%\" r=\"70%\"><stop offset=\"0\" stop-color=\"#fffbe8\"/><stop offset=\"1\" stop-color=\"#f3d58e\"/></radialGradient> <radialGradient id=\"bnFire\" cx=\"50%\" cy=\"60%\" r=\"60%\"><stop offset=\"0\" stop-color=\"#fff3b0\"/><stop offset=\".45\" stop-color=\"#ffb02e\"/><stop offset=\"1\" stop-color=\"#e8401c\" stop-opacity=\"0\"/></radialGradient> <radialGradient id=\"bnFlash\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#fffbe0\"/><stop offset=\".4\" stop-color=\"#ffd24a\"/><stop offset=\"1\" stop-color=\"#ff7a1c\" stop-opacity=\"0\"/></radialGradient> </defs> <rect width=\"600\" height=\"300\" fill=\"url(#bnSky)\"/> <g fill=\"#fff\" opacity=\".75\"><circle cx=\"40\" cy=\"30\" r=\"1.6\"/><circle cx=\"120\" cy=\"70\" r=\"1.3\"/><circle cx=\"210\" cy=\"22\" r=\"1.8\"/><circle cx=\"300\" cy=\"55\" r=\"1.2\"/><circle cx=\"380\" cy=\"18\" r=\"1.5\"/><circle cx=\"560\" cy=\"40\" r=\"1.6\"/><circle cx=\"520\" cy=\"95\" r=\"1.2\"/><circle cx=\"70\" cy=\"110\" r=\"1.2\"/></g> <circle cx=\"470\" cy=\"62\" r=\"30\" fill=\"url(#bnMoon)\" stroke=\"#07101e\" stroke-width=\"4\"/> <circle cx=\"461\" cy=\"55\" r=\"5\" fill=\"#e8c473\" opacity=\".6\"/><circle cx=\"480\" cy=\"74\" r=\"4\" fill=\"#e8c473\" opacity=\".6\"/> <!-- \u00eele au loin --> <path d=\"M0 196q40-26 78-12 30-30 64-6 22-8 40 18z\" fill=\"#1a2c45\" stroke=\"#07101e\" stroke-width=\"4\" stroke-linejoin=\"round\"/> <path d=\"M44 186c2-22 6-34 14-42M58 144c-14-2-22 4-26 10M58 144c10-8 22-6 28 0M58 144c-4-10-14-12-20-10\" fill=\"none\" stroke=\"#07101e\" stroke-width=\"4\" stroke-linecap=\"round\"/> <!-- mer --> <rect y=\"190\" width=\"600\" height=\"110\" fill=\"url(#bnSea)\"/> <path d=\"M0 190H600\" stroke=\"#07101e\" stroke-width=\"4\"/> <g fill=\"none\" stroke=\"#7fe0e6\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\".55\"><path d=\"M30 222q12-7 24 0t24 0\"/><path d=\"M250 262q12-7 24 0t24 0\"/><path d=\"M500 236q12-7 24 0t24 0\"/><path d=\"M120 280q12-7 24 0t24 0\"/><path d=\"M420 284q12-7 24 0t24 0\"/></g> <!-- navire ennemi en feu (droite) --> <g transform=\"translate(440 150) rotate(9)\"> <ellipse cx=\"40\" cy=\"38\" rx=\"70\" ry=\"44\" fill=\"url(#bnFire)\" opacity=\".8\"/> <path d=\"M-10 52h104l-14 30H6z\" fill=\"#4a2a18\" stroke=\"#07101e\" stroke-width=\"5\" stroke-linejoin=\"round\"/> <path d=\"M2 62h80\" stroke=\"#2c170c\" stroke-width=\"3\"/> <path d=\"M40 52V-8\" stroke=\"#07101e\" stroke-width=\"5\"/> <path d=\"M40-2q26 6 30 26-12 4-30 2z\" fill=\"#c9b48e\" stroke=\"#07101e\" stroke-width=\"4\" stroke-linejoin=\"round\"/> <path d=\"M16 46q4-22 14-28 2 14 8 18 4-12 12-16-2 14 6 24z\" fill=\"#ffb02e\" stroke=\"#07101e\" stroke-width=\"3\" stroke-linejoin=\"round\"/> <path d=\"M24 46q2-12 8-16 2 8 6 10 3-6 8-8-1 8 3 14z\" fill=\"#fff0a0\"/> <g fill=\"#3a3346\" stroke=\"#07101e\" stroke-width=\"3\" opacity=\".9\"><circle cx=\"34\" cy=\"-22\" r=\"14\"/><circle cx=\"52\" cy=\"-36\" r=\"18\"/><circle cx=\"76\" cy=\"-50\" r=\"22\"/></g> </g> <!-- boulet + tra\u00een\u00e9e --> <path d=\"M262 104q80-60 168 22\" fill=\"none\" stroke=\"#fff3c4\" stroke-width=\"4\" stroke-dasharray=\"2 10\" stroke-linecap=\"round\" opacity=\".8\"/> <circle cx=\"396\" cy=\"80\" r=\"8\" fill=\"#1b1b22\" stroke=\"#07101e\" stroke-width=\"3\"/> <!-- galion pirate (gauche) --> <g transform=\"translate(108 92)\"> <path d=\"M0 98h210l-22 46H24z\" fill=\"#6b3d22\" stroke=\"#07101e\" stroke-width=\"6\" stroke-linejoin=\"round\"/> <path d=\"M-8 90h56v12H-8zM170 82h52v20h-52z\" fill=\"#7d4a2a\" stroke=\"#07101e\" stroke-width=\"5\" stroke-linejoin=\"round\"/> <path d=\"M14 114h184\" stroke=\"#3e2112\" stroke-width=\"4\"/> <path d=\"M18 124h170\" stroke=\"#d9a441\" stroke-width=\"3\"/> <g fill=\"#07101e\"><circle cx=\"54\" cy=\"113\" r=\"5\"/><circle cx=\"86\" cy=\"113\" r=\"5\"/><circle cx=\"118\" cy=\"113\" r=\"5\"/><circle cx=\"150\" cy=\"113\" r=\"5\"/></g> <!-- \u00e9clair de canon --> <circle cx=\"232\" cy=\"104\" r=\"26\" fill=\"url(#bnFlash)\"/> <path d=\"M208 104l38-14-10 14 16 6-26 2z\" fill=\"#fff6c8\" stroke=\"#07101e\" stroke-width=\"2.5\" stroke-linejoin=\"round\"/> <path d=\"M60 98V-28M140 98V-10M204 82 236 30\" stroke=\"#07101e\" stroke-width=\"6\" stroke-linecap=\"round\"/> <path d=\"M56 -28h8\" stroke=\"#07101e\" stroke-width=\"6\"/> <!-- voiles noires --> <path d=\"M24 -14q36-8 72 0q6 26 0 52q-36-8-72 0q-6-26 0-52z\" fill=\"#16131c\" stroke=\"#07101e\" stroke-width=\"5\" stroke-linejoin=\"round\"/> <path d=\"M20 46q40-8 80 0q6 22 0 44q-40-8-80 0q-6-22 0-44z\" fill=\"#16131c\" stroke=\"#07101e\" stroke-width=\"5\" stroke-linejoin=\"round\"/> <path d=\"M110 4q30-6 60 0q5 24 0 48q-30-6-60 0q-5-24 0-48z\" fill=\"#16131c\" stroke=\"#07101e\" stroke-width=\"5\" stroke-linejoin=\"round\"/> <path d=\"M146 98q-6-24 0-36 22 6 30 30z\" fill=\"#e9dcc0\" stroke=\"#07101e\" stroke-width=\"4\" stroke-linejoin=\"round\"/> <!-- t\u00eate de mort --> <g transform=\"translate(60 12)\"><path d=\"M-12 0a12 12 0 1 1 24 0c0 5-2 8-5 9v5h-14v-5c-3-1-5-4-5-9z\" fill=\"#f3ead6\"/><circle cx=\"-5\" cy=\"1\" r=\"3.4\" fill=\"#16131c\"/><circle cx=\"5\" cy=\"1\" r=\"3.4\" fill=\"#16131c\"/><path d=\"M-20 18l40 12M20 18l-40 12\" stroke=\"#f3ead6\" stroke-width=\"4\" stroke-linecap=\"round\"/></g> <!-- drapeau --> <path d=\"M60 -28V-56\" stroke=\"#07101e\" stroke-width=\"5\"/> <path d=\"M62 -56h30l-6 8 6 8H62z\" fill=\"#e8394d\" stroke=\"#07101e\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/> <!-- lanternes --> <circle cx=\"-2\" cy=\"84\" r=\"6\" fill=\"#ffd36a\" stroke=\"#07101e\" stroke-width=\"3\"/><circle cx=\"214\" cy=\"74\" r=\"6\" fill=\"#ffd36a\" stroke=\"#07101e\" stroke-width=\"3\"/> </g> <!-- \u00e9cume autour du galion --> <path d=\"M120 236q20-10 40 0t40 0 40 0 40 0 40 0\" fill=\"none\" stroke=\"#dff8f6\" stroke-width=\"5\" stroke-linecap=\"round\"/> <!-- \u00e9claboussure --> <g transform=\"translate(540 214)\" fill=\"#dff8f6\" stroke=\"#07101e\" stroke-width=\"3\" stroke-linejoin=\"round\"><path d=\"M-18 8q4-26 10-30 2 16 8 18 2-22 10-28 4 22 2 40z\"/></g> </svg>", isNew: true }
+];
+const GO = '<svg viewBox="0 0 24 24"><path d="M8 4l12 8-12 8z" fill="#2a1302" stroke="#2a1302" stroke-width="2" stroke-linejoin="round"/></svg>';
+function renderGames() {
+  $('#games').innerHTML = LIST.map(g => `<a class="frame tile card" href="${g.href}.html"><div class="thumb">${g.isNew ? `<span class="badge-new sm">${t('isNew')}</span>` : ''}${g.art}</div>
+    <div class="tb"><h3>${esc(t(g.name))}</h3><p>${esc(t(g.desc))}</p><div class="meta"><span>${esc(t(g.tags[0]))}</span><span class="go">${GO}</span></div></div></a>`).join('');
+}
+
+/* --- classement --- */
 let matches = [], tab = P.get('hub-tab', 'all'), dbState = 'load';
 try { matches = JSON.parse(P.get('qd-matches-v1', '[]')).map(m => Object.assign({ g: m.g || 'quoridor' }, m)).filter(m => m.g !== 'uc' || Array.isArray(m.wa)).filter(m => Array.isArray(m.p) && P.okMatch(m)); } catch (e) {}
-const GAMES = [['all', 'all'], ['quoridor', 'Quoridor'], ['diff', '7 Diff.'], ['uc', 'Undercover'], ['cn', 'Codenames'], ['dr', 'Dessin'], ['bj', 'Blackjack'], ['ym', 'Yam\'s'], ['bn', 'Bataille']];
+const GAMES = [['all', 'all'], ['quoridor', 'gn_qd'], ['diff', 'gn_df'], ['uc', 'gn_uc'], ['cn', 'gn_cn'], ['dr', 'gn_dr'], ['bj', 'gn_bj'], ['ym', 'gn_ym'], ['bn', 'gn_bn']];
 const GI = {
   bn: '<svg class="gi" viewBox="0 0 40 40"><path d="M4 22h32l-4 9H8z" fill="#a9b7c4" stroke="#0c0816" stroke-width="2.5" stroke-linejoin="round"/><rect x="15" y="14" width="10" height="8" rx="2" fill="#c3cfda" stroke="#0c0816" stroke-width="2.5"/><path d="M3 34q4-3 8 0t8 0 8 0 8 0" fill="none" stroke="#3ab4e6" stroke-width="2.5" stroke-linecap="round"/><circle cx="30" cy="11" r="4" fill="#ff5a2a" stroke="#0c0816" stroke-width="2"/></svg>',
   ym: '<svg class="gi" viewBox="0 0 40 40"><rect x="5" y="9" width="20" height="20" rx="5" fill="#fff" stroke="#0c0816" stroke-width="2.5" transform="rotate(-10 15 19)"/><rect x="17" y="13" width="18" height="18" rx="5" fill="#e04848" stroke="#0c0816" stroke-width="2.5" transform="rotate(12 26 22)"/><circle cx="11" cy="15" r="2" fill="#0c0816"/><circle cx="18" cy="22" r="2" fill="#0c0816"/><circle cx="26" cy="22" r="2" fill="#fff"/></svg>',
@@ -404,7 +422,7 @@ function histTxt(m) {
   return m.p.length > 2 ? t('winN', { a: esc(m.p[m.w]), n: m.p.length }) : t('beat', { a: esc(m.p[m.w]), b: esc(m.p[1 - m.w]) });
 }
 function render() {
-  $('#lbTabs').innerHTML = GAMES.map(([k, l]) => `<button class="btn" data-tab="${k}" aria-pressed="${k === tab}">${k === 'all' ? t('all') : l}</button>`).join('');
+  $('#lbTabs').innerHTML = GAMES.map(([k, l]) => `<button class="btn" data-tab="${k}" aria-pressed="${k === tab}">${k === 'all' ? t('all') : esc(t(l))}</button>`).join('');
   const rows = P.ranking(matches, tab === 'all' ? null : tab);
   const me = P.name().toLowerCase();
   $('#lbList').innerHTML = rows.length ? rows.slice(0, 30).map((r, i) => `<div class="lb-row${r.name.toLowerCase() === me ? ' me' : ''}"><span class="rank${i < 3 ? ' r' + (i + 1) : ''}">${i + 1}</span><span class="nm">${esc(r.name)}${r.ai ? `<small>${t('aiTag')}</small>` : ''}</span><span>${r.w}</span><span>${r.g}</span><span>${Math.round(100 * r.w / r.g)}%</span></div>`).join('')
@@ -414,7 +432,9 @@ function render() {
   $('#hist').innerHTML = hist.length ? hist.map(m => `<div>${GI[m.g] || ''}<span>${histTxt(m)}</span><span>${fmt.format(new Date(m.t))}</span></div>`).join('')
     : `<div class="empty">${t('lbEmpty')}</div>`;
   const all = P.ranking(matches), mi = all.findIndex(r => r.name.toLowerCase() === me);
-  $('#myStat').innerHTML = mi >= 0 ? t('myStat', { w: all[mi].w, g: all[mi].g, games: P.gamesWord(all[mi].g), r: mi + 1 }) : t('myStat0');
+  $('#myStat').innerHTML = mi >= 0 ? `<span class="chip gold">🏆 <b>${all[mi].w}</b> ${t('stWins')}</span><span class="chip">🎮 <b>${all[mi].g}</b> ${t('stGames')}</span><span class="chip">${t('stRank')} <b>#${mi + 1}</b></span>`
+    : `<span class="chip hint">${t('myStat0')}</span>`;
+  const nm = P.hasName() ? P.name() : ''; $('#avatar').textContent = nm ? nm[0].toUpperCase() : '?';
   $('#dbDot').className = dbState === 'on' ? 'on' : dbState === 'off' ? 'off' : '';
   $('#dbTxt').textContent = dbState === 'on' ? t('dbOn', { n: matches.length, games: P.gamesWord(matches.length) }) : dbState === 'off' ? t('dbOff') : t('dbLoad');
 }
@@ -432,14 +452,20 @@ function renderSnd() { $('#sndSeg').innerHTML = `<button class="btn" data-snd="1
 document.addEventListener('click', e => { const b = e.target.closest('[data-snd]'); if (b) { P.setSound(b.dataset.snd === '1'); renderSnd(); P.sfx('click'); } });
 $('#bSet').onclick = () => { P.unlockAudio(); P.sfx('click'); $('#settings').hidden = !$('#settings').hidden; };
 $('#bSetClose').onclick = () => { P.sfx('click'); $('#settings').hidden = true; };
-document.querySelectorAll('a.card').forEach(a => a.addEventListener('click', e => { P.unlockAudio(); if (!P.needName($('#inName'))) { e.preventDefault(); P.sfx('bad'); $('#inName').scrollIntoView({ block: 'center', behavior: 'smooth' }); return; } P.sfx('click'); }));
-// Chat général (même chat que dans le Quoridor)
+document.addEventListener('click', e => { const a = e.target.closest('a.card'); if (!a) return; P.unlockAudio(); if (!P.needName($('#inName'))) { e.preventDefault(); P.sfx('bad'); $('#inName').scrollIntoView({ block: 'center', behavior: 'smooth' }); return; } P.sfx('click'); });
+// barre d'onglets : aller à une section, et suivre la section visible
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { P.sfx('click'); document.getElementById(b.dataset.go).scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+if (window.IntersectionObserver) {
+  const io = new IntersectionObserver(es => { es.forEach(en => { if (en.isIntersecting) document.querySelectorAll('[data-go]').forEach(b => b.classList.toggle('on', b.dataset.go === en.target.id)); }); }, { rootMargin: '-35% 0px -55% 0px' });
+  ['s-games', 's-party', 's-lb', 's-chat'].forEach(id => io.observe(document.getElementById(id)));
+}
+// Chat général (même chat que dans les jeux)
 const gc = GChat.mount($('#gchat'), { db: P.DB_URL, lang: P.lang, name: () => P.hasName() ? P.name() : '', needName: () => { P.needName($('#inName')); $('#inName').scrollIntoView({ block: 'center', behavior: 'smooth' }); } });
 Party.mountPanel($('#party'));
 // Bouton volume (réglages communs : la musique de chaque jeu et les bruitages)
 P.audioDock({ on: () => P.musicVol() > 0.01, set: () => {}, vol: () => {} });
-P.onLang(() => { render(); renderSnd(); gc.refresh(); Party.refresh(); });
-P.applyStatic(); renderSnd(); render(); load();
+P.onLang(() => { renderGames(); render(); renderSnd(); gc.refresh(); Party.refresh(); });
+P.applyStatic(); renderGames(); renderSnd(); render(); load();
 })();
 </script>
 </body>
