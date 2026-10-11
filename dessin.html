@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-title="gn_dr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no,interactive-widget=resizes-content">
@@ -224,7 +224,7 @@ body.ingame #game .rc-form{padding-left:50px}
         <path d="M118 96l-4 12 12-7z" fill="#3ad0b0" stroke="#120c18" stroke-width="3.5" stroke-linejoin="round"/>
         <circle cx="16" cy="30" r="5" fill="#3ad0b0"/><circle cx="22" cy="92" r="4" fill="#ff6b5a"/><circle cx="150" cy="14" r="4" fill="#ffc93c"/>
       </svg>
-      <div class="logo-t"><span class="a">Dessine</span> <span class="b">&amp;</span><br><span class="c">Devine</span></div>
+      <div class="logo-t" data-i18n-html="logoH"><span class="a">Dessine</span> <span class="b">&amp;</span><br><span class="c">Devine</span></div>
       <div class="tagline" data-i18n="tagline">Dessine, devine, rigole !</div>
     </div>
     <div class="frame panel">
@@ -340,6 +340,7 @@ body.ingame #game .rc-form{padding-left:50px}
 <script>
 (() => {
 'use strict';
+P.addStrings({ fr: { logoH: '<span class="a">Dessine</span> <span class="b">&amp;</span><br><span class="c">Devine</span>' }, en: { logoH: '<span class="a">Draw</span> <span class="b">&amp;</span><br><span class="c">Guess</span>' }, cs: { logoH: '<span class="a">Kresli</span> <span class="b">a</span><br><span class="c">hádej</span>' } });
 const { $, esc, t } = P;
 /* Mots dessinables : on écarte les notions abstraites, marques et lieux difficiles à dessiner. */
 const SKIP = new Set(['Mensonge', 'Secret', 'Week-end', 'Vacances', 'Rêve', 'Cauchemar', 'Sel', 'Sucre', 'Instagram', 'TikTok', 'YouTube', 'Netflix', 'Prague', 'Vienne', 'Espagne', 'Italie', 'Londres', 'Paris', 'Université', 'Directeur', 'Avocat', 'Juge', 'Sorbet', 'Infirmier', 'Lentilles', 'Déodorant', 'Imperméable', 'Congélateur', 'Dames', 'Badminton', 'Colline', 'Magazine', 'Tablette', 'Métro', 'Marché', 'Palais', 'Mer', 'Lac', 'Rap', 'Rock', 'Boulanger', 'Pâtissier', 'Barbier', 'Serveur', 'Livreur', 'Professeur', 'Commissariat', 'Distributeur', 'Prince', 'Guêpe', 'Rat', 'Âne', 'Pégase', 'Moustique', 'Savane', 'Supermarché', 'Fast-food', 'Pharmacie', 'Hôpital', 'Festival', 'Chanteur', 'Mariage', 'Vin', 'Coca', 'Limonade', 'Jus de fruit', 'Cocktail', 'Peignoir', 'Jogging', 'Pull', 'Veste', 'Mouche', 'Week-end']);

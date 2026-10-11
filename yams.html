@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-title="gn_ym">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
@@ -246,7 +246,7 @@ body.ingame #chatBar{margin-left:52px;width:calc(100% - 52px)}
     </div>
     <div class="logo">
       <div class="dice" id="logoDice"></div>
-      <div class="logo-t">Yam's</div>
+      <div class="logo-t" data-i18n-html="logoH">Yam's</div>
       <div class="tagline" data-i18n="tagline">Lance, garde, et vise le Yam's !</div>
     </div>
     <div class="frame panel">
@@ -359,6 +359,7 @@ body.ingame #chatBar{margin-left:52px;width:calc(100% - 52px)}
 <script>
 (() => {
 'use strict';
+P.addStrings({ fr: { logoH: 'Yam’s' }, en: { logoH: 'Yahtzee' }, cs: { logoH: 'Yahtzee' } });
 const { $, esc, t } = P;
 const rnd = () => { try { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] / 4294967296; } catch (e) { return Math.random(); } };
 const d6 = () => 1 + Math.floor(rnd() * 6);

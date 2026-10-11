@@ -132,7 +132,7 @@ function hideInvite() { clearInterval(countT); if (inviteEl) { if (inviteEl._dim
 function showInvite(cur, key) {
   hideInvite();
   const el = inviteEl = document.createElement('div'); el.className = 'pty-inv'; el.dataset.key = key; el.setAttribute('role', 'alert');
-  el.innerHTML = `<div class="big">👥</div><div>${tr('launches', { n: esc(cur.n || '?'), g: esc(GAMES[cur.g][1]) })} <small class="cd"></small></div><div class="row"><button class="go">${tr('go')}</button><button class="no">${tr('later')}</button></div>`;
+  el.innerHTML = `<div class="big">👥</div><div>${tr('launches', { n: esc(cur.n || '?'), g: esc(window.P && P.t && P.t('gn_' + cur.g) !== 'gn_' + cur.g ? P.t('gn_' + cur.g) : GAMES[cur.g][1]) })} <small class="cd"></small></div><div class="row"><button class="go">${tr('go')}</button><button class="no">${tr('later')}</button></div>`;
   const dim = document.createElement('div'); dim.className = 'pty-dim'; el._dim = dim; document.body.appendChild(dim);
   document.body.appendChild(el);
   try { window.P && P.sfx && P.sfx('chat'); navigator.vibrate && navigator.vibrate([30, 60, 30]); } catch (e) {}

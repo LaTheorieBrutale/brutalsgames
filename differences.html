@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-title="gn_df">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
@@ -255,7 +255,7 @@ html[data-ui=night] .err{color:#ff8a8a}
         <circle cx="70" cy="70" r="24" fill="rgba(220,250,255,.35)" stroke="#0c0816" stroke-width="6"/><circle cx="70" cy="70" r="24" fill="none" stroke="#f3e7c9" stroke-width="2.5"/>
         <path d="M87 88l18 18" stroke="#0c0816" stroke-width="13" stroke-linecap="round"/><path d="M87 88l18 18" stroke="#a8643a" stroke-width="7" stroke-linecap="round"/>
       </svg>
-      <div class="logo-t">7 <span>Différences</span></div>
+      <div class="logo-t" data-i18n-html="logoH">7 <span>Différences</span></div>
       <div class="tag" data-i18n="tagline">Œil de lynx exigé !</div>
     </div>
     <div class="frame panel">
@@ -361,6 +361,7 @@ html[data-ui=night] .err{color:#ff8a8a}
 <script>
 (() => {
 'use strict';
+P.addStrings({ fr: { logoH: '7 <span>Différences</span>' }, en: { logoH: '7 <span>Differences</span>' }, cs: { logoH: '7 <span>rozdílů</span>' } });
 const { $, t, esc } = P;
 P.addStrings({
   fr: { games: 'Jeux', tagline: 'Œil de lynx exigé !', nick: 'Ton pseudo', difficulty: 'Difficulté', easy: 'Facile', normal: 'Normal', hard: 'Difficile', nDiff: '{n} différences', go: 'Go !', uiTheme: 'Thème', uiDay: 'Jour', uiNight: 'Nuit', vision: 'Vue', visN: 'Normale', visA: 'Adaptée', visSub: 'Objets plus gros, contours épais, différences très visibles (idéal pour une forte myopie).', lensTip: 'Reste appuyé pour la loupe 🔍', music: 'Musique', musOn: 'Activée', musOff: 'Coupée',

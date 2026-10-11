@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-title="gn_cn">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
@@ -211,7 +211,7 @@ body.ingame .action{padding-left:58px}
         <path d="M66 80l9 22 9-22z" fill="#ffcc4d" stroke="#0a0718" stroke-width="4" stroke-linejoin="round"/>
         <circle cx="22" cy="24" r="4" fill="#ffcc4d"/><circle cx="130" cy="18" r="3" fill="#fff"/><circle cx="134" cy="70" r="4" fill="#ff8a5a"/>
       </svg>
-      <div class="logo-t"><span class="r">Code</span><span class="b">names</span></div>
+      <div class="logo-t" data-i18n-html="logoH"><span class="r">Code</span><span class="b">names</span></div>
       <div class="tagline" data-i18n="tagline">Mission galactique : trouve ton équipage !</div>
     </div>
     <div class="frame panel">
@@ -318,6 +318,7 @@ body.ingame .action{padding-left:58px}
 <script>
 (() => {
 'use strict';
+P.addStrings({ fr: { logoH: '<span class="r">Code</span><span class="b">names</span>' }, en: { logoH: '<span class="r">Code</span><span class="b">names</span>' }, cs: { logoH: '<span class="r">Krycí</span> <span class="b">jména</span>' } });
 const { $, esc, t } = P;
 const WORDS = window.BG_WORDS || [];
 const LI = () => ({ fr: 0, en: 1, cs: 2 }[P.lang()] ?? 0);
