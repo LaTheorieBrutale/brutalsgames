@@ -285,6 +285,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
       <button class="btn wide gold" id="bAgain" data-i18n="again">Nouvelle mission</button>
       <p class="wait-txt" id="endWait"></p>
       <button class="btn" id="bMenu" data-i18n="lobby">Retour au salon</button>
+      <button class="btn" id="bHome" data-i18n="menuBack">Retour au menu</button>
     </div>
   </div>
 </section>
@@ -720,8 +721,9 @@ function sfxFor() {
 setInterval(sfxFor, 150);
 $('#bQuit').onclick = () => {
   P.sfx('click');
-  if (Date.now() - (window.__q || 0) > 2500) { window.__q = Date.now(); toast(t('quitQ') + ' ✕'); return; }
+  P.quitMenu($('#bQuit'), () => {
   leaveNet(); S = null; V = null; myKey = null; show('home');
+  });
 };
 
 /* ---------- Fin ---------- */
@@ -732,11 +734,12 @@ function renderEnd() {
   $('#endBoard').innerHTML = V.words.map((wi, i) => `<div class="card rev ${V.rkey[i]} ${(w => w > 10 ? 'l3' : w > 8 ? 'l2' : w > 6 ? 'l1' : '')(Math.max(...String(wordOf(wi)).split(/\s+/).map(x => x.length)))}">${ICONS[V.rkey[i]]}<span>${esc(wordOf(wi))}</span></div>`).join('');
   $('#endCrew').innerHTML = V.players.map((p, i) => `<div class="pl ${p.team}${i === net.me ? ' me' : ''}">${avatar(i, p.team)}<span>${esc(p.n)}</span>${p.team === V.winner ? '<span class="cap">🏆</span>' : ''}</div>`).join('');
   const guest = net.role !== 'host';
-  $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : '';
+  $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : ''; $('#bMenu').hidden = !net.relay;
   if (lastSfx !== 'end' + V.log.length) { lastSfx = 'end' + V.log.length; P.sfx(won ? 'win' : 'lose'); if (won) P.confetti($('#confetti')); }
   if (V.last && V.last.k === 'a') toast(t('assassinHit', { team: teamName(other(V.winner)) }), true);
 }
 $('#bAgain').onclick = () => { P.sfx('click'); P.stopConfetti(); if (net.role === 'host') $('#bStart').click(); };
+$('#bHome').onclick = () => { P.sfx('click'); P.stopConfetti(); clearTimeout(window.__endT); leaveNet(); S = null; V = null; myKey = null; show('home'); };
 $('#bMenu').onclick = () => {
   P.sfx('click'); P.stopConfetti();
   if (net.relay) { S = null; V = null; myKey = null; show('online'); $('#onForm').hidden = true; $('#onWait').hidden = false; if (net.role === 'host') { net.roster = net.roster.filter(r => !r.gone); broadcastLobby(); } else renderLobby(); return; }

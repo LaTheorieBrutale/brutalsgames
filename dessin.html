@@ -312,6 +312,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
       <button class="btn wide gold" id="bAgain" data-i18n="again">Rejouer</button>
       <p class="wait-txt" id="endWait"></p>
       <button class="btn" id="bMenu" data-i18n="lobby">Retour au salon</button>
+      <button class="btn" id="bHome" data-i18n="menuBack">Retour au menu</button>
     </div>
   </div>
 </section>
@@ -920,8 +921,9 @@ function tickTimer() {
 setInterval(tickTimer, 200);
 $('#bQuit').onclick = () => {
   P.sfx('click');
-  if (Date.now() - (window.__q || 0) > 2500) { window.__q = Date.now(); toast(t('quitQ') + ' ✕'); return; }
+  P.quitMenu($('#bQuit'), () => {
   leaveNet(); G = null; V = null; show('home');
+  });
 };
 
 /* ---------- Podium ---------- */
@@ -935,11 +937,12 @@ function renderEnd() {
   $('#podium').innerHTML = st(L[1], 'p2') + st(L[0], 'p1') + st(L[2], 'p3');
   $('#ranks').innerHTML = L.slice(3).map((o, k) => `<div class="pl">#${k + 4} ${avatar(o.i)}<span>${esc(o.p.n)}</span><b>${o.p.sc}</b></div>`).join('');
   const guest = net.role !== 'host';
-  $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : '';
+  $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : ''; $('#bMenu').hidden = !net.relay;
   const k = net.gameNo + ':' + net.sess;
   if (endKey !== k) { endKey = k; const won = winners.some(o => o.i === net.me); P.sfx(won ? 'win' : 'lose'); if (won) P.confetti($('#confetti')); }
 }
 $('#bAgain').onclick = () => { P.sfx('click'); P.stopConfetti(); if (net.role === 'host') $('#bStart').click(); };
+$('#bHome').onclick = () => { P.sfx('click'); P.stopConfetti(); clearTimeout(window.__endT); leaveNet(); G = null; V = null; show('home'); };
 $('#bMenu').onclick = () => {
   P.sfx('click'); P.stopConfetti();
   if (net.relay) { G = null; V = null; show('online'); $('#onForm').hidden = true; $('#onWait').hidden = false; if (net.role === 'host') { net.roster = net.roster.filter(r => !r.gone); broadcastLobby(); } else renderLobby(); return; }

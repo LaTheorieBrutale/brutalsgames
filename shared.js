@@ -406,19 +406,19 @@ P.quitMenu = (btn, onQuit) => {
   const old = document.getElementById('bgQuitMenu'); if (old) { old.remove(); return; }
   if (!document.getElementById('bgQuitCss')) {
     const st = document.createElement('style'); st.id = 'bgQuitCss';
-    st.textContent = '#bgQuitMenu{position:fixed;z-index:60;min-width:210px;padding:8px;border-radius:16px;background:rgba(14,12,22,.97);border:3px solid #000;box-shadow:0 10px 26px rgba(0,0,0,.55),inset 0 0 0 1.5px rgba(255,255,255,.12);font-family:inherit;color:#fff;animation:bgqm .16s ease-out;transform-origin:top left}'
+    st.textContent = '#bgQuitMenu{position:fixed;z-index:60;min-width:240px;padding:8px;border-radius:16px;background:rgba(14,12,22,.97);border:3px solid #000;box-shadow:0 10px 26px rgba(0,0,0,.55),inset 0 0 0 1.5px rgba(255,255,255,.12);font-family:inherit;color:#fff;animation:bgqm .16s ease-out;transform-origin:top left}'
       + '@keyframes bgqm{from{opacity:0;transform:translateY(-6px) scale(.96)}}'
       + '#bgQuitMenu button{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:9px;width:100%;padding:11px 13px;border-radius:11px;font-weight:900;font-size:15.5px;cursor:pointer;color:#fff}'
       + '#bgQuitMenu button:hover{background:rgba(255,255,255,.09)}'
       + '#bgQuitMenu .q{color:#ff8a7a}#bgQuitMenu .sure{padding:6px 12px 8px;font-size:14.5px;font-weight:800;opacity:.9}'
-      + '#bgQuitMenu .row{display:flex;gap:6px}#bgQuitMenu .row button{justify-content:center;flex:1;padding:10px 8px}'
+      + '#bgQuitMenu .row{display:flex;gap:6px}#bgQuitMenu .row button{justify-content:center;flex:1;padding:10px 8px;white-space:nowrap}'
       + '#bgQuitMenu .yes{background:linear-gradient(180deg,#ff6a5a,#c0281e);box-shadow:inset 0 0 0 2px rgba(0,0,0,.35)}#bgQuitMenu .yes:hover{filter:brightness(1.1);background:linear-gradient(180deg,#ff6a5a,#c0281e)}'
       + '#bgQuitMenu .no{background:rgba(255,255,255,.1)}';
     document.head.appendChild(st);
   }
   const m = document.createElement('div'); m.id = 'bgQuitMenu'; m.setAttribute('role', 'menu');
   const r = btn.getBoundingClientRect();
-  m.style.left = Math.max(8, Math.min(r.left, innerWidth - 230)) + 'px'; m.style.top = (r.bottom + 8) + 'px';
+  m.style.left = Math.max(8, Math.min(r.left, innerWidth - 252)) + 'px'; m.style.top = (r.bottom + 8) + 'px';
   const close = () => { m.remove(); document.removeEventListener('pointerdown', outside, true); };
   const outside = e => { if (!m.contains(e.target) && !btn.contains(e.target)) close(); };
   const step1 = () => { m.innerHTML = `<button class="q" data-q="1"><span style="font-size:17px">🚪</span>${P.t('quitGame')}</button>`; };

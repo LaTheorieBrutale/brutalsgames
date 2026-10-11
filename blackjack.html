@@ -338,6 +338,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
       <button class="btn wide gold" id="bAgain" data-i18n="again">Nouvelle partie</button>
       <p class="wait-txt" id="endWait"></p>
       <button class="btn" id="bMenu" data-i18n="lobby">Retour au salon</button>
+      <button class="btn" id="bHome" data-i18n="menuBack">Retour au menu</button>
     </div>
   </div>
 </section>
@@ -966,9 +967,10 @@ $('#bPay').onclick = () => { P.sfx('click'); renderPay(); $('#payS').hidden = !$
 $('#bPayClose').onclick = () => { P.sfx('click'); $('#payS').hidden = true; };
 $('#bQuit').onclick = () => {
   P.sfx('click');
-  if (Date.now() - (window.__q || 0) > 2500) { window.__q = Date.now(); toast(t('quitQ') + ' ✕'); return; }
+  P.quitMenu($('#bQuit'), () => {
   if (net.solo) { const n = V ? (V.seats[0] || {}).chips : 0; toast(t('soloEnd', { n })); }
   leaveNet(); S = null; V = null; show('home');
+  });
 };
 
 /* ---------- Fin ---------- */
@@ -981,11 +983,12 @@ function renderEnd() {
   $('#endTitle').textContent = net.solo ? t('soloEnd', { n: top }) : win.length > 1 ? t('tie') : t('winner', { name: win[0] ? win[0].s.n : '?', n: top });
   $('#ranks').innerHTML = L.map((o, k) => `<div class="pl">${k < 3 ? ['🥇', '🥈', '🥉'][k] : '#' + (k + 1)} ${avatar(o.i)}<span>${esc(o.s.n)}${o.s.rb ? ` <small style="color:var(--muted)">(${o.s.rb} ${t('rebuys')})</small>` : ''}</span><b>💰 ${sc(o.s)}</b></div>`).join('');
   const guest = net.role !== 'host';
-  $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : ''; $('#bMenu').hidden = net.solo;
+  $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : ''; $('#bMenu').hidden = !net.relay;
   const k = net.gameNo + ':' + net.sess;
   if (endKey !== k) { endKey = k; const won = win.some(o => o.i === net.me) && !net.solo; P.sfx(won ? 'win' : 'lose'); if (won) P.confetti($('#confetti')); }
 }
 $('#bAgain').onclick = () => { P.sfx('click'); P.stopConfetti(); if (net.solo) { show('game'); net.gameNo++; newGame(); } else if (net.role === 'host') $('#bStart').click(); };
+$('#bHome').onclick = () => { P.sfx('click'); P.stopConfetti(); clearTimeout(window.__endT); leaveNet(); S = null; V = null; show('home'); };
 $('#bMenu').onclick = () => {
   P.sfx('click'); P.stopConfetti();
   if (net.relay) { S = null; V = null; show('online'); $('#onForm').hidden = true; $('#onWait').hidden = false; if (net.role === 'host') { net.roster = net.roster.filter(r => !r.gone); broadcastLobby(); } else renderLobby(); return; }

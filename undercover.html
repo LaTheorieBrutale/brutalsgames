@@ -309,6 +309,7 @@ html[data-ui=day] .rules b{color:#b5521b}
       <button class="btn wide yellow" id="bAgain" data-i18n="again">Nouvelle mission</button>
       <p class="wait-txt" id="endWait"></p>
       <button class="btn" id="bMenu" data-i18n="menu">Menu</button>
+      <button class="btn" id="bHome" data-i18n="menuBack">Retour au menu</button>
     </div>
   </div>
 </section>
@@ -1348,11 +1349,8 @@ document.addEventListener('click', e => {
 })();
 $('#bQuit').onclick = () => {
   P.sfx('click');
-  if (!confirmQuit()) return;
-  leaveNet(); S = null; V = null; myCard = null; closeOv(); show('home');
+  P.quitMenu($('#bQuit'), () => { leaveNet(); S = null; V = null; myCard = null; closeOv(); show('home'); });
 };
-let quitArm = 0;
-function confirmQuit() { if (Date.now() - quitArm < 2500) return true; quitArm = Date.now(); toast(t('quitQ') + ' ✕'); return false; }
 
 /* ---------- Fin de mission ---------- */
 function renderEnd() {
@@ -1364,7 +1362,7 @@ function renderEnd() {
   $('#endWords').innerHTML = `<div><small>${t('civWord')}</small><b>${esc(wordOf(wd.pair, wd.civ))}</b></div><div><small>${t('ucWord')}</small><b>${esc(wordOf(wd.pair, 1 - wd.civ))}</b></div>`;
   $('#endList').innerHTML = V.players.map((p, i) => `<div class="prow ${w.includes(i) ? 'win' : 'dead'}" style="${w.includes(i) ? '' : 'filter:none;opacity:.75'}">${avatar(i)}<span class="nm">${esc(p.n)}</span>${i === me ? `<span class="me">(${t('you')})</span>` : ''}<span class="cl">${p.c.map((c, r) => c ? `<span>${trHtml(c, (p.cl || [])[r], i === me)}</span>` : '').join('')}</span><span class="role ${p.r}">${t(p.r)}</span>${w.includes(i) ? '<span class="crown">👑</span>' : ''}</div>`).join('');
   const guest = V.mode === 'online' && net.role !== 'host';
-  $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : '';
+  $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : ''; $('#bMenu').hidden = !net.relay;
   if (lastSfxKey !== 'end' + V.round) { lastSfxKey = 'end' + V.round; P.sfx(won ? 'win' : 'lose'); if (won) P.confetti($('#confetti')); }
 }
 $('#bAgain').onclick = () => {
@@ -1372,6 +1370,7 @@ $('#bAgain').onclick = () => {
   if (V && V.mode === 'local') { $('#loStart').click(); return; }
   if (net.role === 'host') hostStart();
 };
+$('#bHome').onclick = () => { P.sfx('click'); P.stopConfetti(); clearTimeout(window.__endT); leaveNet(); S = null; V = null; myCard = null; closeOv(); show('home'); };
 $('#bMenu').onclick = () => {
   P.sfx('click'); P.stopConfetti();
   const host = net.role === 'host';

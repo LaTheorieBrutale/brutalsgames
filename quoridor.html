@@ -424,6 +424,7 @@ html.overlay #top *,html.overlay #bottom *{pointer-events:none!important}
     <div class="card" id="cardOp">
       <div id="opps"></div>
       <div class="tools">
+        <button class="btn icon sm" id="bQuitQ" hidden data-i18n-aria="quitGame" aria-label="Quitter la partie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
         <span id="qdDock" style="display:inline-flex"></span>
         <button class="btn icon sm mobile-only" id="bChat" data-i18n-aria="chat" aria-label="Chat" hidden>
           <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z" fill="currentColor" stroke="#0c0816" stroke-width="2" stroke-linejoin="round"/><circle cx="9" cy="10.5" r="1.3" fill="#0c0816"/><circle cx="12.5" cy="10.5" r="1.3" fill="#0c0816"/><circle cx="16" cy="10.5" r="1.3" fill="#0c0816"/></svg>
@@ -658,7 +659,7 @@ const I18N = {
     nick: 'Ton pseudo', pickChar: 'Ton personnage', pickTitle: 'Choisis ton personnage', pickN: 'Joueur {n}', pickPlayer: '{name}, choisis ton personnage', pickWait: 'En attente des autres joueurs…', pickTaken: 'Déjà pris', pickYou: 'toi', defName: 'Crâneur', namePh: 'Écris ton pseudo…', nameReq: 'Entre ton pseudo pour jouer !', nameTaken: 'Choisis un vrai pseudo !', host: 'Créer une partie en ligne', orJoin: 'ou rejoindre un ami', codePh: 'CODE', join: 'Rejoindre',
     orDevice: 'ou sur cet appareil', nPlayers: 'Nombre de joueurs', p2: '2 joueurs', p4: '4 joueurs', vsAI: 'Contre l’IA', local: 'Même écran',
     theme: 'Thème', language: 'Langue', seeLb: 'Voir le classement', gameCode: 'Code de la partie', copyCode: 'Copier le code', copied: 'Copié !',
-    players: 'Joueurs', start2: 'Lancer à 2', start4: 'Lancer à 4', leave: 'Quitter', won: 'Vous avez gagné', lost: 'Game Over',
+    players: 'Joueurs', start2: 'Lancer à 2', start4: 'Lancer à 4', leave: 'Quitter', quitGame: 'Quitter la partie', quitSure: 'Es-tu sûr de vouloir quitter ?', quitYes: 'Oui, quitter', quitNo: 'Non', won: 'Vous avez gagné', lost: 'Game Over',
     again: 'Rejouer', menu: 'Menu', rotatePhone: 'Tourne ton téléphone<br>en mode portrait',
     localWins: '{name} gagne', rematch: 'Bien joué ! Une revanche ?', win2: 'Tu as traversé le donjon. {name} boude dans son coin.',
     win4: 'Tu as traversé le donjon avant tout le monde.', lose: '{name} a atteint son but avant toi.', hostRestarts: 'L’hôte relance…',
@@ -717,7 +718,7 @@ const I18N = {
     nick: 'Your nickname', pickChar: 'Your character', pickTitle: 'Choose your character', pickN: 'Player {n}', pickPlayer: '{name}, choose your character', pickWait: 'Waiting for the other players…', pickTaken: 'Taken', pickYou: 'you', defName: 'Skully', namePh: 'Type your nickname…', nameReq: 'Enter your nickname to play!', nameTaken: 'Pick a real nickname!', host: 'Create an online game', orJoin: 'or join a friend', codePh: 'CODE', join: 'Join',
     orDevice: 'or on this device', nPlayers: 'Number of players', p2: '2 players', p4: '4 players', vsAI: 'Vs AI', local: 'Same screen',
     theme: 'Theme', language: 'Language', seeLb: 'View leaderboard', gameCode: 'Game code', copyCode: 'Copy code', copied: 'Copied!',
-    players: 'Players', start2: 'Start with 2', start4: 'Start with 4', leave: 'Leave', won: 'You won', lost: 'Game Over',
+    players: 'Players', start2: 'Start with 2', start4: 'Start with 4', leave: 'Leave', quitGame: 'Leave the game', quitSure: 'Are you sure you want to leave?', quitYes: 'Yes, leave', quitNo: 'No', won: 'You won', lost: 'Game Over',
     again: 'Play again', menu: 'Menu', rotatePhone: 'Turn your phone<br>to portrait mode',
     localWins: '{name} wins', rematch: 'Well played! Rematch?', win2: 'You crossed the dungeon. {name} is sulking in the corner.',
     win4: 'You crossed the dungeon before everyone else.', lose: '{name} reached their goal before you.', hostRestarts: 'The host is restarting…',
@@ -776,7 +777,7 @@ const I18N = {
     nick: 'Tvoje přezdívka', pickChar: 'Tvoje postava', pickTitle: 'Vyber si postavu', pickN: 'Hráč {n}', pickPlayer: '{name}, vyber si postavu', pickWait: 'Čekám na ostatní hráče…', pickTaken: 'Obsazeno', pickYou: 'ty', defName: 'Lebkoun', namePh: 'Napiš svou přezdívku…', nameReq: 'Pro hraní zadej přezdívku!', nameTaken: 'Vyber si skutečnou přezdívku!', host: 'Vytvořit online hru', orJoin: 'nebo se připoj ke kamarádovi', codePh: 'KÓD', join: 'Připojit',
     orDevice: 'nebo na tomto zařízení', nPlayers: 'Počet hráčů', p2: '2 hráči', p4: '4 hráči', vsAI: 'Proti AI', local: 'Jedna obrazovka',
     theme: 'Motiv', language: 'Jazyk', seeLb: 'Zobrazit žebříček', gameCode: 'Kód hry', copyCode: 'Kopírovat kód', copied: 'Zkopírováno!',
-    players: 'Hráči', start2: 'Spustit ve 2', start4: 'Spustit ve 4', leave: 'Odejít', won: 'Vyhrál jsi', lost: 'Konec hry',
+    players: 'Hráči', start2: 'Spustit ve 2', start4: 'Spustit ve 4', leave: 'Odejít', quitGame: 'Opustit hru', quitSure: 'Opravdu chceš odejít?', quitYes: 'Ano, odejít', quitNo: 'Ne', won: 'Vyhrál jsi', lost: 'Konec hry',
     again: 'Hrát znovu', menu: 'Menu', rotatePhone: 'Otoč telefon<br>na výšku',
     localWins: '{name} vyhrává', rematch: 'Dobrá hra! Odveta?', win2: 'Prošel jsi kobkou. {name} trucuje v koutě.',
     win4: 'Prošel jsi kobkou dřív než všichni ostatní.', lose: '{name} dorazil do cíle dřív než ty.', hostRestarts: 'Hostitel spouští novou hru…',
@@ -2359,7 +2360,7 @@ function beginGame(n, nm, bt, seat, lk) {
   reset(n);
   $('#startScreen').hidden = true; $('#endScreen').hidden = true; $('#themeMenu').hidden = true;
   TUT.easy = false; if (TUT.on) endTutorial(false); stopConfetti();
-  started = true; duckMusic(0.3); ui(); resize(); chatLayout(); refreshTags();
+  started = true; $('#bQuitQ').hidden = false; duckMusic(0.3); ui(); resize(); chatLayout(); refreshTags();
   if (window.BGDock) BGDock.slot($('#qdDock'), true);
   maybeAI();
 }
@@ -2375,7 +2376,7 @@ function backToMenu(msg) {
   hidePick(); if (typeof HP !== 'undefined' && HP) { clearTimeout(HP.t); HP = null; }
   nameTags.forEach(t => { t.visible = false; }); goalFlags.forEach(f => { f.visible = false; });
   if (window.BGDock) BGDock.slot(null);
-  closeNet(); started = false; gid++; busy = false;
+  closeNet(); started = false; gid++; busy = false; $('#bQuitQ').hidden = true;
   if (TUT.on) endTutorial(false); TUT.easy = false; stopConfetti();
   if (wasPlaying) showView('home');
   $('#endScreen').hidden = true; $('#lobbyWait').hidden = true; $('#lobbyForm').hidden = false;
@@ -2833,6 +2834,36 @@ $('#bAgain').addEventListener('click', () => {
   beginGame(S.n, names, bots, 0);
 });
 $('#bMenu').addEventListener('click', () => { SFX.wood(); backToMenu(''); });
+// Menu « Quitter la partie » : menu déroulant puis confirmation
+function quitMenu(btn, onQuit) {
+  const old = document.getElementById('bgQuitMenu'); if (old) { old.remove(); return; }
+  if (!document.getElementById('bgQuitCss')) {
+    const st = document.createElement('style'); st.id = 'bgQuitCss';
+    st.textContent = '#bgQuitMenu{position:fixed;z-index:60;min-width:240px;padding:8px;border-radius:16px;background:rgba(14,12,22,.97);border:3px solid #000;box-shadow:0 10px 26px rgba(0,0,0,.55),inset 0 0 0 1.5px rgba(255,255,255,.12);font-family:inherit;color:#fff;animation:bgqm .16s ease-out;transform-origin:top left}'
+      + '@keyframes bgqm{from{opacity:0;transform:translateY(-6px) scale(.96)}}'
+      + '#bgQuitMenu button{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:9px;width:100%;padding:11px 13px;border-radius:11px;font-weight:900;font-size:15.5px;cursor:pointer;color:#fff}'
+      + '#bgQuitMenu button:hover{background:rgba(255,255,255,.09)}'
+      + '#bgQuitMenu .q{color:#ff8a7a}#bgQuitMenu .sure{padding:6px 12px 8px;font-size:14.5px;font-weight:800;opacity:.9}'
+      + '#bgQuitMenu .row{display:flex;gap:6px}#bgQuitMenu .row button{justify-content:center;flex:1;padding:10px 8px;white-space:nowrap}'
+      + '#bgQuitMenu .yes{background:linear-gradient(180deg,#ff6a5a,#c0281e);box-shadow:inset 0 0 0 2px rgba(0,0,0,.35)}#bgQuitMenu .yes:hover{filter:brightness(1.1);background:linear-gradient(180deg,#ff6a5a,#c0281e)}'
+      + '#bgQuitMenu .no{background:rgba(255,255,255,.1)}';
+    document.head.appendChild(st);
+  }
+  const m = document.createElement('div'); m.id = 'bgQuitMenu'; m.setAttribute('role', 'menu');
+  const r = btn.getBoundingClientRect();
+  m.style.left = Math.max(8, Math.min(r.left, innerWidth - 252)) + 'px'; m.style.top = (r.bottom + 8) + 'px';
+  const close = () => { m.remove(); document.removeEventListener('pointerdown', outside, true); };
+  const outside = e => { if (!m.contains(e.target) && !btn.contains(e.target)) close(); };
+  const step1 = () => { m.innerHTML = `<button class="q" data-q="1"><span style="font-size:17px">🚪</span>${tr('quitGame')}</button>`; };
+  const step2 = () => { m.innerHTML = `<div class="sure">${tr('quitSure')}</div><div class="row"><button class="no" data-q="no">${tr('quitNo')}</button><button class="yes" data-q="yes">${tr('quitYes')}</button></div>`; };
+  m.addEventListener('click', e => {
+    const b = e.target.closest('[data-q]'); if (!b) return; e.stopPropagation(); SFX.wood();
+    if (b.dataset.q === '1') step2(); else if (b.dataset.q === 'no') close(); else { close(); onQuit(); }
+  });
+  step1(); document.body.appendChild(m);
+  setTimeout(() => document.addEventListener('pointerdown', outside, true), 0);
+}
+$('#bQuitQ').addEventListener('click', () => { SFX.wood(); quitMenu($('#bQuitQ'), () => backToMenu('')); });
 
 /* =========================================================
    CLASSEMENT : historique local, fusionné avec les autres joueurs à chaque partie en ligne

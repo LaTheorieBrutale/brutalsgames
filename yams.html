@@ -323,6 +323,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
       <button class="btn wide gold" id="bAgain" data-i18n="again">Rejouer</button>
       <p class="wait-txt" id="endWait"></p>
       <button class="btn" id="bMenu" data-i18n="lobby">Retour au salon</button>
+      <button class="btn" id="bHome" data-i18n="menuBack">Retour au menu</button>
     </div>
   </div>
 </section>
@@ -944,8 +945,9 @@ document.addEventListener('keydown', e => {
 });
 $('#bQuit').onclick = () => {
   P.sfx('click');
-  if (Date.now() - (window.__q || 0) > 2500) { window.__q = Date.now(); toast(t('quitQ') + ' ✕'); return; }
+  P.quitMenu($('#bQuit'), () => {
   leaveNet(); S = null; V = null; show('home'); renderSoloSub();
+  });
 };
 
 /* ---------- Fin ---------- */
@@ -957,11 +959,12 @@ function renderEnd() {
   $('#endTitle').textContent = net.solo ? t('soloEnd', { n: top }) + (V.newRecord ? ' ' + t('newRecord') : '') : win.length > 1 ? t('tie') : t('winner', { name: win[0] ? win[0].s.n : '?', n: top });
   $('#ranks').innerHTML = L.map((o, k) => `<div class="pl">${k < 3 ? ['🥇', '🥈', '🥉'][k] : '#' + (k + 1)} ${dieSVG(6, o.s.skin)}<span>${esc(o.s.n)}</span><b>${o.tot}</b></div>`).join('');
   const guest = net.role !== 'host';
-  $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : ''; $('#bMenu').hidden = net.solo;
+  $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : ''; $('#bMenu').hidden = !net.relay;
   const k = net.gameNo + ':' + net.sess;
   if (endKey !== k) { endKey = k; const won = (win.some(o => o.i === net.me) && !net.solo) || V.newRecord; P.sfx(won ? 'win' : 'lose'); if (won) P.confetti($('#confetti')); }
 }
 $('#bAgain').onclick = () => { P.sfx('click'); P.stopConfetti(); if (net.solo) { net.gameNo++; show('game'); net.roster[0].skin = mySkin; newGame(); } else if (net.role === 'host') $('#bStart').click(); };
+$('#bHome').onclick = () => { P.sfx('click'); P.stopConfetti(); clearTimeout(window.__endT); leaveNet(); S = null; V = null; show('home'); renderSoloSub(); };
 $('#bMenu').onclick = () => {
   P.sfx('click'); P.stopConfetti();
   if (net.relay) { S = null; V = null; show('online'); $('#onForm').hidden = true; $('#onWait').hidden = false; if (net.role === 'host') { net.roster = net.roster.filter(r => !r.gone); broadcastLobby(); } else renderLobby(); return; }

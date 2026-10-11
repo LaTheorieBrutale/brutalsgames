@@ -822,7 +822,7 @@ $('#bNext').onclick = () => {
   startGame(Scenes.seedAfter(G.seed), G.level, G.names, G.bots, 0, G.mode, vis);
 };
 $('#bMenu').onclick = () => { P.sfx('click'); leaveNet(); P.stopConfetti(); show('home'); renderLvl(); };
-$('#bQuit').onclick = () => { P.sfx('click'); clearTimeout(G.botT); clearTimeout(G.cdT); clearInterval(G.cdI); $('#count').hidden = true; $('#board').classList.remove('veil'); G.over = true; leaveNet(); show('home'); renderLvl(); };
+$('#bQuit').onclick = () => { P.sfx('click'); P.quitMenu($('#bQuit'), () => { clearTimeout(G.botT); clearTimeout(G.cdT); clearInterval(G.cdI); $('#count').hidden = true; $('#board').classList.remove('veil'); G.over = true; leaveNet(); show('home'); renderLvl(); }); };
 
 /* ---------- Modes locaux ---------- */
 $('#mSolo').onclick = () => { P.unlockAudio(); if (!nameOk()) return; P.sfx('click'); startGame(Scenes.seedAfter(lastSeed), level, [myName()], [false], 0, 'solo'); };

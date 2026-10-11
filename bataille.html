@@ -305,6 +305,7 @@ label,.lbl{font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:
       <button class="btn wide gold" id="bAgain" data-i18n="again">Rejouer</button>
       <p class="wait-txt" id="endWait"></p>
       <button class="btn" id="bMenu" data-i18n="lobby">Retour au salon</button>
+      <button class="btn" id="bHome" data-i18n="menuBack">Retour au menu</button>
     </div>
   </div>
 </section>
@@ -1464,11 +1465,12 @@ function renderEnd() {
     + (V.quit ? `<p class="wait-txt">${esc(t('oppQuit', { name: (V.pl[1 - me] || {}).n || '?' }))}</p>` : '');
   const guest = net.role !== 'host';
   $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : '';
-  $('#bMenu').textContent = net.solo || !net.relay ? t('menuBack') : t('lobby');
+  $('#bMenu').hidden = !net.relay;
   const k = net.gameNo + ':' + net.sess + ':' + V.gid;
   if (endKey !== k) { endKey = k; if (iWon) { sVictory(); P.confetti($('#confetti')); } else sDefeat(); }
 }
 $('#bAgain').onclick = () => { sCoin(); P.stopConfetti(); if (net.solo) { net.gameNo++; resetPlace(); show('game'); newGame(); } else if (net.role === 'host') { if (net.roster.filter(r => !r.gone).length < 2) { $('#bMenu').click(); return; } $('#bStart').click(); } };
+$('#bHome').onclick = () => { P.sfx('click'); P.stopConfetti(); clearTimeout(window.__endT); leaveNet(); S = null; V = null; show('home'); };
 $('#bMenu').onclick = () => {
   sCoin(); P.stopConfetti();
   if (net.relay) { S = null; V = null; show('online'); $('#onForm').hidden = true; $('#onWait').hidden = false; if (net.role === 'host') { net.roster = net.roster.filter(r => !r.gone); broadcastLobby(); } else renderLobby(); return; }
