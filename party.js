@@ -297,6 +297,7 @@ startNet();
     refresh,
     slot(target, right) {
       if (!el) return;
+      target = null; // le bouton du volume reste toujours en bas à gauche de l'écran, même en partie
       if (target) { el.classList.add('in-slot'); el.classList.toggle('right', !!right); target.appendChild(el); }
       else { el.classList.remove('in-slot', 'right'); document.body.appendChild(el); }
       el.querySelector('.bg-dock-pop').hidden = true;
