@@ -338,9 +338,10 @@ body.ingame .action{padding-left:58px}
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="shared.js?v=20261011d"></script>
-<script src="chat.js?v=20261011d"></script>
-<script src="party.js?v=20261011d" data-game="uc"></script>
+<script src="shared.js?v=20261011e"></script>
+<script src="skins.js?v=20261011e"></script>
+<script src="chat.js?v=20261011e"></script>
+<script src="party.js?v=20261011e" data-game="uc"></script>
 <script>
 (() => {
 'use strict';
@@ -830,7 +831,9 @@ P.addStrings({
 /* ---------- Avatars d'agents (10 looks différents) ---------- */
 const COLORS = ['#e5484d', '#3fc1b0', '#ffcc4d', '#9c7bff', '#ff8a3d', '#4aa3ff', '#7ed957', '#ff6fb5', '#c0c7e8', '#b07a4f'];
 const SKIN = ['#f3c9a0', '#d9a273', '#f7d7b5', '#a8693f', '#e8b48a', '#8a5a3a', '#f0c49a', '#c98b5e', '#f5d2ae', '#b97a4c'];
-function avatar(seat, cls = 'av') {
+// Skin perso du joueur (choisi sur l'accueil) à la place de l'agent, s'il en a un
+const avatar = (seat, cls = 'av', name) => P.skinOr(name, avatarGame(seat, cls));
+function avatarGame(seat, cls = 'av') {
   const c = COLORS[seat % 10], sk = SKIN[seat % 10], k = seat % 10, I = '#0b0e1c';
   const hats = [
     `<path d="M14 25h36l-3-4H17z" fill="${I}"/><path d="M19 22c0-9 4-13 13-13s13 4 13 13z" fill="#2b2f45" stroke="${I}" stroke-width="3"/><path d="M19 19h26" stroke="${c}" stroke-width="4"/><path d="M11 25.5h42" stroke="${I}" stroke-width="4" stroke-linecap="round"/>`,
@@ -1117,7 +1120,7 @@ $('#bLeave').onclick = () => { P.sfx('click'); leaveNet(); $('#onForm').hidden =
 function backToForm(msg) { leaveNet(); S = null; V = null; show('online'); $('#onForm').hidden = false; $('#onWait').hidden = true; $('#onErr').textContent = msg || ''; closeOv(); }
 function renderRoster() {
   const host = net.role === 'host', names = host ? net.roster.map(r => r.name) : net.names;
-  $('#roster').innerHTML = names.map((n, i) => `<div>${avatar(i)}<span>${esc(n)}</span></div>`).join('');
+  $('#roster').innerHTML = names.map((n, i) => `<div>${avatar(i, 'av', n)}<span>${esc(n)}</span></div>`).join('');
   $('#rosterN').textContent = `(${names.length}/${MAXP})`;
   if (host) net.me = 0;
   $('#codeBox').hidden = !host; $('#hostOpts').hidden = !host; $('#bStart').hidden = !host;
@@ -1213,7 +1216,7 @@ $('#mLocal').onclick = () => {
 };
 $('#loBack').onclick = () => { P.sfx('click'); show('home'); };
 function renderLocal() {
-  $('#loRoster').innerHTML = LO.names.map((n, i) => `<div>${avatar(i)}<span>${esc(n)}</span><button class="x" data-rm="${i}" aria-label="×">✕</button></div>`).join('');
+  $('#loRoster').innerHTML = LO.names.map((n, i) => `<div>${avatar(i, 'av', n)}<span>${esc(n)}</span><button class="x" data-rm="${i}" aria-label="×">✕</button></div>`).join('');
   $('#loN').textContent = `(${LO.names.length}/${MAXP})`; $('#loStart').disabled = LO.names.length < MINP;
   P.set('uc-local', JSON.stringify(LO.names));
 }
@@ -1235,7 +1238,7 @@ $('#loStart').onclick = () => {
 // Distribution des mots : chacun son tour, à l'abri des regards
 function openPass() {
   const s = LO.reveal, p = S.players[s];
-  showOv(`${avatar(s, 'spy')}<div class="pass">${t('passTo')}<b>${esc(p.name)}</b></div><button class="btn wide yellow" id="ovGo">${t('itsMe')}</button>`, false);
+  showOv(`${avatar(s, 'spy', p.name)}<div class="pass">${t('passTo')}<b>${esc(p.name)}</b></div><button class="btn wide yellow" id="ovGo">${t('itsMe')}</button>`, false);
   $('#ovGo').onclick = () => { P.sfx('click'); myCard = cardOf(s); openCard(false, () => { LO.reveal++; if (LO.reveal < S.players.length) openPass(); else { closeOv(); startRound(); } }); };
 }
 
@@ -1291,7 +1294,7 @@ function render() {
     const cls = ['prow', p.a ? '' : 'dead', V.phase === 'clue' && i === cur ? 'turn' : '', pickable ? 'pick' : '', (local ? localPick : myVoteFor) === i ? 'sel' : ''].join(' ');
     const clues = p.c.map((c, r) => c ? `<span class="${r === V.round - 1 ? 'now' : ''}">${trHtml(c, (p.cl || [])[r], i === me)}</span>` : '').join('');
     const tags = (p.r ? `<span class="role ${p.r}">${t(p.r)}</span>` : '') + (V.phase === 'vote' && !local && V.voted.includes(i) ? '<span class="vt">✓</span>' : '') + (V.phase === 'reveal' && V.ready.includes(i) ? '<span class="vt">✓</span>' : '');
-    return `<${pickable ? 'button' : 'div'} class="${cls}" ${pickable ? `data-pick="${i}"` : ''}>${avatar(i)}<span class="nm">${esc(p.n)}</span>${i === me ? `<span class="me">(${t('you')})</span>` : ''}<span class="cl">${clues}</span>${tags}</${pickable ? 'button' : 'div'}>`;
+    return `<${pickable ? 'button' : 'div'} class="${cls}" ${pickable ? `data-pick="${i}"` : ''}>${avatar(i, 'av', p.n)}<span class="nm">${esc(p.n)}</span>${i === me ? `<span class="me">(${t('you')})</span>` : ''}<span class="cl">${clues}</span>${tags}</${pickable ? 'button' : 'div'}>`;
   }).join('');
   renderAction();
 }
@@ -1362,7 +1365,7 @@ function renderEnd() {
   tt.className = 'banner ' + (V.winner === 'civ' ? '' : V.winner === 'mw' ? 'white' : 'red');
   const wd = V.words || { pair: 0, civ: 0 };
   $('#endWords').innerHTML = `<div><small>${t('civWord')}</small><b>${esc(wordOf(wd.pair, wd.civ))}</b></div><div><small>${t('ucWord')}</small><b>${esc(wordOf(wd.pair, 1 - wd.civ))}</b></div>`;
-  $('#endList').innerHTML = V.players.map((p, i) => `<div class="prow ${w.includes(i) ? 'win' : 'dead'}" style="${w.includes(i) ? '' : 'filter:none;opacity:.75'}">${avatar(i)}<span class="nm">${esc(p.n)}</span>${i === me ? `<span class="me">(${t('you')})</span>` : ''}<span class="cl">${p.c.map((c, r) => c ? `<span>${trHtml(c, (p.cl || [])[r], i === me)}</span>` : '').join('')}</span><span class="role ${p.r}">${t(p.r)}</span>${w.includes(i) ? '<span class="crown">👑</span>' : ''}</div>`).join('');
+  $('#endList').innerHTML = V.players.map((p, i) => `<div class="prow ${w.includes(i) ? 'win' : 'dead'}" style="${w.includes(i) ? '' : 'filter:none;opacity:.75'}">${avatar(i, 'av', p.n)}<span class="nm">${esc(p.n)}</span>${i === me ? `<span class="me">(${t('you')})</span>` : ''}<span class="cl">${p.c.map((c, r) => c ? `<span>${trHtml(c, (p.cl || [])[r], i === me)}</span>` : '').join('')}</span><span class="role ${p.r}">${t(p.r)}</span>${w.includes(i) ? '<span class="crown">👑</span>' : ''}</div>`).join('');
   const guest = V.mode === 'online' && net.role !== 'host';
   $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : ''; $('#bMenu').hidden = !net.relay;
   if (lastSfxKey !== 'end' + V.round) { lastSfxKey = 'end' + V.round; P.sfx(won ? 'win' : 'lose'); if (won) P.confetti($('#confetti')); }
@@ -1411,7 +1414,7 @@ function chatAdd(m) {
 }
 function renderChat() {
   const L = $('#rcList');
-  L.innerHTML = CHAT.list.length ? CHAT.list.map(m => `<div class="rc-msg${m.s === net.me ? ' me' : ''}">${avatar(m.s)}<div class="bub"><b style="color:${COLORS[m.s % 10]}">${esc(m.n)}</b>${trHtml(m.txt, m.l, m.s === net.me)}</div></div>`).join('') : `<p class="rc-empty">${t('chatEmpty')}</p>`;
+  L.innerHTML = CHAT.list.length ? CHAT.list.map(m => `<div class="rc-msg${m.s === net.me ? ' me' : ''}">${avatar(m.s, 'av', m.n)}<div class="bub"><b style="color:${COLORS[m.s % 10]}">${esc(m.n)}</b>${trHtml(m.txt, m.l, m.s === net.me)}</div></div>`).join('') : `<p class="rc-empty">${t('chatEmpty')}</p>`;
   L.scrollTop = L.scrollHeight;
   if (chatVisible()) CHAT.unread = 0;
   document.querySelectorAll('.chatbtn .badge, .chatbar .badge').forEach(b => { b.textContent = CHAT.unread ? CHAT.unread : ''; });
@@ -1445,6 +1448,8 @@ P.onLang(() => { renderUi(); renderSnd(); renderMus(); renderOpts(); if (!$('#on
 P.applyStatic(); renderUi(); renderSnd(); renderMus(); renderOpts(); renderChat();
 { const jc = window.Party && Party.takeJoin(); if (jc) joinFromParty(jc); }
 window.__uc = { newGame, get S() { return S; }, get V() { return V; }, net, PAIRS, guessOk, roleCounts, get card() { return myCard; } };
+// Skins : chargés au démarrage, puis mis à jour en direct
+P.skinLive(() => { try { if (V && !$('#game').hidden) render(); renderRoster(); renderLocal(); renderChat(); } catch (e) {} });
 })();
 </script>
 </body>

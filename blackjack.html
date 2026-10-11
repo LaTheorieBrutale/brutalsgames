@@ -365,9 +365,10 @@ body.ingame .action{padding-left:58px}
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="shared.js?v=20261011d"></script>
-<script src="chat.js?v=20261011d"></script>
-<script src="party.js?v=20261011d" data-game="bj"></script>
+<script src="shared.js?v=20261011e"></script>
+<script src="skins.js?v=20261011e"></script>
+<script src="chat.js?v=20261011e"></script>
+<script src="party.js?v=20261011e" data-game="bj"></script>
 <script>
 (() => {
 'use strict';
@@ -429,8 +430,13 @@ P.addStrings({
 
 /* ---------- Avatars : petits jetons à visage ---------- */
 const COLORS = ['#e04848', '#4aa3ff', '#5cc24a', '#f2c14e', '#b48aff', '#ff8ac8', '#ff9a3c', '#3ad0b0', '#c0b8a8', '#d89a5a'];
-const avatar = seat => { const c = COLORS[seat % 10], I = '#0a0806';
+const avatarGame = seat => { const c = COLORS[seat % 10], I = '#0a0806';
   return `<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="${c}" stroke="${I}" stroke-width="2.5"/><circle cx="20" cy="20" r="12" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="5 4"/><circle cx="15.5" cy="18" r="2.2" fill="${I}"/><circle cx="24.5" cy="18" r="2.2" fill="${I}"/><path d="M15 24q5 4 10 0" fill="none" stroke="${I}" stroke-width="2.2" stroke-linecap="round"/></svg>`; };
+
+// Skin perso du joueur (choisi sur l'accueil) à la place du personnage du jeu, s'il en a un
+const seatName = i => { const g = V ? (V.seats || V.players || []) : []; const p = g[i] || (lobbyList() || [])[i]; return p ? p.n || '' : ''; };
+const avatar = seat => P.skinOr(seatName(seat), avatarGame(seat));
+
 const CHIPS = [[10, '#4aa3ff'], [25, '#5cc24a'], [100, '#1c1c1c'], [500, '#b048d8']];
 const chipHtml = v => { const c = (CHIPS.slice().reverse().find(x => v >= x[0]) || CHIPS[0])[1]; return `<span class="chip" style="--c:${c}">${v >= 1000 ? Math.round(v / 100) / 10 + 'k' : v}</span>`; };
 
@@ -1054,6 +1060,8 @@ P.onLang(() => {
 P.applyStatic(); renderSnd(); renderMus(); renderChat();
 { const jc = window.Party && Party.takeJoin(); if (jc) joinFromParty(jc); }
 window.__bj = { get S() { return S; }, get V() { return V; }, net, total };
+// Skins : chargés au démarrage, puis mis à jour en direct
+P.skinLive(() => { try { if (V && !$('#game').hidden) render(); else if (!$('#onWait').hidden) renderLobby(); if (typeof renderChat === 'function') renderChat(); } catch (e) {} });
 })();
 </script>
 </body>

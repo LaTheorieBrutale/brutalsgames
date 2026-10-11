@@ -210,6 +210,9 @@ html[data-ui=night] .err{color:#ff8a8a}
 .sheet{position:fixed;z-index:15;left:50%;top:50%;transform:translate(-50%,-50%);width:min(360px,calc(100% - 32px));padding:14px;display:flex;flex-direction:column;gap:10px;animation:fadeIn .2s}
 .sheet-head{display:flex;justify-content:space-between;align-items:center;font-size:22px}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+.dfav,.chip .pskin,#roster .pskin{width:24px;height:24px;flex:none;border-radius:50%;display:block}
+#roster .dfav,#roster .pskin{width:30px;height:30px}
+.chip .dfav,.chip .pskin{margin-right:-2px}
 </style>
 </head>
 <body>
@@ -355,8 +358,9 @@ html[data-ui=night] .err{color:#ff8a8a}
 <div id="toast" role="status"></div>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="shared.js?v=20261011d"></script>
-<script src="party.js?v=20261011d" data-game="df"></script>
+<script src="shared.js?v=20261011e"></script>
+<script src="skins.js?v=20261011e"></script>
+<script src="party.js?v=20261011e" data-game="df"></script>
 <script src="scenes.js"></script>
 <script>
 (() => {
@@ -396,6 +400,10 @@ P.addStrings({
     nextLevel: 'Další obrázek', again: 'Odveta', hostAgain: 'Hostitel spouští znovu…', menu: 'Menu', leaderboard: 'Žebříček', settings: 'Nastavení' }
 });
 const COLORS = ['#ff9a3c', '#5ad8ff', '#86f2a0', '#ff7aa0', '#c58bff', '#ffd23f', '#3f7bff', '#16b39a', '#ff4f4f', '#b0896a'];
+// Personnage du jeu : une petite loupe à la couleur du joueur (remplacée par son skin perso s'il en a un)
+const avatarGame = seat => { const c = COLORS[seat % 10], I = '#0c0816';
+  return `<svg class="dfav" viewBox="0 0 40 40"><rect width="40" height="40" fill="#1d1640"/><path d="M27 27l8 8" stroke="${I}" stroke-width="7" stroke-linecap="round"/><path d="M27 27l8 8" stroke="#a8643a" stroke-width="4" stroke-linecap="round"/><circle cx="18" cy="18" r="12" fill="${c}" stroke="${I}" stroke-width="3"/><circle cx="18" cy="18" r="8.5" fill="rgba(255,255,255,.35)"/><circle cx="14.5" cy="17" r="2.2" fill="${I}"/><circle cx="21.5" cy="17" r="2.2" fill="${I}"/><path d="M14.5 22q3.5 3 7 0" fill="none" stroke="${I}" stroke-width="2" stroke-linecap="round"/></svg>`; };
+const avatar = (seat, name) => P.skinOr(name, avatarGame(seat));
 const MAXP = 10;
 
 /* ---------- Musique : ambiance ensoleillée (ukulélé, marimba, basse, shaker), générée en direct ---------- */
@@ -596,7 +604,7 @@ function renderHud() {
   if (G.names.length === 1) {
     $('#chips').innerHTML = `<div class="chip solo"><div class="pips${n > 7 ? " many" : ""}">${G.found.map(f => `<i class="${f >= 0 ? 'on' : ''}"></i>`).join('')}</div></div>`;
   } else {
-    const html = G.names.map((nm, s) => `<div class="chip${s === G.me && G.names.length > 3 ? ' me' : ''}"><i style="background:${COLORS[s]}">${countOf(s)}</i><span>${esc(nm)}</span></div>`).join('');
+    const html = G.names.map((nm, s) => `<div class="chip${s === G.me && G.names.length > 3 ? ' me' : ''}">${avatar(s, nm)}<i style="background:${COLORS[s]}">${countOf(s)}</i><span>${esc(nm)}</span></div>`).join('');
     const many = G.names.length > 3; // à partir de 4 joueurs : scores sur une ligne à part, sous le bandeau
     $('#chips').innerHTML = many ? '' : html; $('#strip').innerHTML = many ? html : '';
   }
@@ -848,7 +856,7 @@ $('#onBack').onclick = () => { P.sfx('click'); leaveNet(); show('home'); };
 $('#bLeave').onclick = () => { P.sfx('click'); leaveNet(); $('#onForm').hidden = false; $('#onWait').hidden = true; };
 function renderRoster() {
   const names = net.role === 'host' ? net.roster.map(r => r.name) : (net.names || []);
-  $('#roster').classList.toggle('many', names.length > 4); $('#roster').innerHTML = names.map((n, i) => `<div><i style="background:${COLORS[i]}"></i>${esc(n)}<small>${i ? t('connected') : t('host')}</small></div>`).join('');
+  $('#roster').classList.toggle('many', names.length > 4); $('#roster').innerHTML = names.map((n, i) => `<div>${avatar(i, n)}${esc(n)}<small>${i ? t('connected') : t('host')}</small></div>`).join('');
   const host = net.role === 'host';
   $('#codeBox').hidden = !host; $('#hostOpts').hidden = !host; $('#bStart').hidden = !host;
   $('#bStart').disabled = names.length < 2;
@@ -947,6 +955,8 @@ P.onLang(() => { renderLvl(); renderSnd(); renderMus(); renderVis(); renderUi();
 P.applyStatic(); renderLvl(); renderSnd(); renderMus(); renderVis(); renderUi();
 { const jc = window.Party && Party.takeJoin(); if (jc) joinFromParty(jc); }
 window.__df = { G, startGame, claim, net };
+// Skins : chargés au démarrage, puis mis à jour en direct
+P.skinLive(() => { try { renderRoster(); if (typeof G !== 'undefined' && G && G.scene) renderHud(); } catch (e) {} });
 })();
 </script>
 </body>

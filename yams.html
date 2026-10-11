@@ -353,9 +353,10 @@ body.ingame #chatBar{margin-left:52px;width:calc(100% - 52px)}
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="shared.js?v=20261011d"></script>
-<script src="chat.js?v=20261011d"></script>
-<script src="party.js?v=20261011d" data-game="ym"></script>
+<script src="shared.js?v=20261011e"></script>
+<script src="skins.js?v=20261011e"></script>
+<script src="chat.js?v=20261011e"></script>
+<script src="party.js?v=20261011e" data-game="ym"></script>
 <script>
 (() => {
 'use strict';
@@ -463,8 +464,13 @@ document.addEventListener('click', e => {
 
 /* ---------- Avatars ---------- */
 const COLORS = ['#e04848', '#4aa3ff', '#5cc24a', '#f2c14e', '#b48aff', '#ff8ac8', '#ff9a3c', '#3ad0b0', '#c0b8a8', '#d89a5a'];
-const avatar = seat => { const c = COLORS[seat % 10], I = '#0d0705';
+const avatarGame = seat => { const c = COLORS[seat % 10], I = '#0d0705';
   return `<svg viewBox="0 0 40 40"><rect x="5" y="5" width="30" height="30" rx="8" fill="${c}" stroke="${I}" stroke-width="2.5"/><circle cx="15" cy="17" r="2.6" fill="${I}"/><circle cx="25" cy="17" r="2.6" fill="${I}"/><path d="M14 25q6 5 12 0" fill="none" stroke="${I}" stroke-width="2.4" stroke-linecap="round"/></svg>`; };
+
+// Skin perso du joueur (choisi sur l'accueil) à la place du personnage du jeu, s'il en a un
+const seatName = i => { const g = V ? (V.seats || V.players || []) : []; const p = g[i] || (lobbyList() || [])[i]; return p ? p.n || '' : ''; };
+const avatar = seat => P.skinOr(seatName(seat), avatarGame(seat));
+
 
 const SCREENS = ['home', 'online', 'game', 'end'];
 const show = id => { SCREENS.forEach(s => { $('#' + s).hidden = s !== id; }); document.body.classList.toggle('ingame', id === 'game'); if (window.BGDock) BGDock.slot(id === 'game' ? $('#hudDock') : null, true); };
@@ -755,7 +761,7 @@ function backToForm(msg) { leaveNet(); S = null; V = null; show('online'); $('#o
 const lobbyList = () => net.role === 'host' ? net.roster.filter(r => !r.gone).map(r => ({ n: r.name, skin: r.skin })) : net.lobby;
 function renderLobby() {
   const host = net.role === 'host', L = lobbyList();
-  $('#lobbyList').innerHTML = L.map((p, i) => `<div class="pl">${dieSVG(6, p.skin)}<span>${esc(p.n)}${i === net.me ? ` <small style="color:var(--muted)">(${t('you')})</small>` : ''}</span></div>`).join('');
+  $('#lobbyList').innerHTML = L.map((p, i) => `<div class="pl">${P.skinOr(p.n, dieSVG(6, p.skin))}<span>${esc(p.n)}${i === net.me ? ` <small style="color:var(--muted)">(${t('you')})</small>` : ''}</span></div>`).join('');
   $('#codeBox').hidden = !host; $('#bStart').hidden = !host; $('#bStart').disabled = L.length < 2;
   $('#waitTxt').innerHTML = host ? t('waitHost') : t('waitGuest');
 }
@@ -1032,6 +1038,8 @@ P.onLang(() => {
 P.applyStatic(); renderSnd(); renderMus(); renderChat(); renderSkins(); renderSoloSub();
 { const jc = window.Party && Party.takeJoin(); if (jc) joinFromParty(jc); }
 window.__ym = { dsDie, dsLoad,  get S() { return S; }, get V() { return V; }, net, catScore, totals };
+// Skins : chargés au démarrage, puis mis à jour en direct
+P.skinLive(() => { try { if (V && !$('#game').hidden) render(); else if (!$('#onWait').hidden) renderLobby(); if (typeof renderChat === 'function') renderChat(); } catch (e) {} });
 })();
 </script>
 </body>

@@ -405,6 +405,8 @@ html.overlay #top *,html.overlay #bottom *{pointer-events:none!important}
 /* place pour le bouton du volume (toujours en bas à gauche) */
 #bottom{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 62px)}
 html.pc #bottom{padding-bottom:70px}
+.avatar.skinned{background:#1d1640}
+.avatar svg.qskin{width:100%!important;height:100%!important;display:block}
 </style>
 </head>
 <body>
@@ -639,8 +641,9 @@ html.pc #bottom{padding-bottom:70px}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="chat.js?v=20261011d"></script>
-<script src="party.js?v=20261011d" data-game="qd"></script>
+<script src="skins.js?v=20261011e"></script>
+<script src="chat.js?v=20261011e"></script>
+<script src="party.js?v=20261011e" data-game="qd"></script>
 <script>
 (() => {
 'use strict';
@@ -2089,7 +2092,10 @@ function applyLooks(lk) {
   looks = ok ? lk.slice() : [0, 1, 2, 3];
   looks.forEach((l, s) => { pawns[s] = MESH[l]; });
 }
-const avatarHTML = s => `<div class="avatar ${LK(s).cls}"><svg><use href="${LK(s).icon}"/></svg></div>`;
+// Skin perso du joueur (choisi sur l'accueil) à la place du personnage, s'il en a un
+const skinOf = nm => (nm && window.P && P.avatarOf) ? P.avatarOf(nm) : null;
+const avInner = (s, nm) => { const a = skinOf(nm); return a ? P.avatarSVG(a, 'qskin') : `<svg><use href="${LK(s).icon}"/></svg>`; };
+const avatarHTML = (s, nm) => { if (nm === undefined) nm = names[s]; return `<div class="avatar ${LK(s).cls}${skinOf(nm) ? ' skinned' : ''}">${avInner(s, nm)}</div>`; };
 
 function placePawnsInstant() {
   pawns.forEach((p, i) => {
@@ -2197,7 +2203,7 @@ function endGame(winner) {
     t.classList.toggle('lose', !win);
     $('.endpanel').classList.toggle('lose', !win);
     const heroSeat = win ? winner : me, hero = $('#endHero');
-    hero.className = 'hero avatar ' + LK(heroSeat).cls; hero.innerHTML = `<svg><use href="${LK(heroSeat).icon}"/></svg>`;
+    hero.className = 'hero avatar ' + LK(heroSeat).cls + (skinOf(names[heroSeat]) ? ' skinned' : ''); hero.innerHTML = avInner(heroSeat, names[heroSeat]);
     const ps = S.p[local ? winner : me];
     $('#endStats').textContent = tr('statsLine', { m: ps.mv || 0, w: (S.n === 4 ? 5 : 10) - ps.w });
     const stars = $('#endStars'); stars.innerHTML = '<i></i><i></i><i></i>'; // relance l'animation
@@ -2238,7 +2244,7 @@ function renderPlayers() {
   // Joueur du bas
   const meTurn = !S.over && S.turn === bottom;
   $('#cardMe').classList.toggle('active', meTurn);
-  const av = $('#avMe'); av.className = 'avatar ' + LK(bottom).cls; av.innerHTML = `<svg><use href="${LK(bottom).icon}"/></svg>`;
+  const av = $('#avMe'); av.className = 'avatar ' + LK(bottom).cls + (skinOf(names[bottom]) ? ' skinned' : ''); av.innerHTML = avInner(bottom, names[bottom]);
   $('#nameMe').textContent = names[bottom];
   $('#chipMe').textContent = meTurn ? tr('yourTurn') : tr('waiting');
   bonesRow($('#bonesMe'), S.p[bottom].w, max);
@@ -2398,8 +2404,8 @@ function renderRoster(list, isHost) {
   for (let i = 0; i < 4; i++) {
     const nm = list[i];
     rows.push(nm
-      ? `<div>${avatarHTML(i)}<span>${esc(nm)}</span><small>${i === 0 ? tr('hostTag') : tr('connected')}</small></div>`
-      : `<div class="empty">${avatarHTML(i)}<span>${tr('free')}</span><small>${tr('ai4')}</small></div>`);
+      ? `<div>${avatarHTML(i, nm)}<span>${esc(nm)}</span><small>${i === 0 ? tr('hostTag') : tr('connected')}</small></div>`
+      : `<div class="empty">${avatarHTML(i, '')}<span>${tr('free')}</span><small>${tr('ai4')}</small></div>`);
   }
   $('#roster').innerHTML = rows.join('');
   const n = list.length;
@@ -3420,6 +3426,8 @@ reset(2);
 resize();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(resize);
 requestAnimationFrame(frame);
+// Skins : chargés au démarrage, puis mis à jour en direct
+if (window.P && P.skinLive) P.skinLive(() => { try { if (typeof S !== 'undefined' && S) renderPlayers(); if (lastRoster) renderRoster(lastRoster.list, lastRoster.isHost); } catch (e) {} });
 })();
 </script>
 </body>

@@ -333,9 +333,10 @@ body.ingame #game .rc-form{padding-left:50px}
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="shared.js?v=20261011d"></script>
-<script src="chat.js?v=20261011d"></script>
-<script src="party.js?v=20261011d" data-game="dr"></script>
+<script src="shared.js?v=20261011e"></script>
+<script src="skins.js?v=20261011e"></script>
+<script src="chat.js?v=20261011e"></script>
+<script src="party.js?v=20261011e" data-game="dr"></script>
 <script src="words.js"></script>
 <script>
 (() => {
@@ -402,10 +403,15 @@ P.addStrings({
 
 /* ---------- Avatars : petits pots de peinture ---------- */
 const COLORS = ['#ff6b5a', '#3ad0b0', '#ffc93c', '#9b7bff', '#ff7eb6', '#7ed957', '#4aa3ff', '#ff9a3c', '#c0b8d8', '#d89a5a'];
-const avatar = (seat, cls) => {
+const avatarGame = (seat, cls) => {
   const c = COLORS[seat % 10], I = '#120c18';
   return `<svg${cls ? ` class="${cls}"` : ''} viewBox="0 0 40 40"><path d="M8 14h24l-2 22H10z" fill="#e8e0f0" stroke="${I}" stroke-width="2.5" stroke-linejoin="round"/><path d="M8 14c4-6 20-6 24 0-2 6-6 2-8 8-1 3-5 3-5 0 0-4-4-3-5-1-2-2-4-2-6-7z" fill="${c}" stroke="${I}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="16" cy="27" r="2.2" fill="${I}"/><circle cx="24" cy="27" r="2.2" fill="${I}"/><path d="M17 31.5q3 2.2 6 0" fill="none" stroke="${I}" stroke-width="2" stroke-linecap="round"/></svg>`;
 };
+
+// Skin perso du joueur (choisi sur l'accueil) à la place du personnage du jeu, s'il en a un
+const seatName = i => { const g = V ? (V.seats || V.players || []) : []; const p = g[i] || (lobbyList() || [])[i]; return p ? p.n || '' : ''; };
+const avatar = (seat, cls) => P.skinOr(seatName(seat), avatarGame(seat, cls));
+
 
 const SCREENS = ['home', 'online', 'game', 'end'];
 const show = id => { SCREENS.forEach(s => { $('#' + s).hidden = s !== id; }); document.body.classList.toggle('ingame', id === 'game'); if (window.BGDock) BGDock.slot(id === 'game' ? $('#hudDock') : null, true); placeChat(id); };
@@ -1014,6 +1020,8 @@ P.onLang(() => {
 P.applyStatic(); renderSnd(); renderMus(); renderChat();
 { const jc = window.Party && Party.takeJoin(); if (jc) joinFromParty(jc); }
 window.__dr = { get G() { return G; }, get V() { return V; }, net, CV, get word() { return myWord; }, get choices() { return myChoices; }, wordOf };
+// Skins : chargés au démarrage, puis mis à jour en direct
+P.skinLive(() => { try { if (V && !$('#game').hidden) render(); else if (!$('#onWait').hidden) renderLobby(); if (typeof renderChat === 'function') renderChat(); } catch (e) {} });
 })();
 </script>
 </body>
