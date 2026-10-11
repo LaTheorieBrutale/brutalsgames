@@ -437,7 +437,7 @@ P.addStrings({
     telDrawH: 'À toi de dessiner !', telDraw: 'Dessine :', telGuessH: 'Qu’est-ce que c’est ?', telGuessPh: 'Décris ce dessin…',
     telSend: 'Valider', telDone: 'J’ai fini ✓', telIdea: '🎲 Idée', telEmpty: 'Écris quelque chose !', telWait: 'Envoyé ! En attente des autres… ({n}/{m})',
     telSpect: 'Partie en cours : tu joueras à la prochaine !', telAlbum: 'L’album de {name}', telAlbumN: 'Album {n}/{m}', telNext: 'Suivant ▶', telNextBook: 'Album suivant ▶',
-    telHostScroll: 'L’hôte fait défiler les albums…', telOver: 'Fin des albums ! 🎉', telAgain: 'Rejouer', telLobby: 'Retour au salon', telNothing: '(rien du tout…)', telAlbums: 'Les albums',
+    telHostScroll: 'L’hôte fait défiler les albums…', telVoice: 'Voix', telOver: 'Fin des albums ! 🎉', telAgain: 'Rejouer', telLobby: 'Retour au salon', telNothing: '(rien du tout…)', telAlbums: 'Les albums',
     telWho: '{name} a écrit', telWhoD: '{name} a dessiné', telWhoG: '{name} a deviné',
     rulesTel: '<p><b>Mode Téléphone 📞</b> : chacun écrit une phrase en secret. Les carnets tournent : on dessine la phrase reçue, puis le suivant devine le dessin, et ainsi de suite. À la fin, on découvre chaque album étape par étape !</p>' },
   en: { mode: 'Mode', classic: 'Classic', phone: 'Telephone 📞', drawTime: 'Drawing time',
@@ -447,7 +447,7 @@ P.addStrings({
     telDrawH: 'Your turn to draw!', telDraw: 'Draw:', telGuessH: 'What is it?', telGuessPh: 'Describe this drawing…',
     telSend: 'Submit', telDone: 'I’m done ✓', telIdea: '🎲 Idea', telEmpty: 'Write something!', telWait: 'Sent! Waiting for the others… ({n}/{m})',
     telSpect: 'Game in progress: you’ll play in the next one!', telAlbum: '{name}’s album', telAlbumN: 'Album {n}/{m}', telNext: 'Next ▶', telNextBook: 'Next album ▶',
-    telHostScroll: 'The host is flipping through the albums…', telOver: 'That’s all the albums! 🎉', telAgain: 'Play again', telLobby: 'Back to lobby', telNothing: '(nothing at all…)', telAlbums: 'The albums',
+    telHostScroll: 'The host is flipping through the albums…', telVoice: 'Voice', telOver: 'That’s all the albums! 🎉', telAgain: 'Play again', telLobby: 'Back to lobby', telNothing: '(nothing at all…)', telAlbums: 'The albums',
     telWho: '{name} wrote', telWhoD: '{name} drew', telWhoG: '{name} guessed',
     rulesTel: '<p><b>Telephone mode 📞</b>: everyone secretly writes a sentence. The books go around: you draw the sentence you get, the next player guesses the drawing, and so on. At the end, you reveal every album step by step!</p>' },
   cs: { mode: 'Režim', classic: 'Klasický', phone: 'Telefon 📞', drawTime: 'Čas na kreslení',
@@ -457,7 +457,7 @@ P.addStrings({
     telDrawH: 'Kreslíš ty!', telDraw: 'Nakresli:', telGuessH: 'Co to je?', telGuessPh: 'Popiš tuhle kresbu…',
     telSend: 'Odeslat', telDone: 'Hotovo ✓', telIdea: '🎲 Nápad', telEmpty: 'Napiš něco!', telWait: 'Odesláno! Čekám na ostatní… ({n}/{m})',
     telSpect: 'Hra právě běží: zahraješ si v další!', telAlbum: 'Album hráče {name}', telAlbumN: 'Album {n}/{m}', telNext: 'Další ▶', telNextBook: 'Další album ▶',
-    telHostScroll: 'Hostitel listuje alby…', telOver: 'To jsou všechna alba! 🎉', telAgain: 'Hrát znovu', telLobby: 'Zpět do lobby', telNothing: '(vůbec nic…)', telAlbums: 'Alba',
+    telHostScroll: 'Hostitel listuje alby…', telVoice: 'Hlas', telOver: 'To jsou všechna alba! 🎉', telAgain: 'Hrát znovu', telLobby: 'Zpět do lobby', telNothing: '(vůbec nic…)', telAlbums: 'Alba',
     telWho: '{name} napsal', telWhoD: '{name} nakreslil', telWhoG: '{name} hádal',
     rulesTel: '<p><b>Režim Telefon 📞</b>: každý tajně napíše větu. Sešity kolují: nakreslíš větu, kterou dostaneš, další hráč hádá kresbu a tak dál. Nakonec se odhalí každé album krok za krokem!</p>' }
 });
@@ -873,6 +873,7 @@ function telPub() {
 function telSync() { if (!T) return; const v = telPub(); net.roster.forEach((r, i) => { if (i === 0) { V = v; render(); } else if (r.conn && r.conn.open && !r.gone) r.conn.send({ t: 'st', v }); }); }
 setInterval(() => { if (net.role === 'host' && T && T.phase === 'tel' && Date.now() > T.deadline + TEL_GRACE) { T.order.forEach((s, p) => telFill(s, p)); telCheck(); } }, 500);
 function telToLobby() {
+  try { speechSynthesis.cancel(); } catch (e) {}
   T = null; G = null; V = null; TK = null;
   net.roster = net.roster.filter(r => !r.gone);
   net.roster.forEach((r, i) => { if (i && r.conn && r.conn.open) r.conn.send({ t: 'tlobby' }); });
@@ -948,6 +949,29 @@ function replay(canvas, ops, ms) {
   };
   requestAnimationFrame(stepF);
 }
+/* --- voix qui lit les phrases de l'album (synthèse vocale du navigateur) --- */
+const VOICE = { on: P.get('dr-voice', '1') !== '0', ok: 'speechSynthesis' in window, unlocked: false };
+const VLANG = { fr: 'fr-FR', en: 'en-GB', cs: 'cs-CZ' };
+function pickVoice(l) {
+  const vs = VOICE.ok ? speechSynthesis.getVoices() : [], tag = VLANG[l] || 'fr-FR', base = tag.slice(0, 2);
+  return vs.find(v => v.lang === tag && /google|natural|premium|enhanced/i.test(v.name)) || vs.find(v => v.lang === tag) || vs.find(v => (v.lang || '').toLowerCase().startsWith(base)) || null;
+}
+function telSpeak(txt, l) {
+  if (!VOICE.ok || !VOICE.on || !txt || !P.soundOn()) return;
+  // dans ma langue : traduction si elle est prête, sinon la phrase d'origine dans sa langue
+  const tl = P.lang(); let say = txt, sl = l || tl;
+  if (l && l !== tl && window.BGT) { const v = BGT.peek(txt, tl, l); if (v) { say = v; sl = tl; } }
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(say); u.lang = VLANG[sl] || 'fr-FR';
+    const v = pickVoice(sl); if (v) u.voice = v;
+    u.rate = 0.98; u.pitch = 1.05; u.volume = Math.max(0.2, Math.min(1, P.sfxVol ? P.sfxVol() : 1));
+    setTimeout(() => speechSynthesis.speak(u), 250);
+  } catch (e) {}
+}
+// iPhone : la voix doit être « débloquée » par un premier toucher
+document.addEventListener('pointerdown', () => { if (!VOICE.ok || VOICE.unlocked) return; VOICE.unlocked = true; try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {} }, { capture: true });
+if (VOICE.ok) { try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => {}; } catch (e) {} }
 let telKey = '';
 function renderTel() {
   if ($('#game').hidden) show('game');
@@ -994,13 +1018,14 @@ function renderTel() {
       const who = t(e.k === 'd' ? 'telWhoD' : e.k === 'g' ? 'telWhoG' : 'telWho', { name: nm(e.s) });
       d.innerHTML = `<div class="who">${avatar(e.s)}<span>${esc(who)}</span></div>` + (e.k === 'd' ? '<canvas width="1000" height="750"></canvas>' : `<div class="txt">${telTxt(e.txt, e.l, () => {})}</div>`);
       list.appendChild(d);
-      if (e.k === 'd') replay(d.querySelector('canvas'), e.ops || [], 2600);
+      if (e.k === 'd') replay(d.querySelector('canvas'), e.ops || [], 2600); else telSpeak(e.txt, e.l);
       setTimeout(() => { list.scrollTop = list.scrollHeight; }, 30);
     });
     const host = net.role === 'host';
-    $('#alCtl').innerHTML = V.phase === 'done'
+    const vBtn = VOICE.ok ? `<button class="btn" id="telVoice" aria-pressed="${VOICE.on}">${VOICE.on ? '🔊' : '🔇'} ${t('telVoice')}</button>` : '';
+    $('#alCtl').innerHTML = vBtn + (V.phase === 'done'
       ? (host ? `<button class="btn gold" id="telAgain">${t('telAgain')}</button><button class="btn" id="telLobby">${t('telLobby')}</button>` : `<p>${t('hostAgain')}</p>`)
-      : host ? `<button class="btn gold" id="telNext">${V.ei + 1 >= V.nb ? t('telNextBook') : t('telNext')}</button>` : `<p class="dots">${t('telHostScroll')}</p>`;
+      : host ? `<button class="btn gold" id="telNext">${V.ei + 1 >= V.nb ? t('telNextBook') : t('telNext')}</button>` : `<p class="dots">${t('telHostScroll')}</p>`);
     if (V.phase === 'done' && $('#alCtl').dataset.k !== 'done' + net.gameNo) { P.sfx('win'); P.confetti($('#confetti')); }
     $('#alCtl').dataset.k = V.phase + net.gameNo;
   }
@@ -1011,6 +1036,7 @@ document.addEventListener('click', e => {
   const id = e.target.closest('button') && e.target.closest('button').id; if (!id) return;
   if (id === 'telDone') telSend(false);
   else if (id === 'telIdea') { const L = IDEAS[P.lang()] || IDEAS.fr, v = L[Math.floor(rnd() * L.length)], inp = $('#telIn'); if (inp) { inp.value = v; TK && (TK.draft = v); inp.focus(); } P.sfx('click'); }
+  else if (id === 'telVoice') { VOICE.on = !VOICE.on; P.set('dr-voice', VOICE.on ? '1' : '0'); if (!VOICE.on) try { speechSynthesis.cancel(); } catch (er) {} P.sfx('click'); render(); }
   else if (id === 'telNext' && net.role === 'host') { P.sfx('click'); telReveal(); }
   else if (id === 'telAgain' && net.role === 'host') { P.sfx('click'); P.stopConfetti(); $('#bStart').click(); }
   else if (id === 'telLobby' && net.role === 'host') { P.sfx('click'); telToLobby(); }
