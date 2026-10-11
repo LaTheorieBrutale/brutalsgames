@@ -1308,8 +1308,8 @@ document.addEventListener('keydown', e => {
 let AIM = -1, pending = false;
 function setAim(i) { AIM = i; const a = G3.b1 && G3.b1.aim; if (a) { a.visible = i >= 0; if (i >= 0) a.position.set((i % N) - 4.5, 0.2, Math.floor(i / N) - 4.5); } renderFireBar(); }
 function tapTarget(i) {
-  if (!V || V.ph !== 'play' || V.turn !== V.me || pending || V.opR[i]) return;
-  if (AIM === i) { fireAim(); return; }
+  if (!V || V.ph !== 'play' || V.turn !== V.me || V.opR[i]) return;
+  if (AIM === i && !pending) { fireAim(); return; }
   sCoin(); setAim(i);
 }
 function fireAim() {
