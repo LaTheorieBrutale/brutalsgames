@@ -553,12 +553,35 @@ P.setMyAvatar = a => {
 P.pushAvatar = () => {
   const a = P.myAvatar(), k = avKey(P.hasName() ? P.name() : '');
   if (!a || !k) return;
-  P.fbReq('/avatars/' + k, 'PUT', a).catch(() => {});
+  P.fbReq(SKIN_PATH + '/' + k, 'PUT', a).catch(() => {});
 };
 P.avatars = {};
+// Les skins sont rangés dans /rooms/skins (/rooms est ouvert en lecture et écriture, contrairement à /avatars)
+const SKIN_PATH = '/rooms/skins';
+// Mise à jour en direct : dès que quelqu'un change de skin, tous les écrans ouverts le voient
+P.watchAvatars = cb => {
+  if (!window.EventSource) return;
+  let es;
+  const open = () => {
+    try { es = new EventSource(P.DB_URL + SKIN_PATH + '.json'); } catch (e) { return; }
+    const on = ev => {
+      let msg; try { msg = JSON.parse(ev.data); } catch (e) { return; }
+      if (!msg) return;
+      const put = (k, v) => { const a = P.avatarNorm(v); if (a) P.avatars[k] = a; else delete P.avatars[k]; };
+      if (msg.path === '/') { if (ev.type === 'put') P.avatars = {}; for (const k in msg.data || {}) put(k, msg.data[k]); }
+      else put(msg.path.slice(1).split('/')[0], msg.data);
+      const mk = avKey(P.hasName() ? P.name() : '');
+      if (mk && P.avatars[mk] && P.avatars[mk] !== P.myAvatar()) P.set('bg-skin', P.avatars[mk]);
+      cb && cb();
+    };
+    es.addEventListener('put', on); es.addEventListener('patch', on);
+    es.onerror = () => { if (es.readyState === 2) setTimeout(open, 5000); };
+  };
+  open();
+};
 P.fetchAvatars = async () => {
   try {
-    const d = await P.fbReq('/avatars', 'GET'); P.avatars = {}; for (const k in d || {}) { const a = P.avatarNorm(d[k]); if (a) P.avatars[k] = a; }
+    const d = await P.fbReq(SKIN_PATH, 'GET'); P.avatars = {}; for (const k in d || {}) { const a = P.avatarNorm(d[k]); if (a) P.avatars[k] = a; }
     // Même pseudo sur un autre appareil : le skin enregistré en ligne fait foi (il est publié à chaque changement)
     const mk = avKey(P.hasName() ? P.name() : '');
     if (mk && P.avatars[mk]) P.set('bg-skin', P.avatars[mk]); else if (mk && P.myAvatar()) P.pushAvatar();
