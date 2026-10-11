@@ -2855,7 +2855,7 @@ function mergeMatches(list) {
   for (const m of list.slice(-MAXM)) {
     if (!validMatch(m) || ids.has(m.id)) continue;
     const b = Array.isArray(m.b) ? m.p.map((_, i) => !!m.b[i]) : m.p.map((_, i) => !!m.ai && i === 1);
-    const g = ['diff', 'uc', 'cn', 'dr', 'bj', 'ym'].includes(m.g) ? m.g : 'quoridor', wa = Array.isArray(m.wa) ? m.wa.filter(i => Number.isInteger(i) && i >= 0 && i < m.p.length) : null;
+    const g = ['diff', 'uc', 'cn', 'dr', 'bj', 'ym', 'bn'].includes(m.g) ? m.g : 'quoridor', wa = Array.isArray(m.wa) ? m.wa.filter(i => Number.isInteger(i) && i >= 0 && i < m.p.length) : null;
     matches.push(Object.assign({ id: m.id.slice(0, 48), t: m.t, p: m.p.map(x => String(x).slice(0, 14)), w: m.w, b, g }, wa && wa.length > 1 ? { wa } : {}));
     ids.add(m.id); added++;
   }

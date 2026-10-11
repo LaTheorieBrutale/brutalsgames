@@ -125,7 +125,7 @@ P.fetchMatches = async () => {
   let data;
   try { data = await P.fbReq('/matches', 'GET'); } catch (e) { throw e; }
   return Object.entries(data || {}).map(([id, m]) => Object.assign({}, m, { id }))
-    .filter(validMatch).map(m => ({ id: m.id, t: m.t, p: m.p.map(x => String(x).slice(0, 14)), w: m.w, wa: winnersArr(m), b: Array.isArray(m.b) ? m.b.map(Boolean) : m.p.map(() => false), g: ['diff', 'uc', 'cn', 'dr', 'bj', 'ym'].includes(m.g) ? m.g : 'quoridor' }))
+    .filter(validMatch).map(m => ({ id: m.id, t: m.t, p: m.p.map(x => String(x).slice(0, 14)), w: m.w, wa: winnersArr(m), b: Array.isArray(m.b) ? m.b.map(Boolean) : m.p.map(() => false), g: ['diff', 'uc', 'cn', 'dr', 'bj', 'ym', 'bn'].includes(m.g) ? m.g : 'quoridor' }))
     .sort((a, b) => a.t - b.t);
 };
 P.pushMatch = async m => {
