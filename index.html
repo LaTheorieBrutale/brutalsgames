@@ -117,7 +117,7 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
 .avatar.noskin .pen{animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{50%{transform:scale(1.18)}}
 /* éditeur de skin */
-.avback{position:fixed;inset:0;z-index:30;background:rgba(3,7,16,.72);backdrop-filter:blur(3px)}
+.avback{position:fixed;inset:0;z-index:30;background:rgba(3,7,16,.72);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .aved{position:fixed;z-index:31;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100% - 20px));max-height:calc(100dvh - 24px);display:flex;flex-direction:column;gap:10px;padding:14px;animation:pop .25s cubic-bezier(.2,1.5,.4,1)}
 @keyframes pop{from{transform:translate(-50%,-46%) scale(.92);opacity:0}}
 .aved .sheet-head{font-size:24px}
@@ -130,9 +130,10 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
 .av-cats .btn{flex:1 1 auto;font-size:13px;padding:7px 8px 6px;border-radius:11px;box-shadow:0 3px 0 var(--ink)}
 .av-cats .btn[aria-pressed="true"]{color:#2a1302;background:linear-gradient(180deg,#ffd29a,var(--orange) 50%,var(--orange2))}
 .av-grp{grid-column:1/-1;font-family:var(--f-display);font-size:15px;color:var(--dim);padding:6px 2px 0;letter-spacing:.02em}
-.av-opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;overflow-y:auto;padding:4px 8px 10px;min-height:80px;max-height:340px;border-radius:14px;background:var(--ink)}
-.av-opts button{all:unset;box-sizing:border-box;aspect-ratio:1;border-radius:14px;border:3px solid #1b2d54;overflow:hidden;cursor:pointer;display:grid;place-items:center;transition:transform .12s}
-.av-opts button svg{width:100%;height:100%;display:block}
+.av-opts{display:grid;grid-auto-rows:max-content;align-content:start;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;overflow-y:auto;padding:4px 8px 10px;min-height:80px;max-height:340px;border-radius:14px;background:var(--ink)}
+.av-opts button{appearance:none;-webkit-appearance:none;margin:0;padding:0;background:none;font:inherit;color:inherit;position:relative;display:block;width:100%;box-sizing:border-box;border-radius:14px;border:3px solid #1b2d54;overflow:hidden;cursor:pointer;display:grid;place-items:center;transition:transform .12s}
+.av-opts button::before{content:"";display:block;padding-top:100%}
+.av-opts button svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .av-opts button:active{transform:scale(.92)}
 .av-opts button[aria-pressed="true"]{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold),0 0 14px rgba(255,207,63,.5)}
 .av-opts button.sw{border-radius:50%}
@@ -172,9 +173,20 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
 .games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 @media (min-width:640px){.games{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
 @media (min-width:1100px){.games{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.lbwrap{display:flex;flex-direction:column;gap:16px;min-width:0}
+/* très grand écran : tout visible d'un coup — jeu à la une et classement côte à côte, les 8 jeux sur une ligne */
+@media (min-width:1700px){
+  .hero{height:300px}
+  .maincol{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px 22px;align-items:start}
+  .maincol>.profile,.maincol>#s-games,.maincol>.games{grid-column:1/-1}
+  .maincol>.feat{grid-column:1;grid-row:2}.maincol>.lbwrap{grid-column:2;grid-row:2}
+  .maincol>.lbwrap h2.sec{margin-top:0}
+  .lb-grid{grid-template-columns:1fr 1fr}
+}
+@media (min-width:2000px){.games{grid-template-columns:repeat(8,minmax(0,1fr))}}
 .tile{display:flex;flex-direction:column;overflow:hidden;text-decoration:none;transition:transform .2s cubic-bezier(.2,1.5,.4,1)}
 @media (hover:hover){.tile:hover{transform:translateY(-4px) rotate(-.5deg)}}
-.tile .thumb{position:relative;aspect-ratio:2/1;border-bottom:3px solid var(--ink);overflow:hidden}
+.tile .thumb{position:relative;height:0;padding-top:50%;border-bottom:3px solid var(--ink);overflow:hidden}
 .tile .thumb svg{position:absolute;inset:0;width:100%;height:100%}
 .tile .tb{padding:9px 10px 10px;display:flex;flex-direction:column;gap:6px;flex:1}
 .tile h3{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(16px,4.4vw,20px);line-height:1.05;text-shadow:0 2px 0 var(--ink)}
@@ -337,6 +349,7 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
       <h2 class="sec" id="s-games"><svg class="ico" viewBox="0 0 40 40"><rect x="3" y="11" width="34" height="22" rx="11" fill="#5cc8ff" stroke="#0b0716" stroke-width="3"/><path d="M12 17v10M7 22h10" stroke="#0b0716" stroke-width="3.4" stroke-linecap="round"/><circle cx="27" cy="19" r="2.6" fill="#ffcf3f" stroke="#0b0716" stroke-width="2"/><circle cx="31" cy="25" r="2.6" fill="#ff5a8a" stroke="#0b0716" stroke-width="2"/></svg><span data-i18n="ourGames">Nos jeux</span></h2>
       <section class="games" id="games"></section>
 
+      <div class="lbwrap">
       <h2 class="sec" id="s-lb"><svg class="ico" viewBox="0 0 40 40"><path d="M11 6h18v9a9 9 0 0 1-18 0z" fill="#ffcf3f" stroke="#0b0716" stroke-width="3"/><path d="M11 9H5a6 6 0 0 0 6 7M29 9h6a6 6 0 0 1-6 7" fill="none" stroke="#0b0716" stroke-width="3"/><path d="M20 24v5M13 35h14l-2-6H15z" fill="#e0a020" stroke="#0b0716" stroke-width="3" stroke-linejoin="round"/></svg><span data-i18n="leaderboard">Classement</span></h2>
       <section class="frame lb">
         <div class="lb-head">
@@ -348,6 +361,7 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
           <div><span class="lbl" data-i18n="lastGames">Dernières parties</span><div class="hist" id="hist"></div></div>
         </div>
       </section>
+      </div>
     </div>
 
     <aside class="sidecol">
@@ -506,8 +520,7 @@ $('#avRnd').onclick = () => { P.sfx('click'); avDraft = avRand(); renderAvEd(); 
 $('#avSave').onclick = () => { P.sfx('good'); P.setMyAvatar(avDraft); closeAvEd(); renderMyAv(); render(); };
 $('#avOpts').addEventListener('click', e => { const b = e.target.closest('[data-avo]'); if (!b) return; P.sfx('click'); avDraft = b.dataset.avo; const sc = $('#avOpts').scrollTop; renderAvEd(); $('#avOpts').scrollTop = sc; });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#avEd').hidden) closeAvEd(); });
-$('#inName').addEventListener('change', () => P.pushAvatar());
-P.pushAvatar();
+$('#inName').addEventListener('change', () => { P.fetchAvatars().then(render); });
 
 P.bindName($('#inName'));
 $('#inName').addEventListener('input', () => render());
@@ -528,9 +541,9 @@ Party.mountPanel($('#party'));
 // Bouton volume (réglages communs : la musique de chaque jeu et les bruitages)
 P.audioDock({ on: () => P.musicVol() > 0.01, set: () => {}, vol: () => {} });
 P.onLang(() => { renderGames(); render(); renderSnd(); gc.refresh(); Party.refresh(); if (!$('#avEd').hidden) renderAvEd(); });
-// Grand écran : la page occupe toute la largeur et s'agrandit en proportion (mise en page calculée sur 1500 px)
+// Grand écran : la page occupe toute la largeur ; léger agrandissement (25 % max) pour rester lisible
 function fitScreen() {
-  const w = window.innerWidth, z = w > 1500 ? Math.min(w / 1500, 2.2) : 1;
+  const w = window.innerWidth, h = window.innerHeight, z = Math.max(1, Math.min(w / 1700, h / 1000, 1.25));
   document.body.style.zoom = z === 1 ? '' : z;
   document.documentElement.style.setProperty('--vh', (window.innerHeight / z) + 'px');
 }

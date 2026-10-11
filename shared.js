@@ -533,7 +533,7 @@ const SKINS = (() => {
   })();
   const list = [];
   for (let i = 0; i < 4; i++) list.push({ id: 'qd' + i, g: 'qd', svg: () => quoridor(i) });
-  for (let i = 0; i < 10; i++) list.push({ id: 'uc' + i, g: 'uc', svg: () => bgWrap(uc(i, 'av'), 64, i % 2 ? '#2a0d12' : '#3a1018') });
+  for (let i = 0; i < 10; i++) list.push({ id: 'uc' + i, g: 'uc', svg: () => bgWrap(uc(i, 'av'), 64, i % 2 ? '#1b2d54' : '#26407a') });
   for (let i = 0; i < 10; i++) list.push({ id: 'cn' + i, g: 'cn', svg: () => bgWrap(cn(i, ''), 40, '#141a33') });
   for (let i = 0; i < 6; i++) list.push({ id: 'bn' + i, g: 'bn', svg: () => bn.captainSVG(i, i % 3 === 1 ? 'smirk' : '') });
   list.push({ id: 'bnm', g: 'bn', svg: () => bn.morgrimSVG('smirk') });
@@ -557,7 +557,12 @@ P.pushAvatar = () => {
 };
 P.avatars = {};
 P.fetchAvatars = async () => {
-  try { const d = await P.fbReq('/avatars', 'GET'); P.avatars = {}; for (const k in d || {}) { const a = P.avatarNorm(d[k]); if (a) P.avatars[k] = a; } } catch (e) {}
+  try {
+    const d = await P.fbReq('/avatars', 'GET'); P.avatars = {}; for (const k in d || {}) { const a = P.avatarNorm(d[k]); if (a) P.avatars[k] = a; }
+    // Même pseudo sur un autre appareil : le skin enregistré en ligne fait foi (il est publié à chaque changement)
+    const mk = avKey(P.hasName() ? P.name() : '');
+    if (mk && P.avatars[mk]) P.set('bg-skin', P.avatars[mk]); else if (mk && P.myAvatar()) P.pushAvatar();
+  } catch (e) {}
   return P.avatars;
 };
 P.avatarOf = name => { const k = avKey(name); if (k === avKey(P.hasName() ? P.name() : '') && P.myAvatar()) return P.myAvatar(); return P.avatars[k] || null; };
