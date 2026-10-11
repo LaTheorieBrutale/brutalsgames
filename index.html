@@ -146,9 +146,9 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
 @media (min-width:1100px){#gchat{height:calc(100vh - 420px);min-height:300px}}
 .lb{display:flex;flex-direction:column;gap:12px}
 .lb-head{display:flex;flex-direction:column;gap:8px}
-#lbTabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;flex-wrap:nowrap}
-#lbTabs::-webkit-scrollbar{display:none}
-#lbTabs .btn{flex:none;white-space:nowrap;padding:8px 11px 7px;font-size:14px}
+#lbTabs{display:flex;flex-wrap:wrap;gap:6px;padding:0 0 4px}
+#lbTabs .btn{flex:1 1 auto;white-space:nowrap;padding:8px 10px 7px;font-size:14px;box-shadow:0 3px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.25)}
+@media (max-width:520px){#lbTabs{gap:5px}#lbTabs .btn{font-size:12.5px;padding:7px 8px 6px;border-radius:11px}}
 .lb-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
 @media (max-width:760px){.lb-grid{grid-template-columns:1fr}}
 .lb-cols,.lb-row{display:grid;grid-template-columns:30px 1fr 44px 44px 46px;align-items:center;gap:6px}
