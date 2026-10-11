@@ -147,6 +147,8 @@ h1{margin:6px 0 3px;font-size:clamp(30px,3.4vw,46px);line-height:1.04;letter-spa
 .game-visual svg{position:absolute;inset:0;width:100%;height:100%;transition:transform .25s}
 .game-card:hover .game-visual .tbg,.game-card:hover .game-visual>svg{transform:scale(1.06)}
 .game-visual .tbg{transition:transform .25s}
+.game-visual img.shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s}
+.game-card:hover .game-visual img.shot{transform:scale(1.06)}
 .game-visual:after{content:"";position:absolute;top:-20%;bottom:-20%;left:-60%;width:30%;pointer-events:none;background:linear-gradient(100deg,transparent,#ffffff29,transparent);transform:skewX(-20deg);animation:tile-sheen 6.5s ease-in-out infinite}
 .game-card:nth-child(2) .game-visual:after{animation-delay:-1.2s}.game-card:nth-child(3) .game-visual:after{animation-delay:-2.4s}.game-card:nth-child(4) .game-visual:after{animation-delay:-3.6s}
 .badge-new{position:absolute;z-index:3;top:8px;left:8px;padding:3px 8px;border-radius:7px;color:#3a1520;background:linear-gradient(135deg,#ffe17a,#ff9e5e);font-size:10px;font-weight:900;letter-spacing:.06em;box-shadow:0 3px 10px #0005}
@@ -503,7 +505,7 @@ function renderFilters() {
 function renderGames() {
   const q = norm($('#gameSearch').value.trim());
   const shown = LIST.filter(g => (filter === 'all' || CAT[g.href] === filter) && (!q || ['fr', 'en', 'cs'].some(l => norm(P.t(g.name)).includes(q)) || norm(g.href).includes(q) || norm(t(g.desc)).includes(q)));
-  $('#games').innerHTML = shown.length ? shown.map(g => `<a class="game-card card" href="${g.href}.html"><div class="game-visual">${g.isNew ? `<span class="badge-new">${t('isNew')}</span>` : ''}${g.art}</div>
+  $('#games').innerHTML = shown.length ? shown.map(g => `<a class="game-card card" href="${g.href}.html"><div class="game-visual">${g.isNew ? `<span class="badge-new">${t('isNew')}</span>` : ''}<img class="shot" src="img/games/${g.href}.jpg?v=2" alt="" loading="lazy" decoding="async"></div>
     <div class="game-info"><h3>${esc(t(g.name))}</h3><p>${esc(t(g.desc))}</p><div class="game-meta"><span>${esc(t(g.tags[0]))}</span><span class="play-mini">${PLAY}</span></div></div></a>`).join('')
     : `<div class="no-game">${t('noMatch')}</div>`;
 }
