@@ -50,8 +50,7 @@ a{color:inherit}
 #sparks{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 #sparks i{position:absolute;bottom:-12px;width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);opacity:.5;animation:rise linear infinite}
 @keyframes rise{to{transform:translateY(-110vh) translateX(40px);opacity:0}}
-.wrap{--gut:14px;position:relative;z-index:1;margin:0 auto;padding:0 var(--gut)}
-@media (min-width:1100px){.wrap{--gut:24px}}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 14px}
 /* éléments de base */
 .frame{position:relative;background:linear-gradient(180deg,#26407a 0,var(--panel) 26%,var(--panel2) 100%);border:3px solid var(--ink);border-radius:22px;
   box-shadow:0 6px 0 var(--ink),inset 0 2px 0 rgba(255,255,255,.14),inset 0 0 0 2px rgba(255,255,255,.04)}
@@ -75,7 +74,7 @@ h2.sec .ico{width:34px;height:34px;flex:none;filter:drop-shadow(0 3px 0 var(--in
 h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-gradient(90deg,var(--line),transparent)}
 
 /* bannière : ciel bleu nuit, halo derrière le logo, objets des jeux qui flottent */
-.hero{position:relative;height:clamp(250px,44vw,370px);margin:0 calc(-1 * var(--gut));overflow:hidden;border-bottom:4px solid var(--ink);isolation:isolate}
+.hero{position:relative;height:clamp(250px,44vw,370px);margin:0 -14px;overflow:hidden;border-bottom:4px solid var(--ink);isolation:isolate}
 .hero svg.scene{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
 .hero .float{animation:bob 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 .hero .f2{animation-delay:-1.3s}.hero .f3{animation-delay:-2.1s}.hero .f4{animation-delay:-.7s}.hero .f5{animation-delay:-2.8s}.hero .f6{animation-delay:-1.9s}.hero .f7{animation-delay:-3.3s}.hero .f8{animation-delay:-.4s}
@@ -103,7 +102,7 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
 /* mise en page */
 .layout{display:grid;grid-template-columns:1fr;gap:18px;margin-top:-34px;position:relative;z-index:2}
 .maincol,.sidecol{display:flex;flex-direction:column;gap:16px;min-width:0}
-@media (min-width:1100px){.layout{grid-template-columns:minmax(0,1fr) clamp(370px,28%,440px);gap:24px;align-items:start}.sidecol{position:sticky;top:16px}}
+@media (min-width:1100px){.layout{grid-template-columns:minmax(0,1fr) 370px;align-items:start}.sidecol{position:sticky;top:16px}}
 
 /* profil */
 .profile{display:flex;align-items:center;gap:12px;padding:12px 14px}
@@ -174,16 +173,7 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
 @media (min-width:640px){.games{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
 @media (min-width:1100px){.games{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .lbwrap{display:flex;flex-direction:column;gap:16px;min-width:0}
-/* très grand écran : tout visible d'un coup — jeu à la une et classement côte à côte, les 8 jeux sur une ligne */
-@media (min-width:1700px){
-  .hero{height:300px}
-  .maincol{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px 22px;align-items:start}
-  .maincol>.profile,.maincol>#s-games,.maincol>.games{grid-column:1/-1}
-  .maincol>.feat{grid-column:1;grid-row:2}.maincol>.lbwrap{grid-column:2;grid-row:2}
-  .maincol>.lbwrap h2.sec{margin-top:0}
-  .lb-grid{grid-template-columns:1fr 1fr}
-}
-@media (min-width:2000px){.games{grid-template-columns:repeat(8,minmax(0,1fr))}}
+
 .tile{display:flex;flex-direction:column;overflow:hidden;text-decoration:none;transition:transform .2s cubic-bezier(.2,1.5,.4,1)}
 @media (hover:hover){.tile:hover{transform:translateY(-4px) rotate(-.5deg)}}
 .tile .thumb{position:relative;height:0;padding-top:50%;border-bottom:3px solid var(--ink);overflow:hidden}
@@ -199,7 +189,7 @@ h2.sec::after{content:"";flex:1;height:4px;border-radius:3px;background:linear-g
 /* panneaux */
 .partybox,.chatbox,.lb{padding:14px}
 #gchat{height:380px}
-@media (min-width:1100px){#gchat{height:calc(var(--vh,100vh) - 420px);min-height:300px}}
+@media (min-width:1100px){#gchat{height:calc(100vh - 420px);min-height:300px}}
 .lb{display:flex;flex-direction:column;gap:12px}
 .lb-head{display:flex;flex-direction:column;gap:8px}
 #lbTabs{display:flex;flex-wrap:wrap;gap:6px;padding:0 0 4px}
@@ -541,13 +531,6 @@ Party.mountPanel($('#party'));
 // Bouton volume (réglages communs : la musique de chaque jeu et les bruitages)
 P.audioDock({ on: () => P.musicVol() > 0.01, set: () => {}, vol: () => {} });
 P.onLang(() => { renderGames(); render(); renderSnd(); gc.refresh(); Party.refresh(); if (!$('#avEd').hidden) renderAvEd(); });
-// Grand écran : la page occupe toute la largeur ; léger agrandissement (25 % max) pour rester lisible
-function fitScreen() {
-  const w = window.innerWidth, h = window.innerHeight, z = Math.max(1, Math.min(w / 1700, h / 1000, 1.25));
-  document.body.style.zoom = z === 1 ? '' : z;
-  document.documentElement.style.setProperty('--vh', (window.innerHeight / z) + 'px');
-}
-window.addEventListener('resize', fitScreen); fitScreen();
 P.applyStatic(); renderGames(); renderSnd(); render(); load();
 })();
 </script>
