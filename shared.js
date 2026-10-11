@@ -401,13 +401,43 @@ function step(now) {
 }
 P.stopConfetti = () => { CF.parts = []; if (CF.raf) cancelAnimationFrame(CF.raf); CF.raf = 0; if (CF.c) CF.c.getContext('2d').clearRect(0, 0, CF.c.width, CF.c.height); };
 
+/* ---------- Menu « Quitter la partie » (croix des jeux) : menu déroulant puis confirmation ---------- */
+P.quitMenu = (btn, onQuit) => {
+  const old = document.getElementById('bgQuitMenu'); if (old) { old.remove(); return; }
+  if (!document.getElementById('bgQuitCss')) {
+    const st = document.createElement('style'); st.id = 'bgQuitCss';
+    st.textContent = '#bgQuitMenu{position:fixed;z-index:60;min-width:210px;padding:8px;border-radius:16px;background:rgba(14,12,22,.97);border:3px solid #000;box-shadow:0 10px 26px rgba(0,0,0,.55),inset 0 0 0 1.5px rgba(255,255,255,.12);font-family:inherit;color:#fff;animation:bgqm .16s ease-out;transform-origin:top left}'
+      + '@keyframes bgqm{from{opacity:0;transform:translateY(-6px) scale(.96)}}'
+      + '#bgQuitMenu button{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:9px;width:100%;padding:11px 13px;border-radius:11px;font-weight:900;font-size:15.5px;cursor:pointer;color:#fff}'
+      + '#bgQuitMenu button:hover{background:rgba(255,255,255,.09)}'
+      + '#bgQuitMenu .q{color:#ff8a7a}#bgQuitMenu .sure{padding:6px 12px 8px;font-size:14.5px;font-weight:800;opacity:.9}'
+      + '#bgQuitMenu .row{display:flex;gap:6px}#bgQuitMenu .row button{justify-content:center;flex:1;padding:10px 8px}'
+      + '#bgQuitMenu .yes{background:linear-gradient(180deg,#ff6a5a,#c0281e);box-shadow:inset 0 0 0 2px rgba(0,0,0,.35)}#bgQuitMenu .yes:hover{filter:brightness(1.1);background:linear-gradient(180deg,#ff6a5a,#c0281e)}'
+      + '#bgQuitMenu .no{background:rgba(255,255,255,.1)}';
+    document.head.appendChild(st);
+  }
+  const m = document.createElement('div'); m.id = 'bgQuitMenu'; m.setAttribute('role', 'menu');
+  const r = btn.getBoundingClientRect();
+  m.style.left = Math.max(8, Math.min(r.left, innerWidth - 230)) + 'px'; m.style.top = (r.bottom + 8) + 'px';
+  const close = () => { m.remove(); document.removeEventListener('pointerdown', outside, true); };
+  const outside = e => { if (!m.contains(e.target) && !btn.contains(e.target)) close(); };
+  const step1 = () => { m.innerHTML = `<button class="q" data-q="1"><span style="font-size:17px">🚪</span>${P.t('quitGame')}</button>`; };
+  const step2 = () => { m.innerHTML = `<div class="sure">${P.t('quitSure')}</div><div class="row"><button class="no" data-q="no">${P.t('quitNo')}</button><button class="yes" data-q="yes">${P.t('quitYes')}</button></div>`; };
+  m.addEventListener('click', e => {
+    const b = e.target.closest('[data-q]'); if (!b) return; e.stopPropagation(); P.sfx('click');
+    if (b.dataset.q === '1') step2(); else if (b.dataset.q === 'no') close(); else { close(); onQuit(); }
+  });
+  step1(); document.body.appendChild(m);
+  setTimeout(() => document.addEventListener('pointerdown', outside, true), 0);
+};
+
 /* ---------- Textes communs ---------- */
 P.addStrings({
-  fr: { defName: 'Crâneur', namePh: 'Écris ton pseudo…', nameReq: 'Entre ton pseudo pour jouer !', nameTaken: 'Choisis un vrai pseudo !', back: 'Retour', home: 'Accueil', settings: 'Réglages', sound: 'Sons', on: 'Activés', off: 'Coupés', language: 'Langue', close: 'Fermer',
+  fr: { defName: 'Crâneur', quitGame: 'Quitter la partie', quitSure: 'Es-tu sûr de vouloir quitter ?', quitYes: 'Oui, quitter', quitNo: 'Non', menuBack: 'Retour au menu',  namePh: 'Écris ton pseudo…', nameReq: 'Entre ton pseudo pour jouer !', nameTaken: 'Choisis un vrai pseudo !', back: 'Retour', home: 'Accueil', settings: 'Réglages', sound: 'Sons', on: 'Activés', off: 'Coupés', language: 'Langue', close: 'Fermer',
     colPlayer: 'Joueur', colW: 'V', colG: 'P', aiTag: 'IA', lastGames: 'Dernières parties', lbEmpty: 'Aucune partie pour l’instant.', beat: '<b>{a}</b> bat {b}', winN: '<b>{a}</b> gagne à {n}', winTeam: '<b>{a}</b> gagnent à {n}', locale: 'fr-FR' },
-  en: { defName: 'Skully', namePh: 'Type your nickname…', nameReq: 'Enter your nickname to play!', nameTaken: 'Pick a real nickname!', back: 'Back', home: 'Home', settings: 'Settings', sound: 'Sounds', on: 'On', off: 'Off', language: 'Language', close: 'Close',
+  en: { defName: 'Skully', quitGame: 'Leave the game', quitSure: 'Are you sure you want to leave?', quitYes: 'Yes, leave', quitNo: 'No', menuBack: 'Back to menu',  namePh: 'Type your nickname…', nameReq: 'Enter your nickname to play!', nameTaken: 'Pick a real nickname!', back: 'Back', home: 'Home', settings: 'Settings', sound: 'Sounds', on: 'On', off: 'Off', language: 'Language', close: 'Close',
     colPlayer: 'Player', colW: 'W', colG: 'G', aiTag: 'AI', lastGames: 'Recent games', lbEmpty: 'No games yet.', beat: '<b>{a}</b> beat {b}', winN: '<b>{a}</b> won a {n}-player game', winTeam: '<b>{a}</b> won a {n}-player game', locale: 'en-GB' },
-  cs: { defName: 'Lebkoun', namePh: 'Napiš svou přezdívku…', nameReq: 'Pro hraní zadej přezdívku!', nameTaken: 'Vyber si skutečnou přezdívku!', back: 'Zpět', home: 'Domů', settings: 'Nastavení', sound: 'Zvuky', on: 'Zapnuté', off: 'Vypnuté', language: 'Jazyk', close: 'Zavřít',
+  cs: { defName: 'Lebkoun', quitGame: 'Opustit hru', quitSure: 'Opravdu chceš odejít?', quitYes: 'Ano, odejít', quitNo: 'Ne', menuBack: 'Zpět do menu',  namePh: 'Napiš svou přezdívku…', nameReq: 'Pro hraní zadej přezdívku!', nameTaken: 'Vyber si skutečnou přezdívku!', back: 'Zpět', home: 'Domů', settings: 'Nastavení', sound: 'Zvuky', on: 'Zapnuté', off: 'Vypnuté', language: 'Jazyk', close: 'Zavřít',
     colPlayer: 'Hráč', colW: 'V', colG: 'H', aiTag: 'AI', lastGames: 'Poslední hry', lbEmpty: 'Zatím žádné hry.', beat: '<b>{a}</b> porazil {b}', winN: '<b>{a}</b> vyhrál hru ve {n}', winTeam: '<b>{a}</b> vyhráli hru ve {n}', locale: 'cs-CZ' }
 });
 })();
