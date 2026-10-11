@@ -360,10 +360,10 @@ body.ingame #game .rc-form{padding-left:50px}
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="shared.js?v=20261011h"></script>
-<script src="skins.js?v=20261011h"></script>
-<script src="chat.js?v=20261011h"></script>
-<script src="party.js?v=20261011h" data-game="dr"></script>
+<script src="shared.js?v=20261011i"></script>
+<script src="skins.js?v=20261011i"></script>
+<script src="chat.js?v=20261011i"></script>
+<script src="party.js?v=20261011i" data-game="dr"></script>
 <script src="words.js"></script>
 <script>
 (() => {
@@ -810,6 +810,7 @@ const TEL_WRITE = 45000, TEL_GUESS = 40000, TEL_GRACE = 4000;
 const telKind = k => k === 0 ? 'w' : k % 2 ? 'd' : 'g';
 const telDur = k => telKind(k) === 'd' ? net.cfg.time * 1000 : k === 0 ? TEL_WRITE : TEL_GUESS;
 function telTo(seat, msg) { if (seat === 0) telRecv(msg); else { const r = net.roster[seat]; if (r && r.conn && r.conn.open && !r.gone) r.conn.send(msg); } }
+const telWire = e => e && e.k === 'd' ? { ...e, ops: chunkOps(e.ops) } : e;
 function telStart() {
   net.roster.forEach(r => { r.score = 0; });
   const order = shuffle(active().map(o => o.i));
@@ -822,7 +823,7 @@ function telStep(k) {
   T.order.forEach((seat, p) => {
     const b = (p - k + T.n) % T.n, prev = k ? T.books[b].e[k - 1] : null;
     if (net.roster[seat] && net.roster[seat].gone) { telFill(seat, p); return; }
-    telTo(seat, { t: 'task', tn: T.tn, step: k, kind, prev });
+    telTo(seat, { t: 'task', tn: T.tn, step: k, kind, prev: telWire(prev) });
   });
   telSync(); telCheck();
 }
@@ -836,7 +837,7 @@ function telSubmit(seat, m) {
   if (!T || T.phase !== 'tel' || !m || m.step !== T.step || m.tn !== T.tn || T.sub[seat]) return;
   const p = T.order.indexOf(seat); if (p < 0) return;
   const k = T.step, b = (p - k + T.n) % T.n, kind = telKind(k);
-  if (kind === 'd') { const ops = []; (Array.isArray(m.ops) ? m.ops : []).slice(0, 2500).forEach(o => mergeOp(ops, o && o.k === 's' ? { ...o, n: 1 } : o)); T.books[b].e[k] = { s: seat, k: 'd', ops }; }
+  if (kind === 'd') { const ops = okOps(m.ops); T.books[b].e[k] = { s: seat, k: 'd', ops }; }
   else T.books[b].e[k] = { s: seat, k: kind, txt: String(m.txt || '').replace(/\s+/g, ' ').trim().slice(0, 100), l: ['fr', 'en', 'cs'].includes(m.l) ? m.l : 'fr' };
   T.sub[seat] = 1; telSync(); telCheck();
 }
@@ -861,7 +862,7 @@ function telReveal() {
   else if (T.bi + 1 < T.n) { T.bi++; T.ei = 0; }
   else { T.phase = 'done'; telSync(); return; }
   const e = T.books[T.bi].e[T.ei];
-  net.roster.forEach((r, i) => telTo(i, { t: 'aent', bi: T.bi, ei: T.ei, owner: T.books[T.bi].owner, e }));
+  net.roster.forEach((r, i) => telTo(i, { t: 'aent', bi: T.bi, ei: T.ei, owner: T.books[T.bi].owner, e: telWire(e) }));
   telSync();
 }
 function telPub() {
@@ -879,7 +880,17 @@ function telToLobby() {
 }
 
 /* --- côté joueur : tâche reçue, envoi, album --- */
-function okOps(list) { const ops = []; (Array.isArray(list) ? list : []).slice(0, 2500).forEach(o => mergeOp(ops, o && o.k === 's' ? { ...o, n: 1 } : o)); return ops; }
+// dessin complet → morceaux de 300 points au plus (un trait long = un début « n » puis des suites), pour ne rien couper
+function chunkOps(list) {
+  const out = [];
+  (list || []).forEach(o => {
+    if (o.k !== 's') { out.push(o); return; }
+    for (let i = 0; i < o.p.length; i += 600) out.push(i ? { k: 's', p: o.p.slice(i, i + 600) } : { k: 's', n: 1, c: o.c, w: o.w, p: o.p.slice(0, 600) });
+  });
+  return out;
+}
+// morceaux reçus → dessin (les suites sont recollées au trait précédent)
+function okOps(list) { const ops = []; (Array.isArray(list) ? list : []).slice(0, 20000).forEach(o => mergeOp(ops, o)); return ops; }
 function telRecv(m) {
   if (m.t === 'task') {
     const prev = m.prev && typeof m.prev === 'object' ? m.prev : null;
@@ -900,7 +911,7 @@ function telRecv(m) {
 function telSend(auto) {
   if (!TK || TK.sent || !V || V.step !== TK.step || V.tn !== TK.tn) return;
   const msg = { t: 'tsub', tn: TK.tn, step: TK.step };
-  if (TK.kind === 'd') { endStroke(); msg.ops = CV.ops.map(o => o.k === 's' ? { k: 's', n: 1, c: o.c, w: o.w, p: o.p } : o); }
+  if (TK.kind === 'd') { endStroke(); msg.ops = chunkOps(CV.ops); }
   else {
     const el = $('#telIn'), v = (el ? el.value : TK.draft || '').replace(/\s+/g, ' ').trim().slice(0, 100);
     if (!v && !auto) { toast(t('telEmpty'), true); P.sfx('bad'); return; }
@@ -1307,7 +1318,7 @@ P.onLang(() => {
 });
 P.applyStatic(); renderSnd(); renderMus(); renderChat();
 { const jc = window.Party && Party.takeJoin(); if (jc) joinFromParty(jc); }
-window.__dr = { get G() { return G; }, get V() { return V; }, net, CV, get word() { return myWord; }, get choices() { return myChoices; }, wordOf };
+window.__dr = { get G() { return G; }, get T() { return T; }, get ALB() { return ALB; }, get V() { return V; }, net, CV, get word() { return myWord; }, get choices() { return myChoices; }, wordOf };
 // Skins : chargés au démarrage, puis mis à jour en direct
 P.skinLive(() => { try { if (V && !$('#game').hidden) render(); else if (!$('#onWait').hidden) renderLobby(); if (typeof renderChat === 'function') renderChat(); } catch (e) {} });
 })();
