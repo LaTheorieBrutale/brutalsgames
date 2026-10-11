@@ -103,7 +103,7 @@ label,.lbl{font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:
 @keyframes jolt{20%{transform:translateX(-4px) rotate(-4deg)}40%{transform:translateX(4px) rotate(4deg)}60%{transform:translateX(-2px)}}
 .cap .nfo{min-width:0;display:flex;flex-direction:column;gap:4px}
 .cap.r .nfo{align-items:flex-end}
-.cap .nm{font-family:var(--f-title);font-size:19px;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;text-shadow:0 2px 0 #000}
+.cap .nm{font-family:var(--f-title);font-size:22px;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;text-shadow:0 2px 0 #000}
 .cap.me .nm{color:var(--mine)}
 .cap .badge2{position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10.5px;font-weight:900;letter-spacing:.08em;padding:2px 8px 1px;border-radius:999px;color:#2a1606;background:linear-gradient(180deg,#ffe7a6,#e0b04e);border:2px solid var(--ink);box-shadow:0 0 10px rgba(224,176,78,.6);animation:pulse 1s ease-in-out infinite alternate}
 @keyframes pulse{to{box-shadow:0 0 18px rgba(224,176,78,.95)}}
@@ -143,7 +143,7 @@ label,.lbl{font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:
 .pctrl,.fctrl{display:flex;gap:7px;width:100%}
 .pctrl .btn{flex:1;min-width:0;font-size:14px;padding:9px 6px 8px}
 .fctrl{align-items:center}
-.fctrl .hint{flex:1;font-size:13px;color:var(--muted);line-height:1.3}
+.fctrl .hint{flex:1;font-size:13.5px;color:var(--muted);line-height:1.3;text-align:center;min-height:18px}
 .fctrl .btn{font-family:var(--f-title);font-weight:400;font-size:26px;padding:6px 22px 3px;letter-spacing:.04em}
 .fctrl .btn svg{width:24px;height:24px}
 .phint{margin:0;text-align:center;font-size:12.5px;color:var(--muted)}
@@ -292,7 +292,6 @@ label,.lbl{font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:
     </div>
     <div class="fctrl" id="fctrl" hidden>
       <div class="hint" id="fhint"></div>
-      <button class="btn gold" id="bFire"><svg viewBox="0 0 24 24" fill="none" stroke="#2a1606" stroke-width="2.6"><circle cx="12" cy="12" r="7"/><path d="M12 1v6M12 17v6M1 12h6M17 12h6"/><circle cx="12" cy="12" r="1.6" fill="#2a1606"/></svg><span data-i18n="fire">TIRER</span></button>
     </div>
     <div class="tbar"><i id="tbar"></i></div>
   </div>
@@ -353,7 +352,7 @@ P.addStrings({
     phPlace: 'Prépare ta flotte', phBattle: 'Bataille', placeHint: 'Glisse tes navires sur la grille. Touche un navire posé pour le tourner.', rotate: '↻ Tourner', random: '🎲 Au hasard', clear: 'Effacer', ready: 'Prêt !',
     waitOpp: 'En attente de {name}…', oppPlacing: '{name} cache sa flotte…', youPlacing: 'Cache tes navires', placeAll: 'Place tous tes navires d’abord !', badSpot: 'Pas de place ici !', autoPlaced: 'Temps écoulé : flotte placée au hasard',
     yourTurn: 'À toi de tirer !', turnBadge: 'À TOI DE JOUER', oppTurn: '{name} vise…', hitAgain: 'Touché ! Rejoue !', miss: 'Plouf… raté', gotHit: 'Touché ! {name} rejoue…', oppMiss: '{name} a raté !',
-    aimHint: 'Touche une case pour viser, puis tire !', aimed: 'Cible {c} : touche-la encore ou appuie sur TIRER', fire: 'TIRER', sunkBanner: 'Coulé : {ship} !', sunkMine: 'Ton {ship} sombre !',
+    aimHint: 'Touche une case de la grille ennemie pour faire feu !', aimed: 'Cible {c} : touche-la encore ou appuie sur TIRER', fire: 'TIRER', sunkBanner: 'Coulé : {ship} !', sunkMine: 'Ton {ship} sombre !',
     yourFleet: 'Ta flotte', shipsLeft: 'Navires : {n}/5', shots: 'Tirs', accuracy: 'Réussite',
     s_galleon: 'galion', s_frigate: 'frégate', s_brig: 'brigantin', s_schooner: 'goélette', s_sloop: 'sloop',
     win: 'Victoire !', lose: 'Naufrage…', oppQuit: '{name} a quitté la partie', statLine: '{s} tirs · {p} % de réussite', again: 'Rejouer', lobby: 'Retour au salon', hostAgain: 'L’hôte peut relancer une partie.',
@@ -368,7 +367,7 @@ P.addStrings({
     phPlace: 'Ready your fleet', phBattle: 'Battle', placeHint: 'Drag your ships onto the grid. Tap a placed ship to rotate it.', rotate: '↻ Rotate', random: '🎲 Random', clear: 'Clear', ready: 'Ready!',
     waitOpp: 'Waiting for {name}…', oppPlacing: '{name} is hiding their fleet…', youPlacing: 'Hide your ships', placeAll: 'Place all your ships first!', badSpot: 'No room here!', autoPlaced: 'Time’s up: fleet placed at random',
     yourTurn: 'Your turn to fire!', turnBadge: 'YOUR TURN', oppTurn: '{name} is aiming…', hitAgain: 'Hit! Fire again!', miss: 'Splash… miss', gotHit: 'Hit! {name} fires again…', oppMiss: '{name} missed!',
-    aimHint: 'Tap a square to aim, then fire!', aimed: 'Target {c}: tap it again or press FIRE', fire: 'FIRE', sunkBanner: 'Sunk: {ship}!', sunkMine: 'Your {ship} is going down!',
+    aimHint: 'Tap a square on the enemy grid to fire!', aimed: 'Target {c}: tap it again or press FIRE', fire: 'FIRE', sunkBanner: 'Sunk: {ship}!', sunkMine: 'Your {ship} is going down!',
     yourFleet: 'Your fleet', shipsLeft: 'Ships: {n}/5', shots: 'Shots', accuracy: 'Accuracy',
     s_galleon: 'galleon', s_frigate: 'frigate', s_brig: 'brigantine', s_schooner: 'schooner', s_sloop: 'sloop',
     win: 'Victory!', lose: 'Shipwrecked…', oppQuit: '{name} left the game', statLine: '{s} shots · {p}% accuracy', again: 'Play again', lobby: 'Back to lobby', hostAgain: 'The host can start a new game.',
@@ -383,7 +382,7 @@ P.addStrings({
     phPlace: 'Připrav flotilu', phBattle: 'Bitva', placeHint: 'Přetáhni lodě do mřížky. Klepnutím na loď ji otočíš.', rotate: '↻ Otočit', random: '🎲 Náhodně', clear: 'Smazat', ready: 'Hotovo!',
     waitOpp: 'Čeká se na hráče {name}…', oppPlacing: '{name} schovává flotilu…', youPlacing: 'Schovej své lodě', placeAll: 'Nejdřív rozmísti všechny lodě!', badSpot: 'Tady není místo!', autoPlaced: 'Čas vypršel: flotila rozmístěna náhodně',
     yourTurn: 'Jsi na řadě, pal!', turnBadge: 'JSI NA ŘADĚ', oppTurn: '{name} míří…', hitAgain: 'Zásah! Pal znovu!', miss: 'Šplouch… vedle', gotHit: 'Zásah! {name} pálí znovu…', oppMiss: '{name} minul!',
-    aimHint: 'Klepni na pole a zamiř, pak pal!', aimed: 'Cíl {c}: klepni znovu nebo stiskni PAL', fire: 'PAL', sunkBanner: 'Potopeno: {ship}!', sunkMine: 'Tvoje {ship} se potápí!',
+    aimHint: 'Klepni na pole v nepřátelské mřížce a vystřel!', aimed: 'Cíl {c}: klepni znovu nebo stiskni PAL', fire: 'PAL', sunkBanner: 'Potopeno: {ship}!', sunkMine: 'Tvoje {ship} se potápí!',
     yourFleet: 'Tvoje flotila', shipsLeft: 'Lodě: {n}/5', shots: 'Výstřely', accuracy: 'Úspěšnost',
     s_galleon: 'galeona', s_frigate: 'fregata', s_brig: 'brigantina', s_schooner: 'škuner', s_sloop: 'šalupa',
     win: 'Vítězství!', lose: 'Ztroskotání…', oppQuit: '{name} opustil hru', statLine: '{s} výstřelů · úspěšnost {p} %', again: 'Hrát znovu', lobby: 'Zpět do lobby', hostAgain: 'Hostitel může spustit novou hru.',
@@ -549,7 +548,7 @@ function tn(X, t0, dur, type, f0, f1, vol, a) {
 // tir : détonation sourde du canon puis sifflement du boulet
 function sCannon() { const X = sfxCtx(); if (!X) return; const t0 = X.c.currentTime;
   nz(X, t0, 0.03, 'highpass', 2500, 0, 0.5); nz(X, t0, 0.75, 'lowpass', 900, 70, 0.95, 0.8, 0.004); tn(X, t0, 0.45, 'sine', 85, 32, 0.8, 0.003);
-  tn(X, t0 + 0.08, 0.46, 'sine', 1900, 620, 0.045, 0.06); }
+  tn(X, t0 + 0.04, 0.28, 'sine', 1900, 620, 0.045, 0.04); }
 // touché : explosion + bois qui éclate
 function sHit(big) { const X = sfxCtx(); if (!X) return; const t0 = X.c.currentTime;
   nz(X, t0, big ? 1.4 : 0.95, 'lowpass', 1600, 80, 1, 0.8, 0.004); tn(X, t0, 0.5, 'sine', 120, 30, 0.75, 0.003);
@@ -1078,13 +1077,13 @@ function splash(p) {
   for (let k = 0; k < 34; k++) { const a = rnd() * 6.28, sp = 0.3 + rnd() * 1.4; spawn(G3.spray, p.x, p.y + 0.1, p.z, Math.cos(a) * sp, 2 + rnd() * 3.2, Math.sin(a) * sp, 0.6 + rnd() * 0.4, 0.22, 0.1, WHITE, [0.6, 0.8, 0.9], 0.9); }
   const col = new THREE.Mesh(G3.colGeo, new THREE.MeshBasicMaterial({ color: 0xe8f6ff, transparent: true, opacity: 0.85, depthWrite: false })); col.position.copy(p); col.scale.set(1, 0.01, 1); G3.scene.add(col);
   const ring = new THREE.Mesh(G3.ringGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, depthWrite: false, side: THREE.DoubleSide })); ring.rotation.x = -Math.PI / 2; ring.position.set(p.x, 0.1, p.z); G3.scene.add(ring);
-  G3.fx.push({ age: 0, life: 0.9, upd(k) { const h = Math.sin(Math.min(1, k * 1.6) * Math.PI) * 1.5; col.scale.set(1 + k, Math.max(0.01, h), 1 + k); col.position.y = h / 2; col.material.opacity = 0.85 * (1 - k); ring.scale.setScalar(1 + k * 3.2); ring.material.opacity = 0.9 * (1 - k); }, end() { G3.scene.remove(col, ring); col.material.dispose(); ring.material.dispose(); } });
+  G3.fx.push({ age: 0, life: 0.55, upd(k) { const h = Math.sin(Math.min(1, k * 1.6) * Math.PI) * 1.5; col.scale.set(1 + k, Math.max(0.01, h), 1 + k); col.position.y = h / 2; col.material.opacity = 0.85 * (1 - k); ring.scale.setScalar(1 + k * 3.2); ring.material.opacity = 0.9 * (1 - k); }, end() { G3.scene.remove(col, ring); col.material.dispose(); ring.material.dispose(); } });
 }
 function addFire(p, strong) { G3.emit.push({ x: p.x, y: p.y, z: p.z, acc: rnd(), strong: strong ? 1 : 0.6 }); }
 function shootBall(b, i, onHit) {
   const to = cellPos(b, i), from = to.clone().add(new THREE.Vector3((rnd() - 0.5) * 3, 1.4, b === 1 ? 8 : -8));
   const ball = new THREE.Mesh(G3.ballGeo, G3.ballMat); ball.position.copy(from); G3.scene.add(ball);
-  G3.fx.push({ age: 0, life: 0.6, upd(k) { ball.position.lerpVectors(from, to, k); ball.position.y = from.y * (1 - k) + Math.sin(k * Math.PI) * 3.2 + 0.1; if (rnd() < 0.6) spawn(G3.smoke, ball.position.x, ball.position.y, ball.position.z, 0, 0.1, 0, 0.5, 0.18, 0.4, [0.4, 0.4, 0.42], SMK1, 0.6); }, end() { G3.scene.remove(ball); onHit && onHit(to); } });
+  G3.fx.push({ age: 0, life: 0.32, upd(k) { ball.position.lerpVectors(from, to, k); ball.position.y = from.y * (1 - k) + Math.sin(k * Math.PI) * 2.2 + 0.1; if (rnd() < 0.6) spawn(G3.smoke, ball.position.x, ball.position.y, ball.position.z, 0, 0.1, 0, 0.5, 0.18, 0.4, [0.4, 0.4, 0.42], SMK1, 0.6); }, end() { G3.scene.remove(ball); onHit && onHit(to); } });
 }
 function shakeView(b, amt) { G3.shake[b] = Math.max(G3.shake[b], amt); }
 function boardFlashRed(b) { const f = G3['b' + b].flash; G3.fx.push({ age: 0, life: 0.5, upd(k) { f.material.opacity = 0.45 * Math.sin(k * Math.PI * 2) ** 2; }, end() { f.material.opacity = 0; } }); }
@@ -1162,7 +1161,7 @@ function frame(dt) {
   // effets temporaires
   G3.fx = G3.fx.filter(f => { f.age += dt; const k = Math.min(1, f.age / f.life); f.upd(k); if (k >= 1) { f.end && f.end(); return false; } return true; });
   // navires qui coulent
-  G3.sinking.forEach(s => { s.age += dt; const k = Math.min(1, s.age / 2.6), e2 = 1 - Math.pow(1 - k, 2); s.obj.position.y = -0.3 * e2; s.obj.rotation.x = s.tilt * e2; });
+  G3.sinking.forEach(s => { s.age += dt; const k = Math.min(1, s.age / 1.4), e2 = 1 - Math.pow(1 - k, 2); s.obj.position.y = -0.3 * e2; s.obj.rotation.x = s.tilt * e2; });
   // navires qui tanguent, drapeaux, marqueurs, viseur
   [0, 1].forEach(b => { const B = G3['b' + b]; Object.values(B.shipObj).forEach((obj, k) => { if (obj.userData.sunk) return; obj.position.y = Math.sin(tm * 1.4 + k) * 0.025; obj.children.forEach(() => {}); obj.rotation.z = Math.sin(tm * 1.1 + k * 1.7) * 0.03; if (obj.userData.flag) obj.userData.flag.rotation.y = Math.sin(tm * 6 + k) * 0.4; });
     if (B.miss.length || B.hit.length) refreshMarks(b);
@@ -1313,20 +1312,18 @@ let AIM = -1, pending = false;
 function setAim(i) { AIM = i; const a = G3.b1 && G3.b1.aim; if (a) { a.visible = i >= 0; if (i >= 0) a.position.set((i % N) - 4.5, 0.2, Math.floor(i / N) - 4.5); } renderFireBar(); }
 function tapTarget(i) {
   if (!V || V.ph !== 'play' || V.turn !== V.me || V.opR[i]) return;
-  if (AIM === i && !pending) { fireAim(); return; }
-  sCoin(); setAim(i);
+  if (pending) return;
+  setAim(i); fireAim();
 }
 function fireAim() {
   if (!V || V.ph !== 'play' || V.turn !== V.me || pending || AIM < 0 || V.opR[AIM]) return;
   pending = true; const i = AIM; setAim(-1); vib(10); P.unlockAudio(); send({ t: 'shoot', i });
   setTimeout(() => { if (pending) { pending = false; renderFireBar(); } }, 4000);
 }
-$('#bFire').onclick = fireAim;
 function renderFireBar() {
   if (!V || V.ph !== 'play') return;
   const my = V.turn === V.me && !pending;
-  $('#bFire').disabled = !my || AIM < 0;
-  $('#fhint').textContent = !my ? '' : AIM >= 0 ? t('aimed', { c: cellName(AIM) }) : t('aimHint');
+  $('#fhint').textContent = my ? t('aimHint') : '';
 }
 
 /* --- capitaines --- */
@@ -1335,7 +1332,7 @@ function setMoods(me, op) { MOOD.me = me; MOOD.op = op; clearTimeout(MOOD.tm); r
 function renderCaps(jolt) {
   if (!V) return;
   const me = V.me, op = 1 - me, P0 = V.pl[me], P1 = V.pl[op] || { n: '?', left: KINDS, b: false }, play = V.ph === 'play';
-  const cap = (p, i, isMe, mood) => `<div class="frame cap${isMe ? ' me' : ' r'}${play && V.turn === i ? ' turn' : ''}"><span class="pt${jolt && mood === 'angry' ? ' angry' : ''}">${portrait(i, p.b, mood)}${isMe && play && V.turn === i ? `<span class="badge2">${esc(t('turnBadge'))}</span>` : ''}</span><span class="nfo"><span class="nm">${esc(p.n)}</span>${fleetIcons(p.left, !isMe)}</span></div>`;
+  const cap = (p, i, isMe, mood) => `<div class="frame cap${isMe ? ' me' : ' r'}${play && V.turn === i ? ' turn' : ''}"><span class="pt${jolt && mood === 'angry' ? ' angry' : ''}">${portrait(i, p.b, mood)}${isMe && play && V.turn === i ? `<span class="badge2">${esc(t('turnBadge'))}</span>` : ''}</span><span class="nfo"><span class="nm">${esc(p.n)}</span></span></div>`;
   $('#caps').innerHTML = cap(P0, me, true, MOOD.me) + '<span class="vs">VS</span>' + cap(P1, op, false, MOOD.op);
 }
 

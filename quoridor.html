@@ -30,7 +30,7 @@
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Creepster&family=Lilita+One&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titan+One&family=Nunito:wght@600;700;800;900&display=swap">
 <style>
 /* Layout : portrait sur mobile (adversaires en haut, plateau 3D au centre, console en bas) ;
    sur PC, colonne de jeu à gauche, plateau au centre, classement à droite. Style jeu mobile cartoon. */
@@ -46,8 +46,8 @@
   --blood:#e8394d;
   --gold:#ffcf3f;
   --rivet:#cbbf9f;
-  --f-display:"Creepster","Chiller",fantasy,cursive;
-  --f-ui:"Lilita One","Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;
+  --f-display:"Titan One","Arial Black",system-ui,sans-serif;
+  --f-ui:"Titan One","Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;
   --f-text:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   color-scheme:dark;
 }
@@ -403,7 +403,8 @@ html.overlay #top *,html.overlay #bottom *{pointer-events:none!important}
 .charpick button[aria-pressed="true"] .avatar{box-shadow:0 0 0 4px var(--torch),0 0 16px var(--torch)}
 .name-err{color:#ff6b7a;font-weight:700;font-size:14px;margin:4px 2px 2px}.name-err:empty{display:none}.field.need{border-color:#e8394d!important;box-shadow:0 0 0 4px rgba(232,57,77,.4)!important;animation:needShake .4s}@keyframes needShake{0%,100%{transform:none}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
 /* place pour le bouton du volume (toujours en bas à gauche) */
-#bottom .controls{margin-left:52px}
+#bottom{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 62px)}
+html.pc #bottom{padding-bottom:70px}
 </style>
 </head>
 <body>
@@ -1498,10 +1499,10 @@ const CHAR_COL = ['#d6c49a', '#c8553a', '#6fb8a4', '#e0952e']; // os, braise, sp
 function pillTex(text, col, big) {
   // big = plaque d'arrivée façon donjon (bois sombre, liseré doré, petit fanion de la couleur du perso)
   const fs = big ? 56 : 50, pad = big ? 26 : 20, c = document.createElement('canvas'), g = c.getContext('2d');
-  g.font = `800 ${fs}px Fredoka, "Trebuchet MS", system-ui, sans-serif`;
+  g.font = `${fs}px "Titan One", "Trebuchet MS", system-ui, sans-serif`;
   const icon = big ? 52 : 28, w = Math.ceil(g.measureText(text).width) + pad * 2 + icon, h = fs + pad * 1.1;
   c.width = w; c.height = h;
-  g.font = `800 ${fs}px Fredoka, "Trebuchet MS", system-ui, sans-serif`; g.textBaseline = 'middle';
+  g.font = `${fs}px "Titan One", "Trebuchet MS", system-ui, sans-serif`; g.textBaseline = 'middle';
   const rr = big ? 16 : h / 2;
   const shape = () => { g.beginPath(); g.roundRect ? g.roundRect(3, 3, w - 6, h - 6, rr) : g.rect(3, 3, w - 6, h - 6); };
   if (big) {
