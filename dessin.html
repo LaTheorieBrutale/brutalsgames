@@ -198,6 +198,31 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
 /* place pour le bouton du volume (toujours en bas à gauche) */
 body.ingame #game .rc-form{padding-left:50px}
+/* ----- mode Téléphone ----- */
+.modehint{grid-column:1/-1;margin:2px 0 0;font-size:13px;color:var(--muted);text-align:center}
+.wordbar form{display:flex;gap:6px;width:100%;align-items:center}
+.wordbar form .field{flex:1;min-width:0;font-size:17px;padding:9px 11px 8px}
+.wordbar form .btn{flex:none;padding:10px 12px 9px;font-size:15px}
+.wordbar .prompt{font-family:var(--f-title);font-size:21px;color:var(--sun);line-height:1.15;overflow-wrap:anywhere}
+.wordbar .btn.done{padding:9px 14px 8px;font-size:15px}
+.ov .tel-ill{font-size:44px;line-height:1}
+.ov .tel-sub{font-size:14px;color:var(--muted);max-width:340px}
+.scores .pl.done{background:rgba(92,214,92,.28)}
+.album{flex:none;display:flex;flex-direction:column;gap:8px;padding:10px;height:min(64dvh,620px);min-height:0}
+.al-head{display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f-title);font-size:21px;text-align:center}
+.al-head svg{width:34px;height:34px;flex:none}
+.al-head small{font-family:var(--f-body,inherit);font-size:13px;color:var(--muted)}
+.al-list{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px;scroll-behavior:smooth}
+.ae{display:flex;flex-direction:column;gap:4px;animation:fadeIn .35s}
+.ae .who{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.ae .who svg{width:24px;height:24px;flex:none}
+.ae .txt{align-self:flex-start;max-width:92%;background:#fff;color:#1a1322;border:3px solid var(--ink);border-radius:16px 16px 16px 4px;padding:8px 12px;font-size:17px;font-weight:700;box-shadow:0 3px 0 var(--ink);overflow-wrap:anywhere}
+.ae.g .txt{background:#fff3c4}
+.ae canvas{width:100%;max-width:520px;aspect-ratio:4/3;border:3px solid var(--ink);border-radius:12px;box-shadow:0 3px 0 var(--ink);background:var(--paper)}
+.al-ctl{flex:none;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.al-ctl .btn{font-size:17px;padding:11px 18px 10px}
+.al-ctl p{margin:0;font-size:14px;color:var(--muted)}
+@media (min-width:980px){ #game .center .album{flex:1;height:auto} }
 </style>
 </head>
 <body>
@@ -259,9 +284,11 @@ body.ingame #game .rc-form{padding-left:50px}
       <label data-i18n="players">Joueurs</label>
       <div class="plist" id="lobbyList"></div>
       <div class="setrow">
-        <span class="lbl" data-i18n="rounds">Manches</span><div class="nseg" id="segRounds"></div>
-        <span class="lbl" data-i18n="time">Temps</span><div class="nseg" id="segTime"></div>
-        <span class="lbl" data-i18n="wordsMode">Mots</span><div class="nseg" id="segCombo"></div>
+        <span class="lbl" data-i18n="mode">Mode</span><div class="nseg" id="segMode"></div>
+        <span class="lbl cl-only" data-i18n="rounds">Manches</span><div class="nseg cl-only" id="segRounds"></div>
+        <span class="lbl" id="lblTime" data-i18n="time">Temps</span><div class="nseg" id="segTime"></div>
+        <span class="lbl cl-only" data-i18n="wordsMode">Mots</span><div class="nseg cl-only" id="segCombo"></div>
+        <p class="modehint" id="modeHint"></p>
       </div>
       <button class="btn wide gold" id="bStart" data-pstart data-i18n="start">Lancer la partie</button>
       <p class="wait-txt" id="waitTxt"></p>
@@ -282,6 +309,7 @@ body.ingame #game .rc-form{padding-left:50px}
   <div class="center">
     <div class="frame wordbar" id="wordbar"></div>
     <div class="stage" id="stage"><canvas id="cv" width="1000" height="750"></canvas><div class="ov" id="ov" hidden></div></div>
+    <div class="frame album" id="album" hidden><div class="al-head" id="alHead"></div><div class="al-list" id="alList"></div><div class="al-ctl" id="alCtl"></div></div>
     <div class="frame tools" id="tools" hidden>
       <div class="pal" id="pal"></div>
       <div class="tl">
@@ -327,16 +355,16 @@ body.ingame #game .rc-form{padding-left:50px}
 </div>
 <div class="frame sheet" id="rules" hidden>
   <div class="sheet-head"><span data-i18n="howTo">Comment jouer ?</span><button class="btn icon" id="bRulesClose" data-i18n-aria="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-  <div class="rules" data-i18n-html="rulesTxt"></div>
+  <div class="rules" data-i18n-html="rulesTxt"></div><div class="rules" data-i18n-html="rulesTel"></div>
 </div>
 <div id="toast" role="status"></div>
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="shared.js?v=20261011e"></script>
-<script src="skins.js?v=20261011e"></script>
-<script src="chat.js?v=20261011e"></script>
-<script src="party.js?v=20261011e" data-game="dr"></script>
+<script src="shared.js?v=20261011f"></script>
+<script src="skins.js?v=20261011f"></script>
+<script src="chat.js?v=20261011f"></script>
+<script src="party.js?v=20261011f" data-game="dr"></script>
 <script src="words.js"></script>
 <script>
 (() => {
@@ -400,6 +428,46 @@ P.addStrings({
     music: 'Hudba', musOn: 'Zapnutá', musOff: 'Vypnutá',
     rulesTxt: '<p>Hráči se střídají: jeden <b>kreslí</b> slovo, které si vybere ze tří. Ostatní píšou své odpovědi do <b>chatu</b>.</p><p>Čím rychleji uhodneš, tím víc bodů! Kreslíř získává body za každého, kdo uhodne.</p><p>Postupně se odkrývají písmena. Odpovědi platí <b>česky, anglicky i francouzsky</b> a každý vidí slova ve svém jazyce.</p><p>Když uhodneš, můžeš psát do <b>tajného chatu</b> vítězů. Kreslíř nesmí napsat hledané slovo!</p>' }
 });
+
+/* ---------- Mode Téléphone : textes et idées de phrases ---------- */
+P.addStrings({
+  fr: { mode: 'Mode', classic: 'Classique', phone: 'Téléphone 📞', drawTime: 'Temps de dessin',
+    classicHint: 'Un joueur dessine, les autres devinent dans le chat.', phoneHint: 'Chacun écrit une phrase, le suivant la dessine, le suivant devine le dessin… puis on découvre les albums ! (3 joueurs minimum)',
+    needPlayers3: 'Il faut au moins 3 joueurs pour le mode Téléphone.',
+    telStep: 'Étape {n}/{m}', telWriteH: 'Invente une phrase à faire dessiner !', telWriteSub: 'Le joueur suivant devra la dessiner. Sois drôle 😄', telWritePh: 'Un chat qui fait du ski…',
+    telDrawH: 'À toi de dessiner !', telDraw: 'Dessine :', telGuessH: 'Qu’est-ce que c’est ?', telGuessPh: 'Décris ce dessin…',
+    telSend: 'Valider', telDone: 'J’ai fini ✓', telIdea: '🎲 Idée', telEmpty: 'Écris quelque chose !', telWait: 'Envoyé ! En attente des autres… ({n}/{m})',
+    telSpect: 'Partie en cours : tu joueras à la prochaine !', telAlbum: 'L’album de {name}', telAlbumN: 'Album {n}/{m}', telNext: 'Suivant ▶', telNextBook: 'Album suivant ▶',
+    telHostScroll: 'L’hôte fait défiler les albums…', telOver: 'Fin des albums ! 🎉', telAgain: 'Rejouer', telLobby: 'Retour au salon', telNothing: '(rien du tout…)', telAlbums: 'Les albums',
+    telWho: '{name} a écrit', telWhoD: '{name} a dessiné', telWhoG: '{name} a deviné',
+    rulesTel: '<p><b>Mode Téléphone 📞</b> : chacun écrit une phrase en secret. Les carnets tournent : on dessine la phrase reçue, puis le suivant devine le dessin, et ainsi de suite. À la fin, on découvre chaque album étape par étape !</p>' },
+  en: { mode: 'Mode', classic: 'Classic', phone: 'Telephone 📞', drawTime: 'Drawing time',
+    classicHint: 'One player draws, the others guess in the chat.', phoneHint: 'Everyone writes a sentence, the next player draws it, the next guesses the drawing… then you reveal the albums! (3 players minimum)',
+    needPlayers3: 'Telephone mode needs at least 3 players.',
+    telStep: 'Step {n}/{m}', telWriteH: 'Make up a sentence to be drawn!', telWriteSub: 'The next player will have to draw it. Be funny 😄', telWritePh: 'A cat skiing…',
+    telDrawH: 'Your turn to draw!', telDraw: 'Draw:', telGuessH: 'What is it?', telGuessPh: 'Describe this drawing…',
+    telSend: 'Submit', telDone: 'I’m done ✓', telIdea: '🎲 Idea', telEmpty: 'Write something!', telWait: 'Sent! Waiting for the others… ({n}/{m})',
+    telSpect: 'Game in progress: you’ll play in the next one!', telAlbum: '{name}’s album', telAlbumN: 'Album {n}/{m}', telNext: 'Next ▶', telNextBook: 'Next album ▶',
+    telHostScroll: 'The host is flipping through the albums…', telOver: 'That’s all the albums! 🎉', telAgain: 'Play again', telLobby: 'Back to lobby', telNothing: '(nothing at all…)', telAlbums: 'The albums',
+    telWho: '{name} wrote', telWhoD: '{name} drew', telWhoG: '{name} guessed',
+    rulesTel: '<p><b>Telephone mode 📞</b>: everyone secretly writes a sentence. The books go around: you draw the sentence you get, the next player guesses the drawing, and so on. At the end, you reveal every album step by step!</p>' },
+  cs: { mode: 'Režim', classic: 'Klasický', phone: 'Telefon 📞', drawTime: 'Čas na kreslení',
+    classicHint: 'Jeden hráč kreslí, ostatní hádají v chatu.', phoneHint: 'Každý napíše větu, další ji nakreslí, další hádá kresbu… a nakonec se odhalí alba! (alespoň 3 hráči)',
+    needPlayers3: 'Režim Telefon potřebuje alespoň 3 hráče.',
+    telStep: 'Krok {n}/{m}', telWriteH: 'Vymysli větu na nakreslení!', telWriteSub: 'Další hráč ji bude muset nakreslit. Buď vtipný 😄', telWritePh: 'Kočka, která lyžuje…',
+    telDrawH: 'Kreslíš ty!', telDraw: 'Nakresli:', telGuessH: 'Co to je?', telGuessPh: 'Popiš tuhle kresbu…',
+    telSend: 'Odeslat', telDone: 'Hotovo ✓', telIdea: '🎲 Nápad', telEmpty: 'Napiš něco!', telWait: 'Odesláno! Čekám na ostatní… ({n}/{m})',
+    telSpect: 'Hra právě běží: zahraješ si v další!', telAlbum: 'Album hráče {name}', telAlbumN: 'Album {n}/{m}', telNext: 'Další ▶', telNextBook: 'Další album ▶',
+    telHostScroll: 'Hostitel listuje alby…', telOver: 'To jsou všechna alba! 🎉', telAgain: 'Hrát znovu', telLobby: 'Zpět do lobby', telNothing: '(vůbec nic…)', telAlbums: 'Alba',
+    telWho: '{name} napsal', telWhoD: '{name} nakreslil', telWhoG: '{name} hádal',
+    rulesTel: '<p><b>Režim Telefon 📞</b>: každý tajně napíše větu. Sešity kolují: nakreslíš větu, kterou dostaneš, další hráč hádá kresbu a tak dál. Nakonec se odhalí každé album krok za krokem!</p>' }
+});
+// Idées de phrases (mêmes idées dans les 3 langues)
+const IDEAS = {
+  fr: ['Un chat qui fait du ski', 'Une pizza en colère', 'Un dinosaure qui fait ses courses', 'Un fantôme qui a peur du noir', 'Une vache sur un skateboard', 'Un robot amoureux d’un grille-pain', 'Un pingouin en vacances à la plage', 'Une banane qui fait du karaté', 'Un escargot pilote de course', 'Une licorne qui mange des frites', 'Un astronaute perdu dans un supermarché', 'Un poisson qui joue de la guitare', 'Une grand-mère qui fait du surf', 'Un chien qui conduit un bus', 'Un cactus qui veut un câlin', 'Un pirate qui a le mal de mer', 'Un hamster qui soulève des haltères', 'Une girafe coincée dans un ascenseur', 'Un vampire chez le dentiste', 'Une tortue qui gagne un marathon', 'Un nuage qui pleure des bonbons', 'Un ours qui fait la sieste dans un hamac', 'Une sorcière qui rate sa potion', 'Un cochon qui fait du parachute', 'Un ninja qui a perdu sa chaussure', 'Un extraterrestre qui prend un selfie', 'Une poule qui pond un œuf en or', 'Un roi qui a perdu sa couronne', 'Un serpent qui fait un nœud', 'Un bonhomme de neige en plein désert', 'Un lapin magicien sort un humain de son chapeau', 'Une fusée qui part en retard', 'Un crocodile qui se brosse les dents', 'Un singe qui fait ses devoirs', 'Une baleine dans une baignoire', 'Un chevalier qui a peur d’une souris', 'Un hibou qui ne dort jamais', 'Un gâteau d’anniversaire qui explose', 'Une sirène qui fait du vélo', 'Un zombie qui fait du yoga'],
+  en: ['A cat skiing', 'An angry pizza', 'A dinosaur doing groceries', 'A ghost afraid of the dark', 'A cow on a skateboard', 'A robot in love with a toaster', 'A penguin on a beach holiday', 'A banana doing karate', 'A snail racing driver', 'A unicorn eating fries', 'An astronaut lost in a supermarket', 'A fish playing the guitar', 'A grandma surfing', 'A dog driving a bus', 'A cactus that wants a hug', 'A seasick pirate', 'A hamster lifting weights', 'A giraffe stuck in an elevator', 'A vampire at the dentist', 'A turtle winning a marathon', 'A cloud raining candy', 'A bear napping in a hammock', 'A witch messing up her potion', 'A pig skydiving', 'A ninja who lost his shoe', 'An alien taking a selfie', 'A hen laying a golden egg', 'A king who lost his crown', 'A snake tied in a knot', 'A snowman in the desert', 'A magician rabbit pulling a human out of a hat', 'A rocket leaving late', 'A crocodile brushing its teeth', 'A monkey doing homework', 'A whale in a bathtub', 'A knight afraid of a mouse', 'An owl that never sleeps', 'An exploding birthday cake', 'A mermaid riding a bike', 'A zombie doing yoga'],
+  cs: ['Kočka, která lyžuje', 'Naštvaná pizza', 'Dinosaurus na nákupu', 'Duch, který se bojí tmy', 'Kráva na skateboardu', 'Robot zamilovaný do topinkovače', 'Tučňák na dovolené u moře', 'Banán, který dělá karate', 'Šnek závodník', 'Jednorožec, který jí hranolky', 'Astronaut ztracený v supermarketu', 'Ryba, která hraje na kytaru', 'Babička na surfu', 'Pes, který řídí autobus', 'Kaktus, který chce obejmout', 'Pirát s mořskou nemocí', 'Křeček, který zvedá činky', 'Žirafa uvízlá ve výtahu', 'Upír u zubaře', 'Želva, která vyhrála maraton', 'Mrak, ze kterého prší bonbony', 'Medvěd, který spí v houpací síti', 'Čarodějnice, které se nepovedl lektvar', 'Prase, které skáče padákem', 'Ninja, který ztratil botu', 'Mimozemšťan, který si dělá selfie', 'Slepice, která snesla zlaté vejce', 'Král, který ztratil korunu', 'Had svázaný na uzel', 'Sněhulák uprostřed pouště', 'Králík kouzelník vytahuje z klobouku člověka', 'Raketa, která odlétá pozdě', 'Krokodýl, který si čistí zuby', 'Opice, která dělá úkoly', 'Velryba ve vaně', 'Rytíř, který se bojí myši', 'Sova, která nikdy nespí', 'Narozeninový dort, který vybuchl', 'Mořská panna na kole', 'Zombie, která cvičí jógu']
+};
 
 /* ---------- Avatars : petits pots de peinture ---------- */
 const COLORS = ['#ff6b5a', '#3ad0b0', '#ffc93c', '#9b7bff', '#ff7eb6', '#7ed957', '#4aa3ff', '#ff9a3c', '#c0b8d8', '#d89a5a'];
@@ -486,7 +554,8 @@ document.addEventListener('click', e => { const el = e.target.closest('.tr'); if
    s = trait {c, w, p:[x,y,…]}, f = remplissage {c, x, y}, u = annuler, c = tout effacer
    ===================================================================== */
 const W = 1000, H = 750, PAPER = '#efe6d2';
-const cv = $('#cv'), cx = cv.getContext('2d', { willReadFrequently: true });
+const cv = $('#cv'); let cx = cv.getContext('2d', { willReadFrequently: true });
+const withCtx = (c2, fn) => { const old = cx; cx = c2; try { fn(); } finally { cx = old; } };
 const CV = { ops: [] };
 function clearCanvas() { cx.fillStyle = PAPER; cx.fillRect(0, 0, W, H); }
 function drawSeg(op, from) {
@@ -557,11 +626,12 @@ $('#tClear').onclick = () => { if (!canDraw()) return; P.sfx('click'); emit({ k:
 renderTools();
 
 /* ---------- Saisie du dessinateur ---------- */
-const canDraw = () => V && V.phase === 'draw' && V.drawer === net.me;
+const canDraw = () => !!V && ((V.phase === 'draw' && V.drawer === net.me) || (V.tel && V.phase === 'tel' && !!TK && TK.kind === 'd' && TK.step === V.step && TK.tn === V.tn && !TK.sent));
 let outQ = [], flushT = 0, drawingNow = false, lastPt = null;
 function emit(o) { applyLocal(o); outQ.push(o); if (o.k !== 's') flush(); else if (!flushT) flushT = setTimeout(flush, 60); }
 function flush() {
   clearTimeout(flushT); flushT = 0; if (!outQ.length) return;
+  if (V && V.tel) { outQ = []; return; }
   // regroupe les morceaux d'un même trait
   const ops = []; outQ.forEach(o => { const l = ops[ops.length - 1]; if (o.k === 's' && !o.n && l && l.k === 's') l.p = l.p.concat(o.p); else ops.push(o.k === 's' ? { ...o, p: o.p.slice() } : o); });
   outQ = [];
@@ -588,9 +658,10 @@ cv.addEventListener('pointerup', endStroke); cv.addEventListener('pointercancel'
    MOTEUR (chez l'hôte)
    ===================================================================== */
 const MAXP = 10, CHOOSE_MS = 15000, REVEAL_MS = 5500;
-const net = { relay: null, role: '', code: '', roster: [], conn: null, sess: '', gameNo: 0, me: 0, lobby: [], cfg: { rounds: 3, time: 80, combo: 0 } };
+const net = { relay: null, role: '', code: '', roster: [], conn: null, sess: '', gameNo: 0, me: 0, lobby: [], cfg: { rounds: 3, time: 80, combo: 0, mode: 0 } };
 let G = null, V = null, myWord = null, myChoices = null, localDeadline = 0, lastTn = -1;
 const active = () => net.roster.map((r, i) => ({ r, i })).filter(o => !o.r.gone);
+let T = null, TK = null, ALB = { bi: -1, ent: [] }; // mode Téléphone : état hôte, ma tâche, album affiché
 function newGame() {
   net.roster.forEach(r => { r.score = 0; r.found = false; r.gain = 0; });
   G = { phase: 'choose', round: 1, rounds: net.cfg.rounds, dur: net.cfg.time * 1000, order: shuffle(net.roster.map((_, i) => i)), oi: -1, drawer: -1, word: null, choices: [], deadline: 0, rev: {}, hints: 0, ops: [], used: new Set(G ? G.used : []), tn: 0, firstFound: false, why: '' };
@@ -722,12 +793,218 @@ setInterval(() => {
 function playerLeft(s) {
   const r = net.roster[s]; if (!r) return; r.gone = true;
   broadcastChat({ sys: 1, k: 'left', name: r.name });
+  if (T) { telLeft(s); return; }
   if (!G || G.phase === 'end') return;
   if (active().length < 2) return endGame();
   if (s === G.drawer && (G.phase === 'draw' || G.phase === 'choose')) { G.why = 'gone'; broadcastChat({ sys: 1, k: 'drawerLeft' }); return endTurn(); }
   if (G.phase === 'draw' && guessers().every(o => o.r.found)) { G.why = 'all'; return endTurn(); }
   sync();
 }
+
+/* =====================================================================
+   MODE TÉLÉPHONE (façon Gartic Phone)
+   Chaque joueur possède un carnet. À l'étape k, le joueur en position p travaille sur le carnet (p − k) mod n :
+   étape 0 = écrire une phrase, étapes impaires = dessiner la phrase reçue, étapes paires = deviner le dessin reçu.
+   L'hôte distribue les tâches, ramasse les réponses, puis fait défiler les albums pour tout le monde.
+   ===================================================================== */
+const TEL_WRITE = 45000, TEL_GUESS = 40000, TEL_GRACE = 4000;
+const telKind = k => k === 0 ? 'w' : k % 2 ? 'd' : 'g';
+const telDur = k => telKind(k) === 'd' ? net.cfg.time * 1000 : k === 0 ? TEL_WRITE : TEL_GUESS;
+function telTo(seat, msg) { if (seat === 0) telRecv(msg); else { const r = net.roster[seat]; if (r && r.conn && r.conn.open && !r.gone) r.conn.send(msg); } }
+function telStart() {
+  net.roster.forEach(r => { r.score = 0; });
+  const order = shuffle(active().map(o => o.i));
+  T = { order, n: order.length, step: -1, tn: (T ? T.tn : 0) + 1, books: order.map(s => ({ owner: s, e: [] })), sub: {}, deadline: 0, phase: 'tel', bi: 0, ei: -1 };
+  telStep(0);
+}
+function telStep(k) {
+  T.step = k; T.sub = {}; T.phase = 'tel'; T.tn++; T.deadline = Date.now() + telDur(k);
+  const kind = telKind(k);
+  T.order.forEach((seat, p) => {
+    const b = (p - k + T.n) % T.n, prev = k ? T.books[b].e[k - 1] : null;
+    if (net.roster[seat] && net.roster[seat].gone) { telFill(seat, p); return; }
+    telTo(seat, { t: 'task', tn: T.tn, step: k, kind, prev });
+  });
+  telSync(); telCheck();
+}
+// réponse vide (temps écoulé ou joueur parti)
+function telFill(seat, p) {
+  if (T.sub[seat]) return; const k = T.step, b = (p - k + T.n) % T.n, kind = telKind(k);
+  T.books[b].e[k] = kind === 'd' ? { s: seat, k: 'd', ops: [] } : { s: seat, k: kind, txt: '', l: 'fr' };
+  T.sub[seat] = 1;
+}
+function telSubmit(seat, m) {
+  if (!T || T.phase !== 'tel' || !m || m.step !== T.step || m.tn !== T.tn || T.sub[seat]) return;
+  const p = T.order.indexOf(seat); if (p < 0) return;
+  const k = T.step, b = (p - k + T.n) % T.n, kind = telKind(k);
+  if (kind === 'd') { const ops = []; (Array.isArray(m.ops) ? m.ops : []).slice(0, 2500).forEach(o => mergeOp(ops, o && o.k === 's' ? { ...o, n: 1 } : o)); T.books[b].e[k] = { s: seat, k: 'd', ops }; }
+  else T.books[b].e[k] = { s: seat, k: kind, txt: String(m.txt || '').replace(/\s+/g, ' ').trim().slice(0, 100), l: ['fr', 'en', 'cs'].includes(m.l) ? m.l : 'fr' };
+  T.sub[seat] = 1; telSync(); telCheck();
+}
+function telCheck() {
+  if (!T || T.phase !== 'tel') return;
+  if (T.order.every(s => T.sub[s] || (net.roster[s] && net.roster[s].gone))) {
+    T.order.forEach((s, p) => { if (!T.sub[s]) telFill(s, p); });
+    if (T.step + 1 < T.n) telStep(T.step + 1); else telAlbum();
+  }
+}
+function telLeft(s) {
+  if (!T) return;
+  if (active().length < 2) { T.phase = 'done'; telSync(); return; }
+  if (T.phase === 'tel') { const p = T.order.indexOf(s); if (p >= 0) telFill(s, p); telCheck(); }
+  telSync();
+}
+function telAlbum() { T.phase = 'album'; T.bi = 0; T.ei = -1; telReveal(); }
+function telReveal() {
+  if (!T || (T.phase !== 'album')) return;
+  const book = T.books[T.bi];
+  if (T.ei + 1 < T.n) T.ei++;
+  else if (T.bi + 1 < T.n) { T.bi++; T.ei = 0; }
+  else { T.phase = 'done'; telSync(); return; }
+  const e = T.books[T.bi].e[T.ei];
+  net.roster.forEach((r, i) => telTo(i, { t: 'aent', bi: T.bi, ei: T.ei, owner: T.books[T.bi].owner, e }));
+  telSync();
+}
+function telPub() {
+  return { tel: 1, phase: T.phase, step: T.step, steps: T.n, kind: telKind(Math.max(0, T.step)), tn: T.tn, dur: telDur(Math.max(0, T.step)), rem: Math.max(0, T.deadline - Date.now()),
+    order: T.order, bi: T.bi, ei: T.ei, nb: T.n, owner: T.phase !== 'tel' ? T.books[T.bi].owner : -1, last: T.phase === 'album' && T.bi === T.n - 1 && T.ei === T.n - 1,
+    players: net.roster.map((o, i) => ({ n: o.name, sc: 0, d: !!T.sub[i], gone: !!o.gone, in: T.order.includes(i) })) };
+}
+function telSync() { if (!T) return; const v = telPub(); net.roster.forEach((r, i) => { if (i === 0) { V = v; render(); } else if (r.conn && r.conn.open && !r.gone) r.conn.send({ t: 'st', v }); }); }
+setInterval(() => { if (net.role === 'host' && T && T.phase === 'tel' && Date.now() > T.deadline + TEL_GRACE) { T.order.forEach((s, p) => telFill(s, p)); telCheck(); } }, 500);
+function telToLobby() {
+  T = null; G = null; V = null; TK = null;
+  net.roster = net.roster.filter(r => !r.gone);
+  net.roster.forEach((r, i) => { if (i && r.conn && r.conn.open) r.conn.send({ t: 'tlobby' }); });
+  P.stopConfetti(); show('online'); $('#onForm').hidden = true; $('#onWait').hidden = false; broadcastLobby();
+}
+
+/* --- côté joueur : tâche reçue, envoi, album --- */
+function okOps(list) { const ops = []; (Array.isArray(list) ? list : []).slice(0, 2500).forEach(o => mergeOp(ops, o && o.k === 's' ? { ...o, n: 1 } : o)); return ops; }
+function telRecv(m) {
+  if (m.t === 'task') {
+    const prev = m.prev && typeof m.prev === 'object' ? m.prev : null;
+    TK = { tn: m.tn | 0, step: m.step | 0, kind: ['w', 'd', 'g'].includes(m.kind) ? m.kind : 'w', prev, sent: false, draft: '' };
+    if (prev && prev.k === 'd') prev.ops = okOps(prev.ops);
+    CV.ops = TK.kind === 'g' && prev && prev.ops ? prev.ops.map(o => o.k === 's' ? { ...o, p: o.p.slice() } : { ...o }) : [];
+    redrawAll(CV.ops); TOOL.mode = 'pen'; renderTools(); telKey = '';
+    if (TK.kind === 'd') { P.sfx('hint'); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {} }
+    if (V) render();
+  } else if (m.t === 'aent') {
+    const bi = m.bi | 0, ei = m.ei | 0; if (bi !== ALB.bi) { ALB = { bi, owner: m.owner | 0, ent: [] }; $('#alList').innerHTML = ''; }
+    const e = m.e && typeof m.e === 'object' ? m.e : { k: 'w', txt: '' };
+    if (e.k === 'd') e.ops = okOps(e.ops);
+    ALB.ent[ei] = e; P.sfx(e.k === 'd' ? 'click' : 'chat');
+    if (V) render();
+  }
+}
+function telSend(auto) {
+  if (!TK || TK.sent || !V || V.step !== TK.step || V.tn !== TK.tn) return;
+  const msg = { t: 'tsub', tn: TK.tn, step: TK.step };
+  if (TK.kind === 'd') { endStroke(); msg.ops = CV.ops.map(o => o.k === 's' ? { k: 's', n: 1, c: o.c, w: o.w, p: o.p } : o); }
+  else {
+    const el = $('#telIn'), v = (el ? el.value : TK.draft || '').replace(/\s+/g, ' ').trim().slice(0, 100);
+    if (!v && !auto) { toast(t('telEmpty'), true); P.sfx('bad'); return; }
+    msg.txt = v; msg.l = P.lang();
+  }
+  TK.sent = true; P.sfx('good');
+  if (net.role === 'host') telSubmit(0, msg); else if (net.conn && net.conn.open) net.conn.send(msg);
+  render();
+}
+// texte d'un autre joueur, traduit dans ma langue si besoin
+function telTxt(txt, l, again) {
+  if (!txt) return `<i style="opacity:.7">${esc(t('telNothing'))}</i>`;
+  const tl = P.lang(); if (!l || l === tl || !window.BGT) return esc(txt);
+  const v = BGT.peek(txt, tl, l); if (v === undefined) { BGT.want(txt, tl, l, again); return esc(txt); }
+  return v ? `<span class="tr" data-orig="${esc(txt)}" title="${esc(t('translated'))}">${esc(v)}</span>` : esc(txt);
+}
+// rejoue un dessin trait par trait dans une toile (≈ 2,5 s)
+function replay(canvas, ops, ms) {
+  const c2 = canvas.getContext('2d', { willReadFrequently: true });
+  withCtx(c2, () => clearCanvas());
+  const units = []; ops.forEach((op, oi) => { if (op.k === 's') { const n = op.p.length / 2; for (let j = 1; j <= n; j++) units.push([oi, j]); } else units.push([oi, 0]); });
+  if (!units.length) return;
+  let done = 0; const t0 = performance.now();
+  const stepF = now => {
+    const want = Math.min(units.length, Math.ceil((now - t0) / ms * units.length));
+    withCtx(c2, () => {
+      for (; done < want; done++) {
+        const [oi, j] = units[done], op = ops[oi];
+        if (op.k === 'f') flood(op.x, op.y, op.c);
+        else { const part = { c: op.c, w: op.w, p: op.p.slice(0, j * 2) }; drawSeg(part, j === 1 ? 0 : (j - 1) * 2); }
+      }
+    });
+    if (done < units.length && canvas.isConnected) requestAnimationFrame(stepF);
+  };
+  requestAnimationFrame(stepF);
+}
+let telKey = '';
+function renderTel() {
+  if ($('#game').hidden) show('game');
+  const me = net.me, mine = TK && TK.step === V.step && TK.tn === V.tn, inGame = (V.order || []).includes(me);
+  localDeadline = Date.now() + (V.rem || 0);
+  const album = V.phase === 'album' || V.phase === 'done';
+  $('#stage').hidden = album; $('#album').hidden = !album; $('#wordbar').hidden = album;
+  $('#tools').hidden = !(V.phase === 'tel' && mine && TK.kind === 'd' && !TK.sent);
+  $('#stage').classList.toggle('nodraw', !canDraw());
+  const nm = i => ((V.players || [])[i] || {}).n || '?';
+  $('#hRound').textContent = album ? t('telAlbums') : t('telStep', { n: V.step + 1, m: V.steps });
+  const doneN = V.order.filter(s => V.players[s] && (V.players[s].d || V.players[s].gone)).length;
+  // scores → avancement de chacun
+  $('#scores').innerHTML = V.players.map((p, i) => ({ p, i })).filter(o => !o.p.gone && o.p.in).map(o => `<div class="pl${V.phase === 'tel' && o.p.d ? ' done' : ''}${o.i === me ? ' me' : ''}">${avatar(o.i)}<span>${esc(o.p.n)}${V.phase === 'tel' ? (o.p.d ? ' ✅' : ' ✏️') : ''}</span></div>`).join('');
+  const OV = $('#ov'), WB = $('#wordbar');
+  if (V.phase === 'tel') {
+    const key = V.tn + ':' + (mine ? (TK.sent ? 's' : 'a') : 'x');
+    if (!inGame) { $('#hWho').textContent = ''; OV.innerHTML = `<div class="tel-ill">⏳</div><h3>${t('telSpect')}</h3>`; OV.hidden = false; WB.innerHTML = ''; }
+    else if (!mine) { OV.innerHTML = `<h3 class="dots">…</h3>`; OV.hidden = false; }
+    else if (TK.sent) {
+      $('#hWho').textContent = t(TK.kind === 'w' ? 'telWriteH' : TK.kind === 'd' ? 'telDrawH' : 'telGuessH');
+      OV.innerHTML = `<div class="tel-ill">✅</div><h3>${t('telWait', { n: doneN, m: V.order.length })}</h3>`; OV.hidden = false;
+      if (key !== telKey) WB.innerHTML = TK.kind === 'd' ? `<span>${t('telDraw')}</span><span class="prompt">${telTxt(TK.prev && TK.prev.txt, TK.prev && TK.prev.l, render)}</span>` : `<span class="prompt">${esc(TK.draft || '')}</span>`;
+    } else if (TK.kind === 'd') {
+      $('#hWho').textContent = t('telDrawH'); OV.hidden = true;
+      if (key !== telKey) WB.innerHTML = `<span>${t('telDraw')}</span><span class="prompt">${telTxt(TK.prev && TK.prev.txt, TK.prev && TK.prev.l, render)}</span><button class="btn gold done" id="telDone" type="button">${t('telDone')}</button>`;
+    } else {
+      const w = TK.kind === 'w';
+      $('#hWho').textContent = t(w ? 'telWriteH' : 'telGuessH');
+      if (w) { OV.innerHTML = `<div class="tel-ill">💡</div><h3>${t('telWriteH')}</h3><div class="tel-sub">${t('telWriteSub')}</div><button class="btn teal" id="telIdea" type="button">${t('telIdea')}</button>`; OV.hidden = false; }
+      else OV.hidden = true;
+      if (key !== telKey) { WB.innerHTML = `<form id="telForm" autocomplete="off"><input class="field" id="telIn" maxlength="100" enterkeyhint="send" autocapitalize="sentences" placeholder="${esc(t(w ? 'telWritePh' : 'telGuessPh'))}"><button class="btn gold" type="submit">${t('telSend')}</button></form>`;
+        const inp = $('#telIn'); inp.value = TK.draft || ''; inp.addEventListener('input', () => { TK.draft = inp.value; }); if (!matchMedia('(pointer:coarse)').matches) setTimeout(() => inp.focus(), 50); }
+    }
+    telKey = key;
+  } else {
+    // album
+    $('#hWho').textContent = V.phase === 'done' ? t('telOver') : t('telAlbum', { name: nm(V.owner) });
+    $('#alHead').innerHTML = `${avatar(V.owner)}<span>${esc(t('telAlbum', { name: nm(V.owner) }))}</span><small>${t('telAlbumN', { n: V.bi + 1, m: V.nb })}</small>`;
+    const list = $('#alList');
+    ALB.ent.forEach((e, ei) => {
+      if (!e || list.querySelector(`[data-ei="${ei}"]`)) return;
+      const d = document.createElement('div'); d.className = 'ae ' + e.k; d.dataset.ei = ei;
+      const who = t(e.k === 'd' ? 'telWhoD' : e.k === 'g' ? 'telWhoG' : 'telWho', { name: nm(e.s) });
+      d.innerHTML = `<div class="who">${avatar(e.s)}<span>${esc(who)}</span></div>` + (e.k === 'd' ? '<canvas width="1000" height="750"></canvas>' : `<div class="txt">${telTxt(e.txt, e.l, () => {})}</div>`);
+      list.appendChild(d);
+      if (e.k === 'd') replay(d.querySelector('canvas'), e.ops || [], 2600);
+      setTimeout(() => { list.scrollTop = list.scrollHeight; }, 30);
+    });
+    const host = net.role === 'host';
+    $('#alCtl').innerHTML = V.phase === 'done'
+      ? (host ? `<button class="btn gold" id="telAgain">${t('telAgain')}</button><button class="btn" id="telLobby">${t('telLobby')}</button>` : `<p>${t('hostAgain')}</p>`)
+      : host ? `<button class="btn gold" id="telNext">${V.ei + 1 >= V.nb ? t('telNextBook') : t('telNext')}</button>` : `<p class="dots">${t('telHostScroll')}</p>`;
+    if (V.phase === 'done' && $('#alCtl').dataset.k !== 'done' + net.gameNo) { P.sfx('win'); P.confetti($('#confetti')); }
+    $('#alCtl').dataset.k = V.phase + net.gameNo;
+  }
+  tickTimer();
+}
+document.addEventListener('submit', e => { if (e.target.id === 'telForm') { e.preventDefault(); telSend(false); } });
+document.addEventListener('click', e => {
+  const id = e.target.closest('button') && e.target.closest('button').id; if (!id) return;
+  if (id === 'telDone') telSend(false);
+  else if (id === 'telIdea') { const L = IDEAS[P.lang()] || IDEAS.fr, v = L[Math.floor(rnd() * L.length)], inp = $('#telIn'); if (inp) { inp.value = v; TK && (TK.draft = v); inp.focus(); } P.sfx('click'); }
+  else if (id === 'telNext' && net.role === 'host') { P.sfx('click'); telReveal(); }
+  else if (id === 'telAgain' && net.role === 'host') { P.sfx('click'); P.stopConfetti(); $('#bStart').click(); }
+  else if (id === 'telLobby' && net.role === 'host') { P.sfx('click'); telToLobby(); }
+});
 
 /* ---------- Chat de la partie (distribution) ---------- */
 function broadcastChat(m) { net.roster.forEach((r, i) => { if (i !== 0 && r.conn && r.conn.open && !r.gone) r.conn.send({ t: 'chat', m }); }); chatAdd(m); }
@@ -737,7 +1014,7 @@ function privTo(s, m) { if (s === 0) chatAdd(m); else { const r = net.roster[s];
 
 /* ---------- Réseau : salon ---------- */
 function leaveNet() {
-  const r = net.relay; Object.assign(net, { relay: null, conn: null, roster: [], role: '', lobby: [] });
+  const r = net.relay; Object.assign(net, { relay: null, conn: null, roster: [], role: '', lobby: [] }); T = null; TK = null;
   try { r && r.destroy(); } catch (e) {}
   CHAT.list = []; renderChat();
 }
@@ -756,15 +1033,20 @@ function renderLobby() {
   $('#segRounds').innerHTML = seg([2, 3, 4, 5], net.cfg.rounds, 'rounds', '');
   $('#segTime').innerHTML = seg([60, 80, 100, 120], net.cfg.time, 'time', ' s');
   $('#segCombo').innerHTML = [[0, t('single')], [1, t('combo')]].map(([v, lb]) => `<button class="btn" data-cfg="combo" data-v="${v}" aria-pressed="${(net.cfg.combo ? 1 : 0) === v}"${host ? '' : ' disabled'}>${lb}</button>`).join('');
+  const phone = net.cfg.mode === 1, minP = phone ? 3 : 2;
+  $('#segMode').innerHTML = [[0, t('classic')], [1, t('phone')]].map(([v, lb]) => `<button class="btn" data-cfg="mode" data-v="${v}" aria-pressed="${(net.cfg.mode ? 1 : 0) === v}"${host ? '' : ' disabled'}>${lb}</button>`).join('');
+  document.querySelectorAll('.cl-only').forEach(el => { el.hidden = phone; });
+  $('#lblTime').textContent = t(phone ? 'drawTime' : 'time');
+  $('#modeHint').textContent = t(phone ? 'phoneHint' : 'classicHint');
   $('#codeBox').hidden = !host; $('#bStart').hidden = !host;
-  $('#bStart').disabled = L.length < 2;
-  $('#waitTxt').innerHTML = host ? (L.length < 2 ? t('needPlayers') : t('waitHost')) : t('waitGuest');
+  $('#bStart').disabled = L.length < minP;
+  $('#waitTxt').innerHTML = host ? (L.length < minP ? t(phone ? 'needPlayers3' : 'needPlayers') : t('waitHost')) : t('waitGuest');
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-cfg]'); if (!b || net.role !== 'host') return;
   net.cfg[b.dataset.cfg] = +b.dataset.v; P.set('dr-cfg', JSON.stringify(net.cfg)); P.sfx('click'); broadcastLobby();
 });
-try { const c = JSON.parse(P.get('dr-cfg', '{}')); if ([2, 3, 4, 5].includes(c.rounds)) net.cfg.rounds = c.rounds; if ([60, 80, 100, 120].includes(c.time)) net.cfg.time = c.time; net.cfg.combo = c.combo ? 1 : 0; } catch (e) {}
+try { const c = JSON.parse(P.get('dr-cfg', '{}')); if ([2, 3, 4, 5].includes(c.rounds)) net.cfg.rounds = c.rounds; if ([60, 80, 100, 120].includes(c.time)) net.cfg.time = c.time; net.cfg.combo = c.combo ? 1 : 0; net.cfg.mode = c.mode ? 1 : 0; } catch (e) {}
 function broadcastLobby() {
   const act = net.roster.filter(r => !r.gone), L = act.map(r => ({ n: r.name }));
   act.forEach((r, i) => { if (r.conn && r.conn.open) r.conn.send({ t: 'lobby', list: L, you: i, cfg: net.cfg }); });
@@ -781,7 +1063,7 @@ function openHost(attempt) {
     conn.on('data', m => hostData(entry, m));
     conn.on('close', () => {
       const i = net.roster.indexOf(entry); if (i < 0 || entry.gone) return;
-      if (G && G.phase !== 'end') { playerLeft(i); return; }
+      if ((G && G.phase !== 'end') || T) { playerLeft(i); return; }
       net.roster.splice(i, 1); broadcastChat({ sys: 1, k: 'left', name: entry.name }); broadcastLobby();
     });
   });
@@ -793,6 +1075,7 @@ function hostData(entry, m) {
     let nm = String(m.name || '?').slice(0, 14); const base = nm; let k = 2; while (net.roster.some(r => !r.gone && r.name.toLowerCase() === nm.toLowerCase())) nm = base.slice(0, 12) + k++;
     entry.name = nm; entry.lang = ['fr', 'en', 'cs'].includes(m.lang) ? m.lang : 'fr';
     net.roster.push(entry); P.sfx('click');
+    if (T) { const s = net.roster.length - 1; entry.conn.send({ t: 'go', seat: s, sess: net.sess, game: net.gameNo }); broadcastChat({ sys: 1, k: 'joined', name: nm }); telSync(); return; }
     if (G && G.phase !== 'end') { // arrivée en cours de partie : on rejoint directement
       const s = net.roster.length - 1; G.order.push(s);
       entry.conn.send({ t: 'go', seat: s, sess: net.sess, game: net.gameNo }); entry.conn.send({ t: 'hist', ops: G.ops });
@@ -805,14 +1088,15 @@ function hostData(entry, m) {
   if (m.t === 'chat') { chatIn(s, m.txt, m.l); return; }
   if (m.t === 'pick') { pickWord(s, m.k); return; }
   if (m.t === 'd') { hostDraw(s, m.ops); return; }
+  if (m.t === 'tsub') { telSubmit(s, m); return; }
 }
 $('#bStart').onclick = () => {
   P.sfx('click');
   net.roster = net.roster.filter(r => !r.gone && (r.conn === null || r.conn.open));
-  if (net.roster.length < 2) return;
+  if (net.roster.length < (net.cfg.mode === 1 ? 3 : 2)) return;
   net.gameNo++;
   net.roster.forEach((r, i) => { if (r.conn && r.conn.open) r.conn.send({ t: 'go', seat: i, sess: net.sess, game: net.gameNo }); });
-  net.me = 0; lastTn = -1; show('game'); newGame(); P.sfx('hint');
+  net.me = 0; lastTn = -1; TK = null; ALB = { bi: -1, ent: [] }; G = null; T = null; show('game'); if (net.cfg.mode === 1) telStart(); else newGame(); P.sfx('hint');
 };
 $('#bCopy').onclick = () => { const done = () => { $('#bCopy').textContent = t('copied'); setTimeout(() => { $('#bCopy').textContent = t('copyCode'); }, 1400); }; if (navigator.clipboard) navigator.clipboard.writeText(net.code).then(done, () => {}); };
 $('#inCode').addEventListener('input', e => { e.target.value = window.BGCode ? BGCode(e.target.value) : e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
@@ -839,18 +1123,20 @@ function guestData(m) {
   if (m.t === 'lobby') {
     net.lobby = (Array.isArray(m.list) ? m.list : []).slice(0, MAXP).map(p => ({ n: String(p.n || '?').slice(0, 14) }));
     if (Number.isInteger(m.you)) net.me = m.you;
-    if (m.cfg) net.cfg = { rounds: m.cfg.rounds | 0 || 3, time: m.cfg.time | 0 || 80, combo: m.cfg.combo ? 1 : 0 };
+    if (m.cfg) net.cfg = { rounds: m.cfg.rounds | 0 || 3, time: m.cfg.time | 0 || 80, combo: m.cfg.combo ? 1 : 0, mode: m.cfg.mode ? 1 : 0 };
     if ($('#game').hidden && $('#end').hidden) { show('online'); $('#onForm').hidden = true; $('#onWait').hidden = false; }
     renderLobby();
   }
   else if (m.t === 'full') backToForm(t('full'));
-  else if (m.t === 'go') { net.me = m.seat | 0; net.sess = String(m.sess || ''); net.gameNo = m.game | 0; V = null; myWord = null; myChoices = null; lastTn = -1; P.stopConfetti(); show('game'); P.sfx('hint'); }
+  else if (m.t === 'go') { net.me = m.seat | 0; net.sess = String(m.sess || ''); net.gameNo = m.game | 0; V = null; myWord = null; myChoices = null; lastTn = -1; TK = null; ALB = { bi: -1, ent: [] }; P.stopConfetti(); show('game'); P.sfx('hint'); }
   else if (m.t === 'st' && m.v) { V = m.v; render(); }
   else if (m.t === 'choices' && Array.isArray(m.w) && (!V || V.tn === m.tn)) { myChoices = m.w.slice(0, 3).map(okWord); render(); }
   else if (m.t === 'word') { myWord = okWord(m.i); render(); }
   else if (m.t === 'd' && Array.isArray(m.ops)) m.ops.forEach(applyLocal);
   else if (m.t === 'hist' && Array.isArray(m.ops)) { CV.ops = []; m.ops.forEach(o => mergeOp(CV.ops, o.k === 's' ? { ...o, n: 1 } : o)); redrawAll(CV.ops); }
   else if (m.t === 'chat') chatAdd(m.m);
+  else if (m.t === 'task' || m.t === 'aent') telRecv(m);
+  else if (m.t === 'tlobby') { V = null; TK = null; P.stopConfetti(); show('online'); $('#onForm').hidden = true; $('#onWait').hidden = false; renderLobby(); }
 }
 
 /* ---------- Affichage de la partie ---------- */
@@ -865,6 +1151,8 @@ function slotsHtml(pat) {
 let ovKey = '';
 function render() {
   if (!V) return;
+  if (V.tel) { renderTel(); return; }
+  $('#stage').hidden = false; $('#album').hidden = true; $('#wordbar').hidden = false;
   if (V.phase === 'end') { renderEnd(); return; }
   if ($('#game').hidden) show('game');
   if (V.tn !== lastTn) { // nouveau tour : toile vierge
@@ -919,19 +1207,20 @@ let lastSec = -1;
 function tickTimer() {
   if (!V || $('#game').hidden) return;
   const rem = Math.max(0, localDeadline - Date.now()), dur = V.phase === 'reveal' ? REVEAL_MS : V.dur || 1, sec = Math.ceil(rem / 1000);
-  const shown = V.phase === 'draw' || V.phase === 'choose';
+  if (V.tel && V.phase === 'tel' && rem <= 0 && TK && TK.step === V.step && TK.tn === V.tn && !TK.sent) telSend(true);
+  const shown = V.phase === 'draw' || V.phase === 'choose' || (V.tel && V.phase === 'tel');
   $('#tNum').textContent = shown ? sec : '✓';
   $('#tRing').style.strokeDashoffset = String(94.25 * (1 - (shown ? rem / dur : 1)));
   $('#tRing').style.stroke = shown && sec <= 10 ? '#ff6b5a' : '#ffc93c';
-  $('#timer').classList.toggle('low', shown && sec <= 10 && V.phase === 'draw');
-  if (V.phase === 'draw' && sec <= 5 && sec > 0 && sec !== lastSec) P.sfx('click');
+  $('#timer').classList.toggle('low', shown && sec <= 10 && (V.phase === 'draw' || V.phase === 'tel'));
+  if ((V.phase === 'draw' || (V.phase === 'tel' && TK && !TK.sent)) && sec <= 5 && sec > 0 && sec !== lastSec) P.sfx('click');
   lastSec = sec;
 }
 setInterval(tickTimer, 200);
 $('#bQuit').onclick = () => {
   P.sfx('click');
   P.quitMenu($('#bQuit'), () => {
-  leaveNet(); G = null; V = null; show('home');
+  leaveNet(); G = null; V = null; T = null; TK = null; show('home');
   });
 };
 
@@ -1008,7 +1297,7 @@ const gcHome = window.GChat ? GChat.mount($('#gchatHome'), { db: P.DB_URL, lang:
 
 /* ---------- Groupe d'amis ---------- */
 function joinFromParty(c) { P.stopConfetti(); G = null; V = null; pendingJoin = c; if (!P.hasName()) { show('home'); nameOk(); return; } $('#mOnline').click(); }
-if (window.Party) { Party.busy = () => !$('#game').hidden && !!V && V.phase !== 'end'; Party.onJoinHere = (g, c) => { joinFromParty(c); return true; }; }
+if (window.Party) { Party.busy = () => !$('#game').hidden && !!V && V.phase !== 'end' && V.phase !== 'done'; Party.onJoinHere = (g, c) => { joinFromParty(c); return true; }; }
 
 /* ---------- Démarrage ---------- */
 P.onLang(() => {
