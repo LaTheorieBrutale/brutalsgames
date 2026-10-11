@@ -51,7 +51,6 @@ html[data-ui=night] #land .path{fill:#6a6450}html[data-ui=night] #land .fl1{fill
 #land .ff{display:none}html[data-ui=night] #land .ff{display:inline}
 @keyframes ff{0%,100%{opacity:.15;transform:translate(0,0)}50%{opacity:1;transform:translate(6px,-10px)}}
 body.ingame #land{opacity:.55}
-@media (prefers-reduced-motion:reduce){#land .ff circle{animation:none}}
 
 .frame{position:relative;background:linear-gradient(180deg,#fff 0,var(--paper) 40%,var(--paper-2) 100%);border:4px solid var(--ink);border-radius:24px;box-shadow:0 7px 0 var(--ink)}
 .btn{position:relative;font-family:var(--f-ui);font-weight:700;font-size:18px;color:var(--ink);cursor:pointer;line-height:1.05;text-decoration:none;
@@ -209,7 +208,6 @@ html[data-ui=night] .err{color:#ff8a8a}
 .scores b{margin-left:auto}
 .sheet{position:fixed;z-index:15;left:50%;top:50%;transform:translate(-50%,-50%);width:min(360px,calc(100% - 32px));padding:14px;display:flex;flex-direction:column;gap:10px;animation:fadeIn .2s}
 .sheet-head{display:flex;justify-content:space-between;align-items:center;font-size:22px}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
 .dfav,.chip .pskin,#roster .pskin{width:24px;height:24px;flex:none;border-radius:50%;display:block}
 #roster .dfav,#roster .pskin{width:30px;height:30px}
 .chip .dfav,.chip .pskin{margin-right:-2px}
@@ -358,9 +356,9 @@ html[data-ui=night] .err{color:#ff8a8a}
 <div id="toast" role="status"></div>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="shared.js?v=20261011g"></script>
-<script src="skins.js?v=20261011g"></script>
-<script src="party.js?v=20261011g" data-game="df"></script>
+<script src="shared.js?v=20261011h"></script>
+<script src="skins.js?v=20261011h"></script>
+<script src="party.js?v=20261011h" data-game="df"></script>
 <script src="scenes.js"></script>
 <script>
 (() => {

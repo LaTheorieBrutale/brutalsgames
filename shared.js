@@ -378,7 +378,6 @@ P.genCode = () => Array.from({ length: 5 }, () => 'ABCDEFGHJKMNPQRSTUVWXYZ234567
 const CF = { parts: [], raf: 0, last: 0, c: null };
 const CF_COLORS = ['#ffcf3f', '#ff9a3c', '#86f2a0', '#ff7aa0', '#9fe6ff', '#f3e7c9', '#c58bff'];
 P.confetti = canvas => {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const c = CF.c = canvas, W = c.clientWidth, H = c.clientHeight, d = Math.min(2, devicePixelRatio || 1);
   c.width = W * d; c.height = H * d; c.getContext('2d').setTransform(d, 0, 0, d, 0, 0);
   for (let k = 0; k < 170; k++) {
