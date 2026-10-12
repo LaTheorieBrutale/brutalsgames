@@ -616,13 +616,15 @@ function fleetOk(ships) {
   return true;
 }
 function randomFleet() {
+  // style de placement tiré à chaque fois : collés aux bords, au centre, ou n'importe où
+  const sty = Math.floor(Math.random() * 3), okPos = (x, y, len, vert) => { if (sty === 0) return true; const ex = vert ? x : x + len - 1, ey = vert ? y + len - 1 : y, e = Math.min(x, y, N - 1 - ex, N - 1 - ey); return sty === 1 ? e <= 1 || Math.random() < .25 : e >= 2 || Math.random() < .3; };
   for (let tries = 0; tries < 400; tries++) {
     const occ = new Set(), near = new Set(), out = []; let ok = true;
     for (let i = 0; i < 5 && ok; i++) {
       const len = LENS[i]; let placed = false;
       for (let k = 0; k < 200 && !placed; k++) {
         const vert = rnd() < 0.5, x = Math.floor(rnd() * N), y = Math.floor(rnd() * N);
-        if (!fits(x, y, len, vert)) continue;
+        if (!fits(x, y, len, vert) || (tries < 200 && !okPos(x, y, len, vert))) continue;
         const cells = shipCells(x, y, len, vert);
         if (cells.some(c => occ.has(c) || (tries < 300 && near.has(c)))) continue;
         cells.forEach(c => { occ.add(c); const cx = c % N, cy = Math.floor(c / N); for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const nx = cx + dx, ny = cy + dy; if (nx >= 0 && ny >= 0 && nx < N && ny < N) near.add(ny * N + nx); } });
@@ -680,7 +682,17 @@ function playerLeft(i) {
   endGame(1 - i, true);
 }
 /* IA : l'Amiral Crabe — carte de probabilités (où les navires restants peuvent-ils encore tenir ?) */
+/* chaque partie, l'Amiral change de manie : damier pair/impair, préférence bords ou centre, coin de départ, part de tirs au jugé */
+const BOTP = { id: -1, p: null };
+function botPersona() {
+  if (BOTP.id === S.id && BOTP.p) return BOTP.p;
+  const r = (a, b) => a + Math.random() * (b - a);
+  BOTP.id = S.id; BOTP.p = { par: Math.random() < .5 ? 0 : 1, parW: r(.35, .75), edge: r(-.45, .45), cx: r(0, 9), cy: r(0, 9), pull: r(0, .35),
+    jit: r(.2, .55), wild: r(.05, .18), pow: r(1.5, 3.5), dirFirst: Math.random() < .5 ? 'h' : 'v' };
+  return BOTP.p;
+}
 function botPick(seat) {
+  const BP = botPersona();
   const op = S.seats[1 - seat], R = op.recv;
   const sunkCells = new Set(); op.ships.forEach(s => { if (isSunk(op, s)) s.cells.forEach(c => sunkCells.add(c)); });
   const open = []; for (let i = 0; i < NN; i++) if (R[i] === 2 && !sunkCells.has(i)) open.push(i);
@@ -695,11 +707,26 @@ function botPick(seat) {
     const w = open.length ? Math.pow(8, covers) : 1;
     cells.forEach(c => { if (!R[c]) score[c] += w; });
   }
-  let cand = []; let best = -1;
-  for (let i = 0; i < NN; i++) { if (R[i]) continue; const sc = score[i] * (open.length ? 1 : ((i % N + Math.floor(i / N)) % 2 ? 1 : 0.55)) * (0.85 + rnd() * 0.3); if (sc > best) { best = sc; cand = [i]; } }
+  let cand = []; let best = -1; const hw = [];
+  for (let i = 0; i < NN; i++) {
+    if (R[i]) continue; const x = i % N, y = Math.floor(i / N);
+    let m = 1;
+    if (!open.length) {
+      m *= (x + y) % 2 === BP.par ? 1 : BP.parW;                                         // damier décalé selon la partie
+      const ed = Math.min(x, y, N - 1 - x, N - 1 - y) / 4.5; m *= 1 + BP.edge * (1 - 2 * ed);  // aime les bords… ou le centre
+      m *= 1 + BP.pull * (1 - Math.min(1, Math.hypot(x - BP.cx, y - BP.cy) / 9));        // zone de départ favorite
+    } else if (open.length === 1) {
+      const o = open[0], ox = o % N, oy = Math.floor(o / N);                             // après un premier touché, teste d'abord un axe
+      if ((BP.dirFirst === 'h' && y === oy) || (BP.dirFirst === 'v' && x === ox)) m *= 1.15;
+    }
+    if (!open.length) { hw.push([i, Math.pow(score[i] * m, BP.pow)]); continue; }
+    const sc = score[i] * m * (1 - BP.jit / 2 + rnd() * BP.jit); if (sc > best) { best = sc; cand = [i]; }
+  }
+  // en chasse (rien de touché) : tirage pondéré plutôt que toujours la case n°1 → jamais deux parties pareilles
+  if (!open.length && hw.length) { const tot = hw.reduce((a, h) => a + h[1], 0); if (tot > 0) { let u = rnd() * tot; for (const [i, w] of hw) { u -= w; if (u <= 0) return i; } } }
   if (best <= 0) { for (let i = 0; i < NN; i++) if (!R[i]) cand.push(i); }
   // un amiral pas infaillible : de temps en temps il tire au jugé quand il chasse
-  if (!open.length && rnd() < 0.22) { const all = []; for (let i = 0; i < NN; i++) if (!R[i]) all.push(i); return all[Math.floor(rnd() * all.length)]; }
+  if (!open.length && rnd() < BP.wild) { const all = []; for (let i = 0; i < NN; i++) if (!R[i]) all.push(i); return all[Math.floor(rnd() * all.length)]; }
   return cand[Math.floor(rnd() * cand.length)];
 }
 function scheduleBot() {
