@@ -657,7 +657,7 @@ const I18N = {
     sub: 'du Donjon Effrayant', vs: 'contre',
     rGoalL: 'But', rGoal: 'Atteins le côté d’en face (ligne verte) avant les autres. 10 os chacun à 2 joueurs, 5 os à 4.',
     rMoveL: 'Bouger', rMove: 'Touche une dalle qui brille en vert. Tu peux sauter par-dessus un pion adjacent.',
-    rBonesL: 'Os', rBonesM: 'Tes fémurs bloquent 2 cases. Glisse pour viser, relâche pour poser. Un 2ᵉ doigt (ou le bouton ⟳) fait pivoter.',
+    rBonesL: 'Os', rBonesM: 'Tes fémurs bloquent 2 cases. Glisse pour viser, relâche pour poser : le mur se tourne tout seul selon la ligne la plus proche.',
     rBonesP: 'Tes fémurs bloquent 2 cases. Mode Mur (touche M), vise à la souris, clic pour poser. Clic droit, molette ou R pour pivoter.',
     nick: 'Ton pseudo', pickChar: 'Ton personnage', pickTitle: 'Choisis ton personnage', pickN: 'Joueur {n}', pickPlayer: '{name}, choisis ton personnage', pickWait: 'En attente des autres joueurs…', pickTaken: 'Déjà pris', pickYou: 'toi', defName: 'Crâneur', namePh: 'Écris ton pseudo…', nameReq: 'Entre ton pseudo pour jouer !', nameTaken: 'Choisis un vrai pseudo !', host: 'Créer une partie en ligne', orJoin: 'ou rejoindre un ami', codePh: 'CODE', join: 'Rejoindre',
     orDevice: 'ou sur cet appareil', nPlayers: 'Nombre de joueurs', p2: '2 joueurs', p4: '4 joueurs', vsAI: 'Contre l’IA', local: 'Même écran',
@@ -716,7 +716,7 @@ const I18N = {
     sub: 'of the Spooky Dungeon', vs: 'vs',
     rGoalL: 'Goal', rGoal: 'Reach the opposite side (green line) before everyone else. 10 bones each with 2 players, 5 with 4.',
     rMoveL: 'Move', rMove: 'Tap a tile glowing green. You can jump over an adjacent pawn.',
-    rBonesL: 'Bones', rBonesM: 'Your femurs block 2 squares. Drag to aim, release to place. A second finger (or the ⟳ button) rotates.',
+    rBonesL: 'Bones', rBonesM: 'Your femurs block 2 squares. Drag to aim, release to place: the wall turns by itself to the nearest line.',
     rBonesP: 'Your femurs block 2 squares. Wall mode (M key), aim with the mouse, click to place. Right-click, wheel or R to rotate.',
     nick: 'Your nickname', pickChar: 'Your character', pickTitle: 'Choose your character', pickN: 'Player {n}', pickPlayer: '{name}, choose your character', pickWait: 'Waiting for the other players…', pickTaken: 'Taken', pickYou: 'you', defName: 'Skully', namePh: 'Type your nickname…', nameReq: 'Enter your nickname to play!', nameTaken: 'Pick a real nickname!', host: 'Create an online game', orJoin: 'or join a friend', codePh: 'CODE', join: 'Join',
     orDevice: 'or on this device', nPlayers: 'Number of players', p2: '2 players', p4: '4 players', vsAI: 'Vs AI', local: 'Same screen',
@@ -775,7 +775,7 @@ const I18N = {
     sub: 'Strašidelné kobky', vs: 'proti',
     rGoalL: 'Cíl', rGoal: 'Dostaň se na protější stranu (zelená čára) dřív než ostatní. Ve 2 hráčích má každý 10 kostí, ve 4 hráčích 5.',
     rMoveL: 'Pohyb', rMove: 'Klepni na zeleně zářící dlaždici. Sousední figurku můžeš přeskočit.',
-    rBonesL: 'Kosti', rBonesM: 'Tvoje kosti blokují 2 políčka. Táhni pro zamíření, pusť pro položení. Druhý prst (nebo tlačítko ⟳) zeď otočí.',
+    rBonesL: 'Kosti', rBonesM: 'Tvoje kosti blokují 2 políčka. Táhni pro zamíření, pusť pro položení: zeď se sama natočí podle nejbližší čáry.',
     rBonesP: 'Tvoje kosti blokují 2 políčka. Režim zdi (klávesa M), miř myší, kliknutím polož. Pravé tlačítko, kolečko nebo R zeď otočí.',
     nick: 'Tvoje přezdívka', pickChar: 'Tvoje postava', pickTitle: 'Vyber si postavu', pickN: 'Hráč {n}', pickPlayer: '{name}, vyber si postavu', pickWait: 'Čekám na ostatní hráče…', pickTaken: 'Obsazeno', pickYou: 'ty', defName: 'Lebkoun', namePh: 'Napiš svou přezdívku…', nameReq: 'Pro hraní zadej přezdívku!', nameTaken: 'Vyber si skutečnou přezdívku!', host: 'Vytvořit online hru', orJoin: 'nebo se připoj ke kamarádovi', codePh: 'KÓD', join: 'Připojit',
     orDevice: 'nebo na tomto zařízení', nPlayers: 'Počet hráčů', p2: '2 hráči', p4: '4 hráči', vsAI: 'Proti AI', local: 'Jedna obrazovka',
@@ -2271,14 +2271,14 @@ function ui() {
   $('#bWall').classList.toggle('wall', mode === 'wall');
   $('#bWall').disabled = w === 0;
   $('#bWallLbl').textContent = tr('wallN', { n: w });
-  $('#bRot').disabled = mode !== 'wall';
+  $('#bRot').disabled = mode !== 'wall'; $('#bRot').hidden = !FINE.matches;
   const st = $('#status');
   const t = S.turn;
   if (S.over) st.textContent = '';
   else if (bots[t]) st.textContent = tr('botThinking', { name: names[t] });
   else if (net.mode !== 'local' && t !== me) st.textContent = tr('otherThinking', { name: names[t] });
   else if (mode === 'move') st.innerHTML = net.mode === 'local' ? tr('tapGreenLocal', { name: esc(names[t]) }) : tr('tapGreen');
-  else st.textContent = `${FINE.matches ? tr('aimMouse') : tr('aimTouch')} · ${G.o === 'h' ? tr('horiz') : tr('vert')}`;
+  else st.textContent = FINE.matches ? `${tr('aimMouse')} · ${G.o === 'h' ? tr('horiz') : tr('vert')}` : '';
   if (mode !== 'wall') ghost.visible = false;
 }
 function setMode(m) {
@@ -3088,6 +3088,13 @@ function updateGhost(e) {
   G.inside = p.x > -0.8 && p.x < 8.8 && p.z > -0.8 && p.z < 8.8;
   G.ax = clamp(Math.round(p.x - 0.5), 0, 7);
   G.az = clamp(Math.round(p.z - 0.5), 0, 7);
+  if (!FINE.matches || e.pointerType === 'touch') {
+    // téléphone : le mur prend tout seul le sens de la ligne la plus proche du doigt
+    const dx = Math.abs(p.x - (G.ax + 0.5)), dz = Math.abs(p.z - (G.az + 0.5));
+    let o = dz <= dx ? 'h' : 'v';
+    if (wallCheck(S, o, G.ax, G.az) && !wallCheck(S, o === 'h' ? 'v' : 'h', G.ax, G.az)) o = o === 'h' ? 'v' : 'h';
+    G.o = o;
+  }
   positionGhost();
 }
 let ghostKey = '';
@@ -3102,7 +3109,7 @@ let dragId = null, downInfo = null;
 canvas.addEventListener('pointerdown', e => {
   if (!canAct()) return;
   if (mode === 'wall') {
-    if (dragId !== null && e.pointerId !== dragId) { rotateGhost(); return; } // 2e doigt : pivoter
+    if (dragId !== null && e.pointerId !== dragId) { if (FINE.matches && e.pointerType !== 'touch') rotateGhost(); return; } // 2e doigt ignoré sur téléphone
     if (e.button === 2) return;
     dragId = e.pointerId;
     try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
