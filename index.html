@@ -223,6 +223,25 @@ h1{margin:6px 0 3px;font-size:clamp(30px,3.4vw,46px);line-height:1.04;letter-spa
 .rank.r3{background:radial-gradient(circle at 35% 30%,#ffc08a,#c9783a);color:#2e1606}
 .lbav{display:inline-grid;place-items:center;vertical-align:middle;width:24px;height:24px;margin-right:7px;border-radius:8px;overflow:hidden;background:#5a3545;font-size:11px;font-style:normal;font-weight:900;color:#ffe8df}
 .lbav svg{width:100%;height:100%;display:block}
+/* podium : les 3 premiers mis en avant */
+.lb-pod{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:4px 0 14px}
+.lb-pod:empty{display:none}
+.pod{--c1:#fff2a8;--c2:#ffcf3f;--ink:#3a2600;position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;padding:12px 8px 11px;border-radius:18px;
+  border:1px solid color-mix(in srgb,var(--c2) 45%,transparent);background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--c2) 26%,transparent),transparent 70%),#30222c;
+  box-shadow:0 8px 22px #0000003a;animation:podIn .45s cubic-bezier(.2,.9,.3,1.2) both}
+.pod.p2{--c1:#ffffff;--c2:#c9d0de;--ink:#22283a;animation-delay:.07s}
+.pod.p3{--c1:#ffc08a;--c2:#c9783a;--ink:#2e1606;animation-delay:.14s}
+@keyframes podIn{from{opacity:0;transform:translateY(10px) scale(.96)}}
+.pod-tag{padding:3px 11px;border-radius:999px;font-size:11.5px;font-weight:900;letter-spacing:.02em;white-space:nowrap;color:var(--ink);
+  background:radial-gradient(circle at 35% 30%,var(--c1),var(--c2));box-shadow:0 2px 8px color-mix(in srgb,var(--c2) 45%,transparent)}
+.pod-av{position:relative;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;padding:4px;
+  background:radial-gradient(circle at 35% 30%,var(--c1),var(--c2));box-shadow:0 0 0 3px #30222c,0 0 18px color-mix(in srgb,var(--c2) 55%,transparent)}
+.pod.p1 .pod-av{box-shadow:0 0 0 3px #30222c,0 0 26px color-mix(in srgb,var(--c2) 80%,transparent)}
+.pod-av .lbav{width:100%;height:100%;margin:0;border-radius:50%;font-size:24px}
+.pod-av .lbav svg{transform:scale(1.08)}
+.pod-nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14.5px;font-weight:900}
+.pod-st{font-size:11.5px;color:#e2cad4;font-weight:700}
+@media(max-width:660px){.lb-pod{gap:7px}.pod{padding:10px 5px 9px}.pod-av{width:52px;height:52px}.pod-tag{font-size:10.5px;padding:3px 8px}.pod-nm{font-size:13px}}
 .lbl{font-size:10px;color:#d4b7c4;letter-spacing:.1em;text-transform:uppercase;font-weight:800}
 .hist{display:flex;flex-direction:column;gap:5px;font-size:13px;margin-top:6px}
 .hist div{display:flex;align-items:center;gap:8px;color:#dac4d0;padding:6px 9px;border-radius:11px;background:#30222c;border:1px solid #ffffff10}
@@ -390,7 +409,7 @@ h1{margin:6px 0 3px;font-size:clamp(30px,3.4vw,46px);line-height:1.04;letter-spa
         <div class="panel-body">
           <div class="lb-head"><div id="lbTabs"></div></div>
           <div class="lb-grid">
-            <div><div class="lb-cols"><span>#</span><span data-i18n="colPlayer">Joueur</span><span data-i18n="colW">V</span><span data-i18n="colG">P</span><span>%</span></div><div class="lb-list" id="lbList"></div></div>
+            <div><div class="lb-pod" id="lbPod"></div><div class="lb-cols"><span>#</span><span data-i18n="colPlayer">Joueur</span><span data-i18n="colW">V</span><span data-i18n="colG">P</span><span>%</span></div><div class="lb-list" id="lbList"></div></div>
             <div><span class="lbl" data-i18n="lastGames">Dernières parties</span><div class="hist" id="hist"></div></div>
           </div>
         </div>
@@ -440,19 +459,19 @@ h1{margin:6px 0 3px;font-size:clamp(30px,3.4vw,46px);line-height:1.04;letter-spa
 'use strict';
 const { $, t, esc } = P;
 P.addStrings({
-  fr: { party: '👥 Groupe d’amis', chat: 'Chat', tagline: 'Salle de jeux entre amis', nick: 'Ton pseudo', ourGames: 'Nos jeux', play: 'Jouer', leaderboard: 'Classement',
+  fr: { party: '👥 Groupe d’amis', chat: 'Chat', tagline: 'Salle de jeux entre amis', nick: 'Ton pseudo', ourGames: 'Nos jeux', play: 'Jouer', leaderboard: 'Classement', pod1: '1ʳᵉ place', pod2: '2ᵉ place', pod3: '3ᵉ place', podW: '{n} victoires',
     qDesc: 'Atteins l’autre côté du donjon en bloquant tes adversaires avec des os.', dDesc: 'Repère les différences entre deux images avant tes amis. Une nouvelle scène à chaque partie.',
     tagStrat: 'Stratégie', tagObs: 'Observation', tag14: '1 à 4 joueurs', tag110: '1 à 10 joueurs', tag310: '3 à 10 joueurs', tagBluff: 'Bluff', cDesc: 'Deux équipages, un capitaine chacun : devine les mots de ton équipe grâce à un seul indice… et évite le trou noir !', rDesc: 'Un joueur dessine, les autres devinent dans le chat. Plus tu trouves vite, plus tu marques !', tagTeam: 'Équipes', tag410: '4 à 10 joueurs', tagDraw: 'Dessin', tag210: '2 à 10 joueurs', bDesc: 'Mise tes jetons et approche-toi de 21 sans dépasser. Bats le croupier avec tes amis !', tagCasino: 'Casino', tag17: '1 à 7 joueurs', yDesc: 'Lance 5 dés, garde les meilleurs et remplis ta feuille de score. Choisis ton skin de dés !', tagDice: 'Dés', tag18: '1 à 8 joueurs', nTitle: 'Bataille navale', nDesc: 'Cache tes 5 navires, puis tire sur la grille adverse. Le premier qui coule toute la flotte gagne !', tag12: '1 contre 1', uDesc: 'Tout le monde a le même mot… sauf l’intrus. Donne des indices, vote, et démasque les espions.', tagOnline: 'En ligne', soonT: 'Prochain jeu…', soonD: 'Une idée ? Il arrive bientôt sur Brutal’s Games.',
     all: 'Général', myStat: '{w} victoires · {g} {games} · rang <b>#{r}</b>', myStat0: 'Joue une partie pour entrer au classement.',
     dbOn: 'Classement en ligne · {n} {games}', dbOff: 'Classement hors ligne', dbLoad: 'Chargement…',
     install: 'Sur iPhone : <b>Partager</b> → <b>Sur l’écran d’accueil</b> pour installer Brutal&#39;s Games comme une app.' },
-  en: { party: '👥 Friends group', chat: 'Chat', tagline: 'Game room for friends', nick: 'Your nickname', ourGames: 'Our games', play: 'Play', leaderboard: 'Leaderboard',
+  en: { party: '👥 Friends group', chat: 'Chat', tagline: 'Game room for friends', nick: 'Your nickname', ourGames: 'Our games', play: 'Play', leaderboard: 'Leaderboard', pod1: '1st place', pod2: '2nd place', pod3: '3rd place', podW: '{n} wins',
     qDesc: 'Reach the other side of the dungeon while blocking your rivals with bones.', dDesc: 'Spot the differences between two pictures before your friends. A new scene every game.',
     tagStrat: 'Strategy', tagObs: 'Observation', tag14: '1 to 4 players', tag110: '1 to 10 players', tag310: '3 to 10 players', tagBluff: 'Bluff', cDesc: 'Two crews, one captain each: guess your team’s words from a single clue… and avoid the black hole!', rDesc: 'One player draws, the others guess in the chat. The faster you guess, the more you score!', tagTeam: 'Teams', tag410: '4 to 10 players', tagDraw: 'Drawing', tag210: '2 to 10 players', bDesc: 'Bet your chips and get close to 21 without going over. Beat the dealer with your friends!', tagCasino: 'Casino', tag17: '1 to 7 players', yDesc: 'Roll 5 dice, keep the best and fill your score sheet. Pick your dice skin!', tagDice: 'Dice', tag18: '1 to 8 players', nTitle: 'Battleship', nDesc: 'Hide your 5 ships, then fire at the enemy grid. The first to sink the whole fleet wins!', tag12: '1 vs 1', uDesc: 'Everyone has the same word… except the impostor. Give clues, vote, and unmask the spies.', tagOnline: 'Online', soonT: 'Next game…', soonD: 'Got an idea? It’s coming soon to Brutal’s Games.',
     all: 'Overall', myStat: '{w} wins · {g} {games} · rank <b>#{r}</b>', myStat0: 'Play a game to enter the leaderboard.',
     dbOn: 'Online leaderboard · {n} {games}', dbOff: 'Leaderboard offline', dbLoad: 'Loading…',
     install: 'On iPhone: <b>Share</b> → <b>Add to Home Screen</b> to install Brutal&#39;s Games like an app.' },
-  cs: { party: '👥 Skupina přátel', chat: 'Chat', tagline: 'Herna pro kamarády', nick: 'Tvoje přezdívka', ourGames: 'Naše hry', play: 'Hrát', leaderboard: 'Žebříček',
+  cs: { party: '👥 Skupina přátel', chat: 'Chat', tagline: 'Herna pro kamarády', nick: 'Tvoje přezdívka', ourGames: 'Naše hry', play: 'Hrát', leaderboard: 'Žebříček', pod1: '1. místo', pod2: '2. místo', pod3: '3. místo', podW: 'výhry: {n}',
     qDesc: 'Dostaň se na druhou stranu kobky a blokuj soupeře kostmi.', dDesc: 'Najdi rozdíly mezi dvěma obrázky dřív než kamarádi. Při každé hře nová scéna.',
     tagStrat: 'Strategie', tagObs: 'Postřeh', tag14: '1 až 4 hráči', tag110: '1 až 10 hráčů', tag310: '3 až 10 hráčů', tagBluff: 'Blafování', cDesc: 'Dvě posádky, každá s kapitánem: uhodni slova svého týmu z jediné nápovědy… a vyhni se černé díře!', rDesc: 'Jeden kreslí, ostatní hádají v chatu. Čím rychleji uhodneš, tím víc bodů!', tagTeam: 'Týmy', tag410: '4 až 10 hráčů', tagDraw: 'Kreslení', tag210: '2 až 10 hráčů', bDesc: 'Vsaď žetony a přibliž se k 21, ale nepřetáhni. Poraz krupiéra s kamarády!', tagCasino: 'Kasino', tag17: '1 až 7 hráčů', yDesc: 'Hoď 5 kostkami, nech si ty nejlepší a vyplň tabulku. Vyber si vzhled kostek!', tagDice: 'Kostky', tag18: '1 až 8 hráčů', nTitle: 'Lodě', nDesc: 'Schovej svých 5 lodí a pal do soupeřovy mřížky. Kdo první potopí celou flotilu, vyhrává!', tag12: '1 na 1', uDesc: 'Všichni mají stejné slovo… kromě vetřelce. Dávej nápovědy, hlasuj a odhal špiony.', tagOnline: 'Online', soonT: 'Další hra…', soonD: 'Máš nápad? Brzy dorazí na Brutal’s Games.',
     all: 'Celkově', myStat: 'výhry: {w} · {g} {games} · pořadí <b>#{r}</b>', myStat0: 'Zahraj si hru a dostaneš se do žebříčku.',
@@ -538,6 +557,7 @@ const lbAv = n => { const a = P.avatarOf(n); return a ? `<i class="lbav">${P.ava
 function render() {
   $('#lbTabs').innerHTML = GAMES.map(([k, l]) => `<button class="filter" type="button" data-tab="${k}" aria-pressed="${k === tab}">${k === 'all' ? t('all') : esc(t(l))}</button>`).join('');
   const rows = P.ranking(matches, tab === 'all' ? null : tab), me = P.name().toLowerCase();
+  $('#lbPod').innerHTML = rows.slice(0, 3).map((r, i) => `<div class="pod p${i + 1}${r.name.toLowerCase() === me ? ' me' : ''}"><span class="pod-tag">${t('pod' + (i + 1))}</span><span class="pod-av">${lbAv(r.name)}</span><span class="pod-nm">${esc(r.name)}</span><span class="pod-st">${t('podW', { n: r.w })} · ${Math.round(100 * r.w / r.g)}%</span></div>`).join('');
   $('#lbList').innerHTML = rows.length ? rows.slice(0, 30).map((r, i) => `<div class="lb-row${r.name.toLowerCase() === me ? ' me' : ''}"><span class="rank${i < 3 ? ' r' + (i + 1) : ''}">${i + 1}</span><span class="nm">${lbAv(r.name)}${esc(r.name)}${r.ai ? `<small>${t('aiTag')}</small>` : ''}</span><span>${r.w}</span><span>${r.g}</span><span>${Math.round(100 * r.w / r.g)}%</span></div>`).join('')
     : `<div class="empty">${t('lbEmpty')}</div>`;
   const fmt = new Intl.DateTimeFormat(t('locale'), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
