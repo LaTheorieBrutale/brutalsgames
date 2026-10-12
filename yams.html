@@ -695,7 +695,7 @@ document.addEventListener('click', e => { const el = e.target.closest('.tr'); if
    RÈGLES ET MOTEUR (chez l'hôte)
    ===================================================================== */
 const UP = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'], LOW = ['c3k', 'c4k', 'cfh', 'css', 'cls', 'cy', 'cch'], CATS = UP.concat(LOW);
-const MAXP = 8, TURN_MS = 30000;
+const MAXP = 8, TURN_MS = 40000;
 function counts(d) { const c = [0, 0, 0, 0, 0, 0, 0]; d.forEach(v => c[v]++); return c; }
 function catScore(cat, d) {
   if (!d.every(v => v >= 1 && v <= 6)) return 0;
@@ -742,7 +742,7 @@ function hostRoll(seat, held) {
   if (Array.isArray(held) && S.rolls > 0) S.held = S.held.map((_, k) => !!held[k]);
   if (S.rolls === 0) S.held = [false, false, false, false, false];
   S.dice = S.dice.map((v, k) => S.held[k] && v ? v : d6());
-  S.rolls++; S.rollId++; S.deadline = Date.now() + TURN_MS; sync();
+  S.rolls++; S.rollId++; sync();
 }
 function hostHold(seat, i, v) {
   if (!S || S.phase !== 'play' || seat !== S.turn || !S.rolls || S.rolls >= 3 || !(i >= 0 && i < 5)) return;
