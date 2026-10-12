@@ -179,13 +179,13 @@ P.skinLive = cb => { P.fetchAvatars().then(() => cb && cb()); P.watchAvatars(cb)
   const st = document.createElement('style');
   st.textContent = `
 .bg-rk{display:inline;font-weight:inherit;-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;text-shadow:none!important;-webkit-text-stroke:0!important;filter:none!important;
-  background-repeat:repeat-x,no-repeat;background-size:720px 100%,100% 100%;animation:bgRkShine 7.2s linear infinite}
-/* calque 1 : un éclat doux qui traverse le nom (motif de 720 px, il avance d'exactement 720 px → boucle invisible) ;
+  background-repeat:repeat-x,no-repeat;background-size:420px 100%,100% 100%;animation:bgRkShine 3s linear infinite}
+/* calque 1 : un éclat doux qui traverse le nom (motif de 420 px, il avance d'exactement 420 px → boucle invisible) ;
    calque 2 : le métal, fixe (clair en haut, plus profond en bas) */
-.bg-rk.r1{background-image:linear-gradient(90deg,rgba(255,250,225,0) 0,rgba(255,250,225,0) 300px,rgba(255,250,225,.35) 330px,rgba(255,252,235,.95) 360px,rgba(255,250,225,.35) 390px,rgba(255,250,225,0) 420px,rgba(255,250,225,0) 720px),linear-gradient(180deg,#ffe58a 0%,#f5c330 45%,#d99a12 100%)}
-.bg-rk.r2{background-image:linear-gradient(90deg,rgba(255,255,255,0) 0,rgba(255,255,255,0) 300px,rgba(255,255,255,.35) 330px,rgba(255,255,255,.95) 360px,rgba(255,255,255,.35) 390px,rgba(255,255,255,0) 420px,rgba(255,255,255,0) 720px),linear-gradient(180deg,#f4f6fa 0%,#cfd6e2 50%,#a7b1c3 100%)}
-.bg-rk.r3{background-image:linear-gradient(90deg,rgba(255,235,215,0) 0,rgba(255,235,215,0) 300px,rgba(255,235,215,.35) 330px,rgba(255,240,225,.95) 360px,rgba(255,235,215,.35) 390px,rgba(255,235,215,0) 420px,rgba(255,235,215,0) 720px),linear-gradient(180deg,#f4b27a 0%,#d5803f 50%,#a3561f 100%)}
-@keyframes bgRkShine{from{background-position:-360px 0,0 0}to{background-position:360px 0,0 0}}`;
+.bg-rk.r1{background-image:linear-gradient(90deg,rgba(255,250,225,0) 0,rgba(255,250,225,0) 150px,rgba(255,250,225,.35) 175px,rgba(255,252,235,.95) 200px,rgba(255,250,225,.35) 225px,rgba(255,250,225,0) 420px,rgba(255,250,225,0) 420px),linear-gradient(180deg,#ffe58a 0%,#f5c330 45%,#d99a12 100%)}
+.bg-rk.r2{background-image:linear-gradient(90deg,rgba(255,255,255,0) 0,rgba(255,255,255,0) 150px,rgba(255,255,255,.35) 175px,rgba(255,255,255,.95) 200px,rgba(255,255,255,.35) 225px,rgba(255,255,255,0) 420px,rgba(255,255,255,0) 420px),linear-gradient(180deg,#f4f6fa 0%,#cfd6e2 50%,#a7b1c3 100%)}
+.bg-rk.r3{background-image:linear-gradient(90deg,rgba(255,235,215,0) 0,rgba(255,235,215,0) 150px,rgba(255,235,215,.35) 175px,rgba(255,240,225,.95) 200px,rgba(255,235,215,.35) 225px,rgba(255,235,215,0) 420px,rgba(255,235,215,0) 420px),linear-gradient(180deg,#f4b27a 0%,#d5803f 50%,#a3561f 100%)}
+@keyframes bgRkShine{from{background-position:-210px 0,0 0}to{background-position:210px 0,0 0}}`;
   (document.head || document.documentElement).appendChild(st);
   const key = n => String(n || '').trim().toLowerCase();
   let top = {}; try { top = JSON.parse(P.get('bg-top3', '{}')) || {}; } catch (e) { top = {}; }
@@ -204,7 +204,7 @@ P.skinLive = cb => { P.fetchAvatars().then(() => cb && cb()); P.watchAvatars(cb)
     const frag = document.createDocumentFragment(); let last = 0, m;
     while ((m = re.exec(txt))) {
       if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
-      const sp = document.createElement('span'); sp.className = 'bg-rk r' + top[key(m[1])]; sp.textContent = m[1]; sp.style.animationDelay = (-(performance.timeOrigin + performance.now()) % 7200 / 1000).toFixed(3) + 's'; frag.appendChild(sp);
+      const sp = document.createElement('span'); sp.className = 'bg-rk r' + top[key(m[1])]; sp.textContent = m[1]; sp.style.animationDelay = (-(performance.timeOrigin + performance.now()) % 3000 / 1000).toFixed(3) + 's'; frag.appendChild(sp);
       last = m.index + m[1].length;
     }
     if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
