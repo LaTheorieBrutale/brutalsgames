@@ -99,8 +99,12 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .vp{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;cursor:pointer;background:none;border:0;padding:0;color:var(--text);font:inherit}
 .vp .av{position:relative;width:52px;height:52px;border-radius:50%;border:3px solid var(--ink);background:var(--panel);display:grid;place-items:center;box-shadow:0 3px 0 var(--ink)}
 .vp .av svg{width:38px;height:38px}
-.vp.turn .av{border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,193,78,.45),0 3px 0 var(--ink)}
-.vp.turn .av::before{content:"";position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:28px;height:5px;border-radius:3px;background:var(--gold)}
+.vp.turn .av{border-color:var(--gold)}
+/* minuteur du tour : anneau qui se vide autour de l'avatar */
+.vp.turn .av::after{content:"";position:absolute;inset:-8px;border-radius:50%;pointer-events:none;
+  background:conic-gradient(var(--tc,#f2c14e) calc(var(--tp,1) * 1turn),rgba(255,255,255,.13) 0);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3.5px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 3.5px),#000 calc(100% - 3px));
+  filter:drop-shadow(0 0 2px rgba(0,0,0,.5))}
 .vp .info{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
 .vp .nm{font-size:13px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .vp.me .nm::before{content:"● ";color:var(--green)}
@@ -142,15 +146,15 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .gtot{display:grid;grid-template-columns:1fr 46px 50px;align-items:center;padding:6px;background:#0c1d2b;border-top:3px solid var(--ink);font-family:var(--f-title);font-size:15px}
 .gtot span{text-align:center;color:var(--gold)}.gtot span:first-child{text-align:left;color:var(--text);font-size:13px}.gtot span:last-child{color:var(--mine)}
 /* dés */
-.tray{flex:none;position:relative;padding:10px 8px 8px;border-radius:22px;border:4px solid var(--ink);
+.tray{flex:none;position:relative;padding:22px 12px;border-radius:22px;border:4px solid var(--ink);
   background:radial-gradient(ellipse at 50% 30%,rgba(255,255,255,.1),transparent 65%),repeating-radial-gradient(circle at 40% 40%,rgba(0,0,0,.05) 0 2px,transparent 2px 5px),linear-gradient(180deg,var(--felt),var(--felt2));
-  box-shadow:inset 0 0 0 7px var(--wood),inset 0 0 0 10px var(--ink),inset 0 0 22px 10px rgba(0,0,0,.4),0 6px 0 var(--ink);display:flex;flex-direction:column;align-items:center;gap:6px}
-.dicerow{display:flex;gap:clamp(5px,2vw,14px);justify-content:center;padding:4px 0 6px}
+  box-shadow:inset 0 0 0 7px var(--wood),inset 0 0 0 10px var(--ink),inset 0 0 22px 10px rgba(0,0,0,.4),0 6px 0 var(--ink);display:flex;flex-direction:column;align-items:center;gap:12px}
+.dicerow{display:flex;gap:clamp(5px,2vw,14px);justify-content:center;padding:0}
 .die{position:relative;width:clamp(50px,15vw,78px);height:clamp(50px,15vw,78px);background:none;border:0;padding:0;cursor:pointer;transition:transform .15s}
 .die svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 0 rgba(0,0,0,.55))}
 .hring{opacity:0;transition:opacity .15s}
 .die.held .hring{opacity:1;filter:drop-shadow(0 0 3px rgba(255,207,63,.7))}
-.die.held::before{content:"";position:absolute;z-index:2;top:-11px;left:-9px;width:22px;height:22px;border-radius:50%;background:var(--gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3' fill='none' stroke='%232a1a00' stroke-width='2.6' stroke-linecap='round'/%3E%3Crect x='5.5' y='10.5' width='13' height='10' rx='2.5' fill='%232a1a00'/%3E%3Ccircle cx='12' cy='15.5' r='1.6' fill='%23ffcf3f'/%3E%3C/svg%3E") center/68% no-repeat;box-shadow:0 2px 6px rgba(0,0,0,.45);pointer-events:none;animation:heldIn .18s ease-out}
+.die.held::before{content:"";position:absolute;z-index:2;top:-8px;left:-8px;width:22px;height:22px;border-radius:50%;background:var(--gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3' fill='none' stroke='%232a1a00' stroke-width='2.6' stroke-linecap='round'/%3E%3Crect x='5.5' y='10.5' width='13' height='10' rx='2.5' fill='%232a1a00'/%3E%3Ccircle cx='12' cy='15.5' r='1.6' fill='%23ffcf3f'/%3E%3C/svg%3E") center/68% no-repeat;box-shadow:0 2px 6px rgba(0,0,0,.45);pointer-events:none;animation:heldIn .18s ease-out}
 @keyframes heldIn{from{opacity:0;transform:scale(.7)}}
 .die:disabled{cursor:default}
 .die .dbody{display:block;width:100%;height:100%;position:relative;z-index:1;isolation:isolate;transform-origin:50% 80%;will-change:transform}
@@ -166,13 +170,14 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 #bRoll.shake{animation:shake .32s}
 @keyframes shake{20%{transform:rotate(-5deg)}40%{transform:rotate(5deg)}60%{transform:rotate(-3deg)}80%{transform:rotate(2deg)}}
 .die.blank svg{opacity:.3}
-.rzone{position:relative;width:100%;display:flex;flex-direction:column;align-items:center;gap:5px}
+.rzone{position:relative;width:100%;display:flex;flex-direction:column;align-items:center;gap:12px}
 .rhint{margin:0;font-size:13px;font-weight:800;color:#e9fffb;text-align:center;min-height:1.25em;transition:opacity .25s}
-.rstage{position:relative;width:100%;height:50px}
+.rstage{position:relative;width:100%;height:46px}
 .rbtns{position:absolute;inset:0;display:flex;justify-content:center;gap:clamp(10px,4vw,26px)}
 .rb{min-width:0;width:min(42%,190px);font-family:var(--f-title);font-size:18px;letter-spacing:.04em;text-transform:uppercase;color:#fff;
   text-shadow:0 2px 0 rgba(0,0,0,.35);padding:9px 10px 8px;background:linear-gradient(180deg,#9a9a9a,#6c6c6c);
-  transition:transform .42s cubic-bezier(.55,0,.75,.2),background .2s,filter .2s}
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.4);transition:transform .42s cubic-bezier(.55,0,.75,.2),background .2s,filter .2s}
+.rb:active{transform:scale(.96);box-shadow:inset 0 3px 0 rgba(255,255,255,.4)}
 .rb:disabled{opacity:1;cursor:default}
 .rb.blue{background:linear-gradient(180deg,#8cc8ff 0,#3a8cf0 55%,#2160c4 100%)}
 .rb.green{background:linear-gradient(180deg,#a8f08a 0,#45b347 55%,#2b8030 100%);animation:rbPop .35s ease-out}
@@ -184,7 +189,6 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .rwait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;margin:0;font-size:15px;font-weight:800;color:#e9fffb;text-align:center;opacity:0;transition:opacity .2s;pointer-events:none}
 .rzone.other .rwait{opacity:1;transition:opacity .45s .38s}
 .rzone.other .rhint{opacity:0}
-.tleft{margin:0;font-size:13px;font-weight:900;color:#fff;text-align:center}
 /* dés gardés : halo qui pulse, étincelles, cadenas qui gigote */
 .die .hglow{position:absolute;inset:-12%;z-index:0;border-radius:30%;pointer-events:none;opacity:0;
   background:radial-gradient(closest-side,rgba(255,236,120,.0) 62%,rgba(255,226,90,.6) 80%,transparent 100%);filter:blur(3px)}
@@ -206,10 +210,10 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .tbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#ff9a3c);transform-origin:left;transition:transform .25s linear}
 @media (max-height:800px){
   .versus .vp{flex-direction:row;gap:7px}.versus .vp .info{display:flex;flex-direction:column;align-items:flex-start}
-  .vp .av{width:40px;height:40px;border-width:2.5px}.vp .av svg{width:30px;height:30px}.vp.turn .av::before{top:-8px;width:22px;height:4px}
+  .vp .av{width:40px;height:40px;border-width:2.5px}.vp .av svg{width:30px;height:30px}
   .vp .sc{font-size:22px}.status{font-size:13.5px;min-height:18px}#game{gap:5px}
-  .tray{padding:7px 8px 6px;gap:4px}.dicerow{padding:2px 0 4px}.die{width:clamp(44px,13.5vw,66px);height:clamp(44px,13.5vw,66px)}
-  .rb{font-size:16px;padding:7px 10px 6px}.rstage{height:44px}.rhint{font-size:12px}.hint{font-size:11.5px}
+  .tray,.rzone{gap:9px}.tray{padding:19px 10px}.die{width:clamp(44px,13.5vw,66px);height:clamp(44px,13.5vw,66px)}
+  .rb{font-size:16px;padding:7px 10px 6px}.rstage{height:40px}.rhint{font-size:12px}.hint{font-size:11.5px}
 }
 @media (max-height:690px){#chatBar{display:none!important}.die{width:clamp(40px,12vw,58px);height:clamp(40px,12vw,58px)}.hud{padding:3px 6px}.hud .btn.icon{padding:5px}}
 
@@ -348,9 +352,7 @@ body.ingame #chatBar{margin-left:52px;width:calc(100% - 52px)}
         <div class="rbtns"><button class="btn rb" id="bRoll"></button><button class="btn rb" id="bPlay" disabled></button></div>
         <p class="rwait" id="rwait"></p>
       </div>
-      <p class="tleft" id="tleft"></p>
     </div>
-    <div class="tbar"><i id="tbar"></i></div>
   </div>
   <button class="frame chatbar" id="chatBar"><span class="cb-ico">💬</span><span class="cb-txt"></span><span class="badge"></span></button>
 </section>
@@ -946,7 +948,7 @@ function render() {
   if (!ending) renderRollZone(mine, cur);
   // (phrase d’aide retirée)
   localDeadline = Date.now() + (V.rem || 0);
-  renderVersus(); renderGrid(mine);
+  renderVersus(); tickRing(); renderGrid(mine);
   // ligne d'info : dernier coup joué
   if (V.last) { const L = V.last, who = L.seat === net.me ? t('youPlayed') : esc(t('hePlayed', { name: (V.seats[L.seat] || {}).n || '' })); $('#status').innerHTML = `${who} <b>${t(L.cat)}</b> ${t('forPts', { n: L.v })}`; }
   else $('#status').innerHTML = mine ? t('hintFirst') : esc(t('turnOf', { name: cur.n || '' }));
@@ -968,7 +970,6 @@ function renderRollZone(mine, cur) {
   if (pb.classList.contains('green') !== canPlay) pb.classList.toggle('green', canPlay);
   $('#rhint').textContent = !mine ? '' : !V.rolls ? t('hRoll') : pickCat ? t('hPlay') : t('hHold');
   $('#rwait').textContent = mine ? '' : t('waitFor', { name: cur.n || '', n: left });
-  const tl = 14 - Math.min(13, V.round); $('#tleft').textContent = tl <= 1 ? t('turnsLeft1') : t('turnsLeft', { n: tl });
 }
 // petites étincelles qui scintillent autour des dés gardés
 setInterval(() => {
@@ -1042,7 +1043,12 @@ function renderGrid(mine) {
   $('#grid').innerHTML = `<div class="gcol">${left}</div><div class="gcol">${right}</div>`;
   // couleurs des colonnes : toi en vert, les autres en or (comme l'en-tête)
 }
-setInterval(() => { const b = document.getElementById('tbar'); if (b && V && V.phase === 'play') b.style.transform = `scaleX(${Math.max(0, Math.min(1, (localDeadline - Date.now()) / TURN_MS))})`; }, 250);
+function tickRing() {
+  if (!V || V.phase !== 'play') return;
+  const f = Math.max(0, Math.min(1, (localDeadline - Date.now()) / TURN_MS));
+  document.querySelectorAll('#versus .vp.turn .av').forEach(a => { a.style.setProperty('--tp', f.toFixed(4)); a.style.setProperty('--tc', f > .33 ? '#f2c14e' : f > .15 ? '#ff9a3c' : '#ff5a4a'); });
+}
+setInterval(tickRing, 100);
 $('#dice').addEventListener('click', e => {
   const b = e.target.closest('[data-die]'); if (!b || b.disabled || !V) return;
   const k = +b.dataset.die; localHeld[k] = !localHeld[k]; b.classList.toggle('held', localHeld[k]); P.sfx('click');
