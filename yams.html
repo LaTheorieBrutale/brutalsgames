@@ -130,6 +130,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .grow .me{margin:0 0 0 4px;height:calc(100% - 4px);min-height:28px;display:grid;place-items:center;border-radius:9px;background:#0c1d2b;font-family:var(--f-title);font-size:clamp(17px,5vw,24px);color:var(--mine)}
 .grow .me.empty{color:rgba(255,255,255,.12)}
 .grow .me.pick{cursor:pointer;background:rgba(92,194,74,.22);color:#b8ff9a;outline:2px dashed rgba(142,224,106,.7);outline-offset:-3px}
+.grow .me.pick.sel,.grow .me.pick.zero.sel{background:rgba(92,194,74,.75);color:#fff;outline:3px solid #d8ffc4;outline-offset:-3px;text-shadow:0 1px 0 rgba(0,0,0,.4)}
 .grow .me.pick.zero{background:rgba(224,72,72,.14);color:#ff9a9a;outline-color:rgba(255,120,120,.5)}
 @media (hover:hover){.grow .me.pick:hover{background:rgba(92,194,74,.45)}}
 .grow .me.just,.grow .v.just{animation:flash 1.2s}
@@ -165,11 +166,41 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 #bRoll.shake{animation:shake .32s}
 @keyframes shake{20%{transform:rotate(-5deg)}40%{transform:rotate(5deg)}60%{transform:rotate(-3deg)}80%{transform:rotate(2deg)}}
 .die.blank svg{opacity:.3}
-.rollbar{display:flex;align-items:center;gap:10px;width:100%;justify-content:center}
-.rollbar .btn{min-width:150px;font-size:18px;padding:8px 14px 7px}
-.pipsleft{display:flex;gap:4px}
-.pipsleft i{width:12px;height:12px;border-radius:50%;border:2.5px solid var(--ink);background:var(--gold)}
-.pipsleft i.off{background:rgba(0,0,0,.35)}
+.rzone{position:relative;width:100%;display:flex;flex-direction:column;align-items:center;gap:5px}
+.rhint{margin:0;font-size:13px;font-weight:800;color:#e9fffb;text-align:center;min-height:1.25em;transition:opacity .25s}
+.rstage{position:relative;width:100%;height:50px}
+.rbtns{position:absolute;inset:0;display:flex;justify-content:center;gap:clamp(10px,4vw,26px)}
+.rb{min-width:0;width:min(42%,190px);font-family:var(--f-title);font-size:18px;letter-spacing:.04em;text-transform:uppercase;color:#fff;
+  text-shadow:0 2px 0 rgba(0,0,0,.35);padding:9px 10px 8px;background:linear-gradient(180deg,#9a9a9a,#6c6c6c);
+  transition:transform .42s cubic-bezier(.55,0,.75,.2),background .2s,filter .2s}
+.rb:disabled{opacity:1;cursor:default}
+.rb.blue{background:linear-gradient(180deg,#8cc8ff 0,#3a8cf0 55%,#2160c4 100%)}
+.rb.green{background:linear-gradient(180deg,#a8f08a 0,#45b347 55%,#2b8030 100%);animation:rbPop .35s ease-out}
+@keyframes rbPop{40%{transform:scale(1.07)}}
+.rzone.other .rb{pointer-events:none}
+.rzone.other #bRoll{transform:translateX(-120vw)}
+.rzone.other #bPlay{transform:translateX(120vw)}
+.rzone.mine .rb{transition-timing-function:cubic-bezier(.2,.9,.3,1.15)}
+.rwait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;margin:0;font-size:15px;font-weight:800;color:#e9fffb;text-align:center;opacity:0;transition:opacity .2s;pointer-events:none}
+.rzone.other .rwait{opacity:1;transition:opacity .45s .38s}
+.rzone.other .rhint{opacity:0}
+.tleft{margin:0;font-size:13px;font-weight:900;color:#fff;text-align:center}
+/* dés gardés : halo qui pulse, étincelles, cadenas qui gigote */
+.die .hglow{position:absolute;inset:-12%;z-index:0;border-radius:30%;pointer-events:none;opacity:0;
+  background:radial-gradient(closest-side,rgba(255,236,120,.0) 62%,rgba(255,226,90,.6) 80%,transparent 100%);filter:blur(3px)}
+.die.held .hglow{animation:hGlow 1.3s ease-in-out infinite}
+@keyframes hGlow{0%,100%{opacity:.55;transform:scale(.97)}50%{opacity:1;transform:scale(1.04)}}
+.die.held .hring{animation:hRing 1.3s ease-in-out infinite}
+@keyframes hRing{0%,100%{filter:drop-shadow(0 0 2px rgba(255,214,60,.75))}50%{filter:drop-shadow(0 0 7px rgba(255,236,120,1)) drop-shadow(0 0 2px #fff6c0)}}
+.die.held::before{animation:heldIn .18s ease-out,lockWob 1.7s .25s ease-in-out infinite;transform-origin:50% 70%}
+@keyframes lockWob{0%,46%,100%{transform:none}8%{transform:scale(1.16,.86) rotate(-9deg)}16%{transform:scale(.9,1.12) rotate(7deg)}25%{transform:scale(1.05,.96) rotate(-4deg)}34%{transform:scale(.98,1.02) rotate(2deg)}}
+.tray .hsp{position:absolute;z-index:3;pointer-events:none;width:4px;height:4px;border-radius:50%;background:#fff8c8;box-shadow:0 0 4px 1px #ffd84a}
+.die.flash .hring{opacity:1;filter:drop-shadow(0 0 9px #ffe066) drop-shadow(0 0 3px #fff7c2)}
+.die.flash::before,.dicerow.ending .die::before{display:none}
+.tray .streak{position:absolute;z-index:3;height:6px;pointer-events:none;border-radius:3px;
+  background:linear-gradient(90deg,transparent,rgba(255,226,90,.85) 12%,#fff8d0 50%,rgba(255,226,90,.85) 88%,transparent);filter:blur(1px) drop-shadow(0 0 6px #ffd84a)}
+.die.blank.fresh .dbody{animation:blankIn .35s ease-out}
+@keyframes blankIn{from{transform:scale(.2);opacity:0}}
 .hint{margin:0;font-size:12.5px;color:#d8fbf4;text-align:center;min-height:1.2em}
 .tbar{width:100%;height:6px;border-radius:4px;background:rgba(0,0,0,.4);overflow:hidden;border:2px solid var(--ink)}
 .tbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#ff9a3c);transform-origin:left;transition:transform .25s linear}
@@ -178,7 +209,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
   .vp .av{width:40px;height:40px;border-width:2.5px}.vp .av svg{width:30px;height:30px}.vp.turn .av::before{top:-8px;width:22px;height:4px}
   .vp .sc{font-size:22px}.status{font-size:13.5px;min-height:18px}#game{gap:5px}
   .tray{padding:7px 8px 6px;gap:4px}.dicerow{padding:2px 0 4px}.die{width:clamp(44px,13.5vw,66px);height:clamp(44px,13.5vw,66px)}
-  .rollbar .btn{font-size:16px;padding:6px 12px 5px}.hint{font-size:11.5px}
+  .rb{font-size:16px;padding:7px 10px 6px}.rstage{height:44px}.rhint{font-size:12px}.hint{font-size:11.5px}
 }
 @media (max-height:690px){#chatBar{display:none!important}.die{width:clamp(40px,12vw,58px);height:clamp(40px,12vw,58px)}.hud{padding:3px 6px}.hud .btn.icon{padding:5px}}
 
@@ -311,7 +342,14 @@ body.ingame #chatBar{margin-left:52px;width:calc(100% - 52px)}
   <div class="grid" id="grid"></div>
   <div class="tray">
     <div class="dicerow" id="dice"></div>
-    <div class="rollbar"><div class="pipsleft" id="rollsLeft"></div><button class="btn gold" id="bRoll" data-i18n="roll">🎲 Lancer</button></div>
+    <div class="rzone mine" id="rzone">
+      <p class="rhint" id="rhint"></p>
+      <div class="rstage">
+        <div class="rbtns"><button class="btn rb" id="bRoll"></button><button class="btn rb" id="bPlay" disabled></button></div>
+        <p class="rwait" id="rwait"></p>
+      </div>
+      <p class="tleft" id="tleft"></p>
+    </div>
     <div class="tbar"><i id="tbar"></i></div>
   </div>
   <button class="frame chatbar" id="chatBar"><span class="cb-ico">💬</span><span class="cb-txt"></span><span class="badge"></span></button>
@@ -372,7 +410,7 @@ P.addStrings({
     create: 'Créer une partie', orJoin: 'ou rejoindre des amis', join: 'Rejoindre', gameCode: 'Code de la partie', copyCode: 'Copier le code', copied: 'Copié !', start: 'Lancer la partie', leave: 'Quitter', players: 'Joueurs',
     badCode: 'Entre le code à 5 caractères.', connecting: 'Connexion…', noGame: 'Aucune partie avec ce code.', netErr: 'Connexion impossible. Réessaie.', full: 'Partie complète ou déjà commencée.', hostLeft: 'L’hôte a quitté la partie.',
     waitHost: 'Tout le monde est là ? Lance la partie !', waitGuest: '<span class="dots">L’hôte va lancer la partie</span>', you: 'toi',
-    round: 'Tour {n}/13', yourTurn: 'À toi de jouer !', turnOf: 'Au tour de {name}', roll: '🎲 Lancer', rollAgain: '🎲 Relancer', rollsLeft: '{n} lancer(s)',
+    round: 'Tour {n}/13', yourTurn: 'À toi de jouer !', turnOf: 'Au tour de {name}', roll: '🎲 Lancer', rollAgain: '🎲 Relancer', rollsLeft: '{n} lancer(s)', rollN: 'Lancer ({n})', play: 'Jouer', hRoll: 'Appuyez sur le bouton LANCER pour lancer les dés !', hHold: 'Touchez les dés à garder, relancez ou choisissez une case', hPlay: 'Appuyez sur JOUER pour valider', waitFor: 'En attente de {name} (Lancers : {n})', turnsLeft: '{n} tours restants', turnsLeft1: 'Dernier tour !',
     hintFirst: 'Lance les dés !', hintHold: 'Touche les dés à garder, relance, ou choisis une case dans la feuille.', hintPick: 'Choisis une case dans la feuille de score.', hintWatch: '{name} joue…',
     scored: '{name} : {cat} → {n}', yams: 'YAM’S !', yamsBonus: 'Yam’s bonus +100 !', player: 'Joueur',
     c1: 'As (1)', c2: 'Deux', c3: 'Trois', c4: 'Quatre', c5: 'Cinq', c6: 'Six', upper: 'Total haut', upperS: 'SUPÉRIEUR', lowerS: 'INFÉRIEUR', bonusIf: '63 et +', youPlayed: 'Tu as joué', hePlayed: '{name} a joué', forPts: 'pour {n} pts', b_ss: 'PS', b_ls: 'GS', bonus: 'Bonus (63+)', c3k: 'Brelan', c4k: 'Carré', cfh: 'Full', css: 'Petite suite', cls: 'Grande suite', cy: 'Yam’s', cch: 'Chance', yb: 'Bonus Yam’s', lower: 'Total bas', total: 'TOTAL',
@@ -387,7 +425,7 @@ P.addStrings({
     create: 'Create a game', orJoin: 'or join friends', join: 'Join', gameCode: 'Game code', copyCode: 'Copy code', copied: 'Copied!', start: 'Start the game', leave: 'Leave', players: 'Players',
     badCode: 'Enter the 5-character code.', connecting: 'Connecting…', noGame: 'No game with this code.', netErr: 'Can’t connect. Try again.', full: 'Game full or already started.', hostLeft: 'The host left the game.',
     waitHost: 'Everyone here? Start the game!', waitGuest: '<span class="dots">The host will start the game</span>', you: 'you',
-    round: 'Turn {n}/13', yourTurn: 'Your turn!', turnOf: '{name}’s turn', roll: '🎲 Roll', rollAgain: '🎲 Roll again', rollsLeft: '{n} roll(s)',
+    round: 'Turn {n}/13', yourTurn: 'Your turn!', turnOf: '{name}’s turn', roll: '🎲 Roll', rollAgain: '🎲 Roll again', rollsLeft: '{n} roll(s)', rollN: 'Roll ({n})', play: 'Play', hRoll: 'Press ROLL to roll the dice!', hHold: 'Tap dice to hold them, roll again or pick a box', hPlay: 'Press PLAY to confirm', waitFor: 'Waiting for {name} (Rolls: {n})', turnsLeft: '{n} turns left', turnsLeft1: 'Last turn!',
     hintFirst: 'Roll the dice!', hintHold: 'Tap dice to hold them, roll again, or pick a box on the sheet.', hintPick: 'Pick a box on your score sheet.', hintWatch: '{name} is playing…',
     scored: '{name}: {cat} → {n}', yams: 'YAHTZEE!', yamsBonus: 'Yahtzee bonus +100!', player: 'Player',
     c1: 'Ones', c2: 'Twos', c3: 'Threes', c4: 'Fours', c5: 'Fives', c6: 'Sixes', upper: 'Upper total', upperS: 'UPPER', lowerS: 'LOWER', bonusIf: '63 or more', youPlayed: 'You played', hePlayed: '{name} played', forPts: 'for {n} pts', b_ss: 'SM', b_ls: 'LG', bonus: 'Bonus (63+)', c3k: '3 of a kind', c4k: '4 of a kind', cfh: 'Full house', css: 'Sm. straight', cls: 'Lg. straight', cy: 'Yahtzee', cch: 'Chance', yb: 'Yahtzee bonus', lower: 'Lower total', total: 'TOTAL',
@@ -402,7 +440,7 @@ P.addStrings({
     create: 'Vytvořit hru', orJoin: 'nebo se připoj ke kamarádům', join: 'Připojit', gameCode: 'Kód hry', copyCode: 'Kopírovat kód', copied: 'Zkopírováno!', start: 'Spustit hru', leave: 'Odejít', players: 'Hráči',
     badCode: 'Zadej 5místný kód.', connecting: 'Připojování…', noGame: 'Hra s tímto kódem neexistuje.', netErr: 'Nelze se připojit. Zkus to znovu.', full: 'Hra je plná nebo už začala.', hostLeft: 'Hostitel opustil hru.',
     waitHost: 'Jsou všichni tady? Spusť hru!', waitGuest: '<span class="dots">Hostitel brzy spustí hru</span>', you: 'ty',
-    round: 'Kolo {n}/13', yourTurn: 'Jsi na tahu!', turnOf: 'Na tahu: {name}', roll: '🎲 Hodit', rollAgain: '🎲 Hodit znovu', rollsLeft: 'hody: {n}',
+    round: 'Kolo {n}/13', yourTurn: 'Jsi na tahu!', turnOf: 'Na tahu: {name}', roll: '🎲 Hodit', rollAgain: '🎲 Hodit znovu', rollsLeft: 'hody: {n}', rollN: 'Hodit ({n})', play: 'Hrát', hRoll: 'Stiskni HODIT a hoď kostkami!', hHold: 'Klepni na kostky, které chceš nechat, hoď znovu nebo vyber políčko', hPlay: 'Stiskni HRÁT pro potvrzení', waitFor: 'Čeká se na {name} (hody: {n})', turnsLeft: 'Zbývá kol: {n}', turnsLeft1: 'Poslední kolo!',
     hintFirst: 'Hoď kostkami!', hintHold: 'Klepni na kostky, které chceš nechat, hoď znovu, nebo vyber políčko.', hintPick: 'Vyber políčko v tabulce.', hintWatch: '{name} hraje…',
     scored: '{name}: {cat} → {n}', yams: 'YAMS!', yamsBonus: 'Bonus za Yams +100!', player: 'Hráč',
     c1: 'Jedničky', c2: 'Dvojky', c3: 'Trojky', c4: 'Čtyřky', c5: 'Pětky', c6: 'Šestky', upper: 'Horní součet', upperS: 'HORNÍ', lowerS: 'DOLNÍ', bonusIf: '63 a víc', youPlayed: 'Zahrál jsi', hePlayed: '{name} zahrál', forPts: 'za {n} b.', b_ss: 'MP', b_ls: 'VP', bonus: 'Bonus (63+)', c3k: 'Trojice', c4k: 'Čtveřice', cfh: 'Full house', css: 'Malá postupka', cls: 'Velká postupka', cy: 'Yams', cch: 'Šance', yb: 'Bonus Yams', lower: 'Dolní součet', total: 'CELKEM',
@@ -866,7 +904,7 @@ function guestData(m) {
 
 /* ---------- Affichage de la partie ---------- */
 let justId = -1, justUntil = 0;
-let localHeld = null, heldKey = '', lastRoll = -1, lastLast = 0, lastTurnKey = '', localDeadline = 0, cmpPick = -1;
+let pickCat = null, ending = false, localHeld = null, heldKey = '', lastRoll = -1, lastLast = 0, lastTurnKey = '', localDeadline = 0, cmpPick = -1;
 // icônes des cases : dés aux points colorés (haut), étiquettes (bas)
 const UPCOL = ['#e0483a', '#f08a1e', '#2a7ad8', '#3aa84a', '#9a3ad8', '#1ab0a8'];
 function upIcon(n) { return `<svg viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90" rx="20" fill="#fbf7ee" stroke="#0d0705" stroke-width="6"/>${PIPS[n].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${n === 1 ? 11 : 9}" fill="${UPCOL[n - 1]}"/>`).join('')}</svg>`; }
@@ -890,22 +928,22 @@ function render() {
   $('#hInfo').innerHTML = mine ? t('yourTurn') : esc(t('turnOf', { name: cur.n || '' }));
   // dés gardés : en local, pour que le clic réponde tout de suite
   const hk = V.turn + ':' + V.round + ':' + V.rolls;
-  if (heldKey !== hk || !mine) { heldKey = hk; localHeld = V.held.slice(); }
+  if (heldKey !== hk || !mine) { heldKey = hk; localHeld = V.held.slice(); pickCat = null; }
   const rolled = V.rollId !== lastRoll; const firstSeen = lastRoll === -1; lastRoll = V.rollId;
   const canHold = mine && V.rolls > 0 && V.rolls < 3;
   const doAnim = rolled && !firstSeen && V.rolls;
   const prevFaces = doAnim ? [...$('#dice').querySelectorAll('.die')].map(d => +d.dataset.v ? d.querySelector('.dbody').innerHTML : '') : null;
-  if (doAnim || !animating()) {
-    $('#dice').classList.remove('busy');
-    $('#dice').innerHTML = V.dice.map((v, k) => `<button class="die${localHeld[k] ? ' held' : ''}${!v ? ' blank' : ''}${doAnim && v && !V.held[k] ? ' rolling anim' : ''}" data-die="${k}" data-v="${v}" ${canHold ? '' : 'disabled'} aria-label="${v || ''}"><span class="dbody">${dieSVG(v || 6, cur.skin)}</span><i class="dsh"></i></button>`).join('');
+  const freshBlank = !V.rolls && $('#dice').dataset.k !== hk; $('#dice').dataset.k = hk;
+  if (!ending && (doAnim || !animating())) {
+    $('#dice').classList.remove('busy', 'ending');
+    $('#dice').innerHTML = V.dice.map((v, k) => `<button class="die${localHeld[k] ? ' held' : ''}${!v ? ' blank' : ''}${doAnim && v && !V.held[k] ? ' rolling anim' : ''}${!v && freshBlank ? ' fresh' : ''}" data-die="${k}" data-v="${v}" ${canHold ? '' : 'disabled'} aria-label="${v || ''}"><i class="hglow"></i><span class="dbody">${dieSVG(v || 6, cur.skin)}</span><i class="dsh"></i></button>`).join('');
   }
   if (doAnim) {
     const ms = animateRoll(cur.skin, prevFaces); animEnd = Date.now() + ms;
     clearTimeout(animTimer); if (ms) animTimer = setTimeout(() => { animEnd = 0; render(); }, ms + 30);
     const c = counts(V.dice); if (c.includes(5)) setTimeout(() => { toast('🎲 ' + t('yams'), 'yams', 2600); P.sfx('win'); P.confetti($('#confetti')); }, ms + 150);
   }
-  $('#rollsLeft').innerHTML = [0, 1, 2].map(k => `<i class="${k < 3 - V.rolls ? '' : 'off'}"></i>`).join('');
-  const rb = $('#bRoll'); rb.textContent = V.rolls ? t('rollAgain') : t('roll'); rb.disabled = !mine || V.rolls >= 3 || animating(); rb.style.visibility = mine ? '' : 'hidden';
+  if (!ending) renderRollZone(mine, cur);
   // (phrase d’aide retirée)
   localDeadline = Date.now() + (V.rem || 0);
   renderVersus(); renderGrid(mine);
@@ -920,6 +958,57 @@ function render() {
   const tk = V.turn + ':' + V.round;
   if (tk !== lastTurnKey) { lastTurnKey = tk; if (mine) { P.sfx('hint'); try { navigator.vibrate && navigator.vibrate(30); } catch (e) {} } }
 }
+function renderRollZone(mine, cur) {
+  const z = $('#rzone'), left = 3 - V.rolls, rb = $('#bRoll'), pb = $('#bPlay');
+  z.classList.toggle('mine', mine); z.classList.toggle('other', !mine);
+  rb.textContent = t('rollN', { n: left });
+  const canRoll = mine && left > 0 && !animating(); rb.disabled = !canRoll; rb.classList.toggle('blue', canRoll);
+  const canPlay = mine && !!pickCat && V.rolls > 0 && !animating();
+  pb.textContent = t('play'); pb.disabled = !canPlay;
+  if (pb.classList.contains('green') !== canPlay) pb.classList.toggle('green', canPlay);
+  $('#rhint').textContent = !mine ? '' : !V.rolls ? t('hRoll') : pickCat ? t('hPlay') : t('hHold');
+  $('#rwait').textContent = mine ? '' : t('waitFor', { name: cur.n || '', n: left });
+  const tl = 14 - Math.min(13, V.round); $('#tleft').textContent = tl <= 1 ? t('turnsLeft1') : t('turnsLeft', { n: tl });
+}
+// petites étincelles qui scintillent autour des dés gardés
+setInterval(() => {
+  if (document.hidden || ending) return;
+  const held = [...document.querySelectorAll('#dice .die.held')]; if (!held.length) return;
+  const b = held[Math.floor(rnd() * held.length)], tray = b.closest('.tray'), tr = tray.getBoundingClientRect(), r = b.getBoundingClientRect();
+  const side = Math.floor(rnd() * 4), u = rnd(), sp = document.createElement('i'); sp.className = 'hsp';
+  const x = side === 0 ? r.left + u * r.width : side === 1 ? r.right + 1 : side === 2 ? r.left + u * r.width : r.left - 3;
+  const y = side === 0 ? r.top - 3 : side === 1 ? r.top + u * r.height : side === 2 ? r.bottom + 1 : r.top + u * r.height;
+  sp.style.left = (x - tr.left) + 'px'; sp.style.top = (y - tr.top) + 'px'; const z = .5 + rnd() * .8; tray.appendChild(sp);
+  sp.animate([{ transform: 'scale(0)', opacity: 0 }, { transform: `scale(${z})`, opacity: 1, offset: .4 }, { transform: `translateY(-${4 + rnd() * 6}px) scale(0)`, opacity: 0 }], { duration: 700 + rnd() * 400, easing: 'ease-out' }).onfinish = () => sp.remove();
+}, 110);
+/* fin de tour : éclat doré, les dés s'assombrissent et rapetissent */
+function playEnd(done) {
+  const row = $('#dice'), tray = row.closest('.tray'), dice = [...row.querySelectorAll('.die')];
+  if (!Element.prototype.animate || !dice.length) return done();
+  ending = true; row.classList.add('busy', 'ending'); P.sfx('good');
+  const tr = tray.getBoundingClientRect(), rw = row.getBoundingClientRect();
+  dice.forEach((b, n) => {
+    b.classList.remove('held'); b.classList.add('flash');
+    const body = b.querySelector('.dbody'), ring = b.querySelector('.hring');
+    if (ring) ring.animate([{ opacity: 0 }, { opacity: 1, offset: .15 }, { opacity: 1, offset: .6 }, { opacity: 0 }], { duration: 780, fill: 'forwards' });
+    body.animate([{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(1.08)', filter: 'brightness(1.35)', offset: .12 }, { transform: 'scale(1)', filter: 'brightness(1)', offset: .5 },
+      { transform: 'scale(1)', filter: 'brightness(.35)', offset: .74 }, { transform: 'scale(0)', filter: 'brightness(.25)' }], { duration: 1250, delay: n * 25, easing: 'ease-in-out', fill: 'forwards' });
+    b.querySelector('.dsh').style.opacity = 0;
+  });
+  // ligne d'étincelles qui traverse la rangée
+  const st = document.createElement('i'); st.className = 'streak';
+  st.style.left = (rw.left - tr.left - 8) + 'px'; st.style.width = (rw.width + 16) + 'px'; st.style.top = (rw.top - tr.top + rw.height / 2 - 3) + 'px';
+  tray.appendChild(st);
+  st.animate([{ transform: 'scaleX(0)', opacity: 1 }, { transform: 'scaleX(1)', opacity: 1, offset: .35 }, { transform: 'scaleX(1) scaleY(.4)', opacity: 0 }], { duration: 700, easing: 'ease-out', fill: 'forwards' }).onfinish = () => st.remove();
+  for (let k = 0; k < 26; k++) {
+    const sp = document.createElement('i'); sp.className = 'hsp'; const x = rw.left - tr.left + rnd() * rw.width, y = rw.top - tr.top + rw.height / 2 + (rnd() - .5) * 10;
+    sp.style.left = x + 'px'; sp.style.top = y + 'px'; tray.appendChild(sp);
+    const dy = (rnd() - .5) * rw.height * 1.1;
+    sp.animate([{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1.2)', opacity: 1, offset: .25 }, { transform: `translate(${(rnd() - .5) * 20}px,${dy}px) scale(.3)`, opacity: 0 }],
+      { duration: 650 + rnd() * 400, delay: (x - (rw.left - tr.left)) / rw.width * 220, easing: 'ease-out', fill: 'both' }).onfinish = () => sp.remove();
+  }
+  setTimeout(() => { ending = false; done(); }, 1330);
+}
 function renderVersus() {
   const live = V.seats.map((s, i) => ({ s, i })).filter(o => !o.s.gone);
   const cols = shownCols(), cmp = cols.length === 2 && live.length > 3 ? cols[0].i : -1;
@@ -932,7 +1021,7 @@ function renderVersus() {
   } else box.innerHTML = live.map(vp).join('');
 }
 function renderGrid(mine) {
-  const cols = shownCols(), canPick = mine && V.rolls > 0 && !animating(), k = cols.length;
+  const cols = shownCols(), canPick = mine && V.rolls > 0 && !animating() && !ending, k = cols.length;
   const tpl = `grid-template-columns:minmax(${k > 2 ? 34 : 44}px,auto) repeat(${k}, minmax(${k > 2 ? 36 : 46}px,1fr))`;
   // la case jouée ne clignote qu'une fois, pas à chaque mise à jour de la feuille
   if (V.last && V.last.id !== justId) { justId = V.last.id; justUntil = Date.now() + 1200; }
@@ -940,7 +1029,7 @@ function renderGrid(mine) {
   const cell = (o, cat) => {
     const v = o.s.card[cat], isMe = o.i === net.me, cls = isMe ? 'me' : 'v', j = just === o.i + ':' + cat ? ' just' : '';
     if (v !== undefined) return `<span class="${cls}${j}">${v}${cat === 'cy' && o.s.card.yb ? `<small class="ytag">+${o.s.card.yb}</small>` : ''}</span>`;
-    if (canPick && isMe) { const p = catScore(cat, V.dice); return `<span class="me pick${p ? '' : ' zero'}" data-cat="${cat}">${p}</span>`; }
+    if (canPick && isMe) { const p = catScore(cat, V.dice); return `<span class="me pick${p ? '' : ' zero'}${pickCat === cat ? ' sel' : ''}" data-cat="${cat}">${p}</span>`; }
     return `<span class="${cls} empty">·</span>`;
   };
   const head = `<div class="ghead" style="${tpl}"><span></span>${cols.map(o => `<span style="color:${o.i === net.me ? '#5fe8d8' : '#f2c14e'}">${esc(o.s.n)}</span>`).join('')}</div>`;
@@ -959,15 +1048,23 @@ $('#dice').addEventListener('click', e => {
   const k = +b.dataset.die; localHeld[k] = !localHeld[k]; b.classList.toggle('held', localHeld[k]); P.sfx('click');
   send({ t: 'hold', i: k, v: localHeld[k] });
 });
-$('#bRoll').onclick = () => { if (!V || V.turn !== net.me || V.rolls >= 3) return; if (animating()) return; P.unlockAudio(); const rb = $('#bRoll'); rb.disabled = true; rb.classList.remove('shake'); void rb.offsetWidth; rb.classList.add('shake'); send({ t: 'roll', held: localHeld }); };
+$('#bRoll').onclick = () => { if (!V || V.turn !== net.me || V.rolls >= 3 || ending) return; if (animating()) return; P.unlockAudio(); const rb = $('#bRoll'); rb.disabled = true; rb.classList.remove('shake'); void rb.offsetWidth; rb.classList.add('shake'); send({ t: 'roll', held: localHeld }); };
 $('#versus').addEventListener('click', e => { const b = e.target.closest('[data-cmp]'); if (!b || +b.dataset.cmp === net.me) return; cmpPick = +b.dataset.cmp; P.sfx('click'); if (V) render(); });
 $('#grid').addEventListener('click', e => {
   const c = e.target.closest('[data-cat]'); if (!c || !V || V.turn !== net.me || !V.rolls) return;
-  const cat = c.dataset.cat; P.sfx('click'); document.querySelectorAll('#grid [data-cat]').forEach(x => x.removeAttribute('data-cat')); send({ t: 'score', c: cat });
+  const cat = c.dataset.cat; P.sfx('click'); pickCat = pickCat === cat ? null : cat; render();
 });
+$('#bPlay').onclick = () => {
+  if (!V || V.turn !== net.me || !V.rolls || !pickCat || ending || animating()) return;
+  const cat = pickCat; pickCat = null; P.unlockAudio();
+  document.querySelectorAll('#grid [data-cat]').forEach(x => x.removeAttribute('data-cat'));
+  $('#bPlay').disabled = true; $('#bRoll').disabled = true; $('#bPlay').classList.remove('green'); $('#bRoll').classList.remove('blue');
+  playEnd(() => send({ t: 'score', c: cat }));
+};
 document.addEventListener('keydown', e => {
   if (!V || V.turn !== net.me || document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
-  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); $('#bRoll').click(); }
+  if (e.key === ' ') { e.preventDefault(); $('#bRoll').click(); }
+  if (e.key === 'Enter') { e.preventDefault(); if (pickCat) $('#bPlay').click(); else $('#bRoll').click(); }
   const n = +e.key; if (n >= 1 && n <= 5) { const b = document.querySelector(`[data-die="${n - 1}"]`); if (b && !b.disabled) b.click(); }
 });
 $('#bQuit').onclick = () => {
