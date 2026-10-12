@@ -229,7 +229,7 @@ h1{margin:6px 0 3px;font-size:clamp(30px,3.4vw,46px);line-height:1.04;letter-spa
 .pod-card{display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;padding:14px 8px 12px;border-radius:16px;border:1px solid #674653;background:#35232e}
 .pod.p2{animation-delay:.07s}.pod.p3{animation-delay:.14s}
 @keyframes podIn{from{opacity:0;transform:translateY(10px) scale(.96)}}
-.pod-tag{text-align:center;padding:7px 10px;border-radius:10px;font-size:13px;font-weight:700;white-space:nowrap;color:#e4c9d4;border:1px solid #674653;background:#35232e}
+.pod-tag{text-align:center;padding:7px 10px;border-radius:10px;font-size:13.5px;font-weight:900;white-space:nowrap;color:#e4c9d4;border:1px solid #674653;background:#35232e}
 .pod-av{width:64px;height:64px;border-radius:16px;overflow:hidden;display:grid;place-items:center}
 .pod-av .lbav{width:100%;height:100%;margin:0;border-radius:0;font-size:24px}
 .pod-nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14.5px;font-weight:900}
@@ -443,10 +443,10 @@ h1{margin:6px 0 3px;font-size:clamp(30px,3.4vw,46px);line-height:1.04;letter-spa
   <div class="av-foot"><button class="btn" data-close="skin" type="button" data-i18n="avCancel">Annuler</button><button class="btn orange" id="avSave" type="button" data-i18n="avSave">Valider</button></div>
 </div>
 
-<script src="shared.js?v=20261012e"></script>
-<script src="skins.js?v=20261012e"></script>
-<script src="chat.js?v=20261012e"></script>
-<script src="party.js?v=20261012e"></script>
+<script src="shared.js?v=20261013a"></script>
+<script src="skins.js?v=20261013a"></script>
+<script src="chat.js?v=20261013a"></script>
+<script src="party.js?v=20261013a"></script>
 <script>
 (() => {
 'use strict';
@@ -551,7 +551,8 @@ function render() {
   $('#lbTabs').innerHTML = GAMES.map(([k, l]) => `<button class="filter" type="button" data-tab="${k}" aria-pressed="${k === tab}">${k === 'all' ? t('all') : esc(t(l))}</button>`).join('');
   const rows = P.ranking(matches, tab === 'all' ? null : tab), me = P.name().toLowerCase();
   document.querySelector('.lb-cols').hidden = rows.length > 0 && rows.length <= 3;
-  $('#lbPod').innerHTML = rows.slice(0, 3).map((r, i) => `<div class="pod p${i + 1}${r.name.toLowerCase() === me ? ' me' : ''}"><span class="pod-tag">${t('pod' + (i + 1))}</span><div class="pod-card"><span class="pod-av">${lbAv(r.name)}</span><span class="pod-nm">${esc(r.name)}</span><span class="pod-st">${t('podW', { n: r.w })} · ${Math.round(100 * r.w / r.g)}%</span></div></div>`).join('');
+  const rkDelay = (-(performance.timeOrigin + performance.now()) % 3000 / 1000).toFixed(3) + 's';
+  $('#lbPod').innerHTML = rows.slice(0, 3).map((r, i) => `<div class="pod p${i + 1}${r.name.toLowerCase() === me ? ' me' : ''}"><span class="pod-tag"><span class="bg-rk r${i + 1}" data-rk-keep style="animation-delay:${rkDelay}">${t('pod' + (i + 1))}</span></span><div class="pod-card"><span class="pod-av">${lbAv(r.name)}</span><span class="pod-nm">${esc(r.name)}</span><span class="pod-st">${t('podW', { n: r.w })} · ${Math.round(100 * r.w / r.g)}%</span></div></div>`).join('');
   $('#lbList').innerHTML = rows.length ? rows.slice(3, 30).map((r, i) => (i += 3, `<div class="lb-row${r.name.toLowerCase() === me ? ' me' : ''}"><span class="rank">${i + 1}</span><span class="nm">${lbAv(r.name)}${esc(r.name)}${r.ai ? `<small>${t('aiTag')}</small>` : ''}</span><span>${r.w}</span><span>${r.g}</span><span>${Math.round(100 * r.w / r.g)}%</span></div>`)).join('')
     : `<div class="empty">${t('lbEmpty')}</div>`;
   const fmt = new Intl.DateTimeFormat(t('locale'), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });

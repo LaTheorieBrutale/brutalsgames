@@ -225,7 +225,7 @@ P.skinLive = cb => { P.fetchAvatars().then(() => cb && cb()); P.watchAvatars(cb)
     ms.forEach(m => { if (m.type === 'characterData') queue.add(m.target); else m.addedNodes.forEach(n => queue.add(n)); });
     if (queue.size && !raf) raf = requestAnimationFrame(flush);
   });
-  function unwrapAll() { document.querySelectorAll('.bg-rk').forEach(sp => { sp.replaceWith(document.createTextNode(sp.textContent)); }); }
+  function unwrapAll() { document.querySelectorAll('.bg-rk:not([data-rk-keep])').forEach(sp => { sp.replaceWith(document.createTextNode(sp.textContent)); }); }
   function apply(t) {
     const same = JSON.stringify(t) === JSON.stringify(top);
     top = t; P.set('bg-top3', JSON.stringify(t)); build();
