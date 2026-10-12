@@ -171,4 +171,86 @@ P.skinOr = (name, html) => {
 };
 // Charger les skins et rafraîchir l'écran quand quelqu'un change le sien
 P.skinLive = cb => { P.fetchAvatars().then(() => cb && cb()); P.watchAvatars(cb); };
+
+/* ---------- Top 3 du classement : noms en or, argent et bronze, animés, partout ----------
+   Le classement général est relu régulièrement ; chaque nom du top 3 trouvé dans la page
+   (listes, bandeaux, chat, phrases…) est entouré d'un <span class="bg-rk rN">. */
+(() => {
+  const st = document.createElement('style');
+  st.textContent = `
+.bg-rk{display:inline;font-weight:inherit;background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;animation:bgRkShine 2.6s linear infinite;text-shadow:none!important;-webkit-text-stroke:0!important}
+.bg-rk.r1{background-image:linear-gradient(100deg,#b8860b 0%,#ffd84a 22%,#fff6c8 32%,#ffcf3f 44%,#c98a10 60%,#ffd84a 80%,#b8860b 100%);filter:drop-shadow(0 0 5px rgba(255,200,60,.55))}
+.bg-rk.r2{background-image:linear-gradient(100deg,#c3ccdc 0%,#eef2f8 22%,#ffffff 32%,#dfe4ee 44%,#aab4c6 60%,#eef2f8 80%,#c3ccdc 100%);filter:drop-shadow(0 0 6px rgba(225,235,255,.7))}
+.bg-rk.r3{background-image:linear-gradient(100deg,#8a4a1c 0%,#e0904a 22%,#ffd2a8 32%,#d27a36 44%,#9a5420 60%,#e0904a 80%,#8a4a1c 100%);filter:drop-shadow(0 0 5px rgba(230,140,70,.5))}
+@keyframes bgRkShine{from{background-position:100% 0}to{background-position:-150% 0}}`;
+  (document.head || document.documentElement).appendChild(st);
+  const key = n => String(n || '').trim().toLowerCase();
+  let top = {}; try { top = JSON.parse(P.get('bg-top3', '{}')) || {}; } catch (e) { top = {}; }
+  let re = null;
+  const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  function build() {
+    const names = Object.keys(top).filter(n => n.length >= 2).sort((a, b) => b.length - a.length);
+    re = names.length ? new RegExp(`(?<![\\p{L}\\p{N}_])(${names.map(esc).join('|')})(?![\\p{L}\\p{N}_])(?!['’]s\\s*Games)`, 'giu') : null;
+  }
+  const SKIP = 'script,style,textarea,input,select,option,svg,canvas,title,noscript,.bg-rk,[contenteditable="true"],.wordmark,.logo,.logo-t,.logo-q,.brand,[data-norank]';
+  let busy = false;
+  function wrapText(tn) {
+    if (!re || !tn.nodeValue || tn.nodeValue.length > 400) return;
+    const par = tn.parentElement; if (!par || par.closest(SKIP)) return;
+    const txt = tn.nodeValue; re.lastIndex = 0; if (!re.test(txt)) return; re.lastIndex = 0;
+    const frag = document.createDocumentFragment(); let last = 0, m;
+    while ((m = re.exec(txt))) {
+      if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+      const sp = document.createElement('span'); sp.className = 'bg-rk r' + top[key(m[1])]; sp.textContent = m[1]; frag.appendChild(sp);
+      last = m.index + m[1].length;
+    }
+    if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+    tn.parentNode.replaceChild(frag, tn);
+  }
+  function scan(root) {
+    if (!re || !root) return;
+    if (root.nodeType === 3) { wrapText(root); return; }
+    if (root.nodeType !== 1 || root.closest && root.closest(SKIP)) return;
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), list = [];
+    while (w.nextNode()) list.push(w.currentNode);
+    list.forEach(wrapText);
+  }
+  let queue = new Set(), raf = 0;
+  const flush = () => { raf = 0; busy = true; try { queue.forEach(n => { if (n.isConnected) scan(n); }); } finally { queue.clear(); busy = false; } };
+  const mo = new MutationObserver(ms => {
+    if (busy || !re) return;
+    ms.forEach(m => { if (m.type === 'characterData') queue.add(m.target); else m.addedNodes.forEach(n => queue.add(n)); });
+    if (queue.size && !raf) raf = requestAnimationFrame(flush);
+  });
+  function unwrapAll() { document.querySelectorAll('.bg-rk').forEach(sp => { sp.replaceWith(document.createTextNode(sp.textContent)); }); }
+  function apply(t) {
+    const same = JSON.stringify(t) === JSON.stringify(top);
+    top = t; P.set('bg-top3', JSON.stringify(t)); build();
+    if (!same) { busy = true; try { unwrapAll(); document.body && document.body.normalize(); } finally { busy = false; } }
+    busy = true; try { scan(document.body); } finally { busy = false; }
+  }
+  // classement : celui de shared.js s'il est là, sinon un calcul simple (Quoridor)
+  async function load() {
+    try {
+      let rows;
+      if (P.fetchMatches && P.ranking) rows = P.ranking(await P.fetchMatches());
+      else {
+        const d = await P.fbReq('/matches', 'GET'), tab = new Map();
+        Object.values(d || {}).forEach(m => {
+          if (!m || !Array.isArray(m.p) || !Number.isInteger(m.w)) return;
+          const wa = Array.isArray(m.wa) && m.wa.length ? m.wa : [m.w], seen = new Set();
+          m.p.forEach((n0, i) => { const n = String(n0).slice(0, 14), k = key(n); if (seen.has(k)) return; seen.add(k); const r = tab.get(k) || { name: n, w: 0, g: 0 }; r.g++; if (wa.includes(i)) r.w++; tab.set(k, r); });
+        });
+        rows = [...tab.values()].sort((a, b) => b.w - a.w || (b.w / b.g) - (a.w / a.g) || b.g - a.g);
+      }
+      const t = {}; rows.slice(0, 3).forEach((r, i) => { if (r.w > 0) t[key(r.name)] = i + 1; });
+      apply(t);
+    } catch (e) {}
+  }
+  const start = () => {
+    build(); if (document.body) { busy = true; try { scan(document.body); } finally { busy = false; } mo.observe(document.body, { childList: true, subtree: true, characterData: true }); }
+    load(); setInterval(() => { if (!document.hidden) load(); }, 60000);
+  };
+  if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
+})();
 })();
