@@ -178,14 +178,13 @@ P.skinLive = cb => { P.fetchAvatars().then(() => cb && cb()); P.watchAvatars(cb)
 (() => {
   const st = document.createElement('style');
   st.textContent = `
-.bg-rk{display:inline;font-weight:inherit;background-repeat:repeat-x;background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;text-shadow:none!important;-webkit-text-stroke:0!important;
-  animation:bgRkFlow 5s linear infinite,bgRkGlow 3.2s ease-in-out infinite}
-.bg-rk.r1{--g:255,200,60;background-image:linear-gradient(90deg,#d99a12 0%,#f3c235 12.5%,#ffe17a 25%,#fff4c4 37.5%,#ffe17a 50%,#f3c235 62.5%,#d99a12 75%,#e6ab1f 87.5%,#d99a12 100%)}
-.bg-rk.r2{--g:225,235,255;background-image:linear-gradient(90deg,#aeb8ca 0%,#cfd6e3 12.5%,#eef2f8 25%,#ffffff 37.5%,#eef2f8 50%,#cfd6e3 62.5%,#aeb8ca 75%,#bcc5d5 87.5%,#aeb8ca 100%)}
-.bg-rk.r3{--g:235,145,75;background-image:linear-gradient(90deg,#a85a24 0%,#c9733a 12.5%,#e8995a 25%,#ffcf9e 37.5%,#e8995a 50%,#c9733a 62.5%,#a85a24 75%,#b8662d 87.5%,#a85a24 100%)}
-/* le motif fait 2 largeurs et se répète : il avance d'exactement une période, la boucle ne se voit pas */
-@keyframes bgRkFlow{from{background-position:0% 0}to{background-position:200% 0}}
-@keyframes bgRkGlow{0%,100%{filter:drop-shadow(0 0 2px rgba(var(--g),.35))}50%{filter:drop-shadow(0 0 7px rgba(var(--g),.75))}}`;
+.bg-rk{display:inline;font-weight:inherit;background-repeat:repeat;background-size:auto;-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;text-shadow:none!important;-webkit-text-stroke:0!important;filter:none!important;
+  animation:bgRkFlow 3.6s linear infinite}
+/* motif répété toutes les 180 px, en pixels fixes : il avance d'exactement 180 px par tour, la boucle est invisible */
+.bg-rk.r1{background-image:repeating-linear-gradient(90deg,#d39410 0px,#e8b024 20px,#f7cd45 40px,#ffe58a 60px,#fff4c8 80px,#ffe58a 100px,#f7cd45 120px,#e8b024 140px,#dca018 160px,#d39410 180px)}
+.bg-rk.r2{background-image:repeating-linear-gradient(90deg,#a9b3c6 0px,#bcc5d5 20px,#d3d9e5 40px,#e9edf4 60px,#ffffff 80px,#e9edf4 100px,#d3d9e5 120px,#bcc5d5 140px,#b0bacb 160px,#a9b3c6 180px)}
+.bg-rk.r3{background-image:repeating-linear-gradient(90deg,#a35624 0px,#b9672e 20px,#d27f40 40px,#eda065 60px,#ffd0a0 80px,#eda065 100px,#d27f40 120px,#b9672e 140px,#ac5d28 160px,#a35624 180px)}
+@keyframes bgRkFlow{from{background-position:0 0}to{background-position:180px 0}}`;
   (document.head || document.documentElement).appendChild(st);
   const key = n => String(n || '').trim().toLowerCase();
   let top = {}; try { top = JSON.parse(P.get('bg-top3', '{}')) || {}; } catch (e) { top = {}; }
