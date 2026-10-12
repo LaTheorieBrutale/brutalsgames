@@ -67,8 +67,8 @@ st.textContent = `
 .pty-panel .pty-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .pty-panel .pty-code{font-size:34px;font-weight:800;letter-spacing:.22em;color:#ffcf3f;text-shadow:0 3px 0 #0b0816}
 .pty-panel .pty-mem{display:flex;flex-wrap:wrap;gap:6px}
-.pty-panel .pty-mem span{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:rgba(0,0,0,.28);font-size:14px}
-.pty-panel .pty-mem i{width:8px;height:8px;border-radius:50%;background:#7ee36a;box-shadow:0 0 6px #7ee36a}
+.pty-panel .pty-mem>span{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:rgba(0,0,0,.28);font-size:14px}
+.pty-panel .pty-mem>span>i{width:8px;height:8px;border-radius:50%;background:#7ee36a;box-shadow:0 0 6px #7ee36a}
 .pty-panel .pty-err{color:#ff8a8a;font-size:13px;margin:0}
 .pty-panel .pty-err:empty{display:none}
 .pty-panel label.pty-auto{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;text-transform:none;letter-spacing:0}
