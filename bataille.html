@@ -448,6 +448,7 @@ const portrait = (seat, bot, mood) => bot ? morgrimSVG(mood || '') : P.skinOr(se
 // Skin perso du joueur (choisi sur l'accueil) à la place du personnage du jeu, s'il en a un
 const seatName = i => { const g = V ? (V.pl || V.seats || V.players || []) : []; const p = g[i] || ((typeof lobbyList === "function" ? lobbyList() : []) || [])[i]; return p ? p.n || '' : ''; };
 
+const COLORS = ['#ff8a5a', '#5ad8ff', '#ffcc4d', '#b48aff', '#ff6fb5', '#7ed957', '#4aa3ff', '#ff5a5f', '#c0c7e8', '#d89a5a'];
 const avatar = (seat, bot) => portrait(seat, bot, '');
 
 /* ---------- Emblème : crâne et sabres croisés ---------- */
