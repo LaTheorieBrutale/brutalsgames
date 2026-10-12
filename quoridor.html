@@ -950,16 +950,16 @@ function persona(seat) {
   if (AIP.p[seat]) return AIP.p[seat];
   const r = (a, b) => a + Math.random() * (b - a), pick = a => a[Math.floor(Math.random() * a.length)];
   const P = { style: pick(['coureur', 'batisseur', 'piegeur', 'flanc', 'equilibre']), atk: r(.9, 1.3), self: r(.9, 1.2), noise: r(.15, .5),
-    early: r(.04, .18), reserve: Math.floor(r(0, 3)), side: Math.random() < .5 ? -1 : 1, lat: r(.05, .3), open: Math.floor(r(0, 2)),
-    ori: Math.random() < .5 ? 'h' : 'v', oriB: r(0, .3), near: r(0, .25), moves: 0, walls: 0 };
-  if (P.style === 'coureur') { P.early = 0; P.reserve = 3 + Math.floor(r(0, 3)); P.atk = r(.85, 1.05); }
-  if (P.style === 'batisseur') { P.early = r(.3, .5); P.reserve = 0; P.atk = r(1.2, 1.5); }
-  if (P.style === 'piegeur') { P.early = r(.08, .2); P.near = r(.4, .8); P.reserve = Math.floor(r(1, 4)); }      // os collés au rival, gardés pour la fin
-  if (P.style === 'flanc') { P.lat = r(.5, .9); P.open = 2 + Math.floor(r(0, 3)); }                             // contourne par un côté
+    early: r(.04, .18), reserve: Math.floor(r(0, 3)), side: Math.random() < .5 ? -1 : 1, lat: r(.05, .3), open: Math.random() < .65 ? 1 + Math.floor(r(0, 2)) : 0, openAt: Math.floor(r(0, 3)),
+    ori: Math.random() < .5 ? 'h' : 'v', oriB: r(.1, .6), near: r(0, .25), zoneD: r(0, 6), patience: Math.floor(r(1, 4)), turns: 0, moves: 0, walls: 0 };
+  if (P.style === 'coureur') { P.early = 0; P.reserve = 3 + Math.floor(r(0, 3)); P.atk = r(.85, 1.05); P.patience = Math.floor(r(3, 7)); }
+  if (P.style === 'batisseur') { P.early = r(.3, .5); P.reserve = 0; P.atk = r(1.2, 1.5); P.patience = Math.floor(r(0, 2)); P.zoneD = r(2, 6); }
+  if (P.style === 'piegeur') { P.early = r(.08, .2); P.near = r(.4, .8); P.reserve = Math.floor(r(1, 4)); P.zoneD = r(0, 1.5); P.patience = Math.floor(r(2, 5)); }      // os collés au rival, gardés pour la fin
+  if (P.style === 'flanc') { P.lat = r(.6, 1.1); P.open = 2 + Math.floor(r(0, 3)); P.openAt = Math.floor(r(0, 2)); P.patience = Math.floor(r(2, 5)); }                             // contourne par un côté
   return (AIP.p[seat] = P);
 }
 function aiDecide(seat, noWalls) {
-  const st = S, me = st.p[seat], P = persona(seat);
+  const st = S, me = st.p[seat], P = persona(seat); P.turns++;
   const dm = distMap(st, seat), myD = dm[me.z * 9 + me.x];
   let rival = -1, rD = 1e9;
   for (let i = 0; i < st.n; i++) if (i !== seat) { const d = distOf(st, i); if (d < rD) { rD = d; rival = i; } }
@@ -971,13 +971,13 @@ function aiDecide(seat, noWalls) {
     if (d < 0) continue;
     const dx = m.x - me.x, dz = m.z - me.z, sideStep = (fwd[0] === 0 ? dx : dz) * P.side;
     let s = d + Math.random() * P.noise;
-    if (P.moves < P.open && d <= myD && sideStep > 0) s -= P.lat;                  // ouverture : glisse vers son côté préféré
+    if (P.moves >= P.openAt && P.moves < P.openAt + P.open && sideStep > 0 && d <= myD + 1) s -= 2.3;               // ouverture : glisse vers son côté préféré
     else if (sideStep > 0) s -= P.lat * 0.3;
     if (s < bd) { bd = s; best = m; }
   }
   const progresses = best && dm[best.z * 9 + best.x] < myD;
   const losingRace = rD < myD || (rD <= 2 && rD <= myD);
-  const canWall = me.w > 0 && rival >= 0 && !noWalls && (me.w > P.reserve || rD <= 3 || losingRace);
+  const canWall = me.w > 0 && rival >= 0 && !noWalls && (me.w > P.reserve || rD <= 3) && (P.turns > P.patience || rD <= 3 || myD - rD >= 3);
   const wantEarly = !losingRace && progresses && Math.random() < P.early && rD <= 7;
   if (canWall && (!progresses || losingRace || wantEarly)) {
     const rp = st.p[rival], cands = [];
@@ -988,15 +988,15 @@ function aiDecide(seat, noWalls) {
       st[o].delete(K(x, z));
       const gain = nR - rD, cost = nMy - myD;
       if (gain <= 0) continue;
-      const prox = Math.max(0, 3 - (Math.abs(x + .5 - rp.x) + Math.abs(z + .5 - rp.z))) / 3;
-      const score = P.atk * gain - P.self * cost + (o === P.ori ? P.oriB : 0) + P.near * prox + Math.random() * P.noise;
+      const dd = Math.abs(x + .5 - rp.x) + Math.abs(z + .5 - rp.z), prox = Math.max(0, 3 - dd) / 3;
+      const score = P.atk * gain - P.self * cost + (o === P.ori ? P.oriB : 0) + P.near * prox - 0.25 * Math.abs(dd - P.zoneD) + Math.random() * (P.noise + .4);
       cands.push({ o, x, z, score, gain, cost });
     }
     cands.sort((a, b) => b.score - a.score);
     // pas toujours le « meilleur » os : parmi les meilleurs, un tirage pondéré
-    const top = cands.filter(c => c.score >= (cands[0] ? cands[0].score : 0) - 0.6).slice(0, 4);
+    const top = cands.filter(c => c.score >= (cands[0] ? cands[0].score : 0) - 1.2).slice(0, 6);
     let bw = null;
-    if (top.length) { let tot = 0; top.forEach(c => { c.wt = Math.exp(c.score * 2); tot += c.wt; }); let u = Math.random() * tot; for (const c of top) { u -= c.wt; if (u <= 0) { bw = c; break; } } bw = bw || top[0]; }
+    if (top.length) { let tot = 0; top.forEach(c => { c.wt = Math.exp(c.score * 1.3); tot += c.wt; }); let u = Math.random() * tot; for (const c of top) { u -= c.wt; if (u <= 0) { bw = c; break; } } bw = bw || top[0]; }
     const need = wantEarly && !losingRace ? 2 : 1;
     if (bw && bw.gain - bw.cost >= need) { P.walls++; return { k: 'wall', o: bw.o, x: bw.x, z: bw.z }; }
   }
