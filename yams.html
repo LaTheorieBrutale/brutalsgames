@@ -169,7 +169,7 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .tray .spark{position:absolute;z-index:3;pointer-events:none;background:#fff3b0;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);filter:drop-shadow(0 0 3px #ffd34a)}
 #bRoll.shake{animation:shake .32s}
 @keyframes shake{20%{transform:rotate(-5deg)}40%{transform:rotate(5deg)}60%{transform:rotate(-3deg)}80%{transform:rotate(2deg)}}
-.die.blank svg{opacity:.3}
+.die.blank{visibility:hidden;pointer-events:none}
 .rzone{position:relative;width:100%;display:flex;flex-direction:column;align-items:center;gap:12px}
 .rhint{margin:0;font-size:13px;font-weight:800;color:#e9fffb;text-align:center;min-height:1.25em;transition:opacity .25s}
 .rstage{position:relative;width:100%;height:46px}
@@ -203,7 +203,6 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .die.flash::before,.dicerow.ending .die::before{display:none}
 .tray .streak{position:absolute;z-index:3;height:6px;pointer-events:none;border-radius:3px;
   background:linear-gradient(90deg,transparent,rgba(255,226,90,.85) 12%,#fff8d0 50%,rgba(255,226,90,.85) 88%,transparent);filter:blur(1px) drop-shadow(0 0 6px #ffd84a)}
-.die.blank.fresh .dbody{animation:blankIn .35s ease-out}
 @keyframes blankIn{from{transform:scale(.2);opacity:0}}
 .hint{margin:0;font-size:12.5px;color:#d8fbf4;text-align:center;min-height:1.2em}
 .tbar{width:100%;height:6px;border-radius:4px;background:rgba(0,0,0,.4);overflow:hidden;border:2px solid var(--ink)}
