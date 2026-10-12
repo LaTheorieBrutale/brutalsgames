@@ -182,9 +182,9 @@ P.skinLive = cb => { P.fetchAvatars().then(() => cb && cb()); P.watchAvatars(cb)
   background-repeat:repeat-x,no-repeat;background-size:420px 100%,100% 100%;animation:bgRkShine 3s linear infinite}
 /* calque 1 : un éclat doux qui traverse le nom (motif de 420 px, il avance d'exactement 420 px → boucle invisible) ;
    calque 2 : le métal, fixe (clair en haut, plus profond en bas) */
-.bg-rk.r1{background-image:linear-gradient(90deg,rgba(255,250,225,0) 0,rgba(255,250,225,0) 150px,rgba(255,250,225,.35) 175px,rgba(255,252,235,.95) 200px,rgba(255,250,225,.35) 225px,rgba(255,250,225,0) 420px,rgba(255,250,225,0) 420px),linear-gradient(180deg,#ffe58a 0%,#f5c330 45%,#d99a12 100%)}
-.bg-rk.r2{background-image:linear-gradient(90deg,rgba(255,255,255,0) 0,rgba(255,255,255,0) 150px,rgba(255,255,255,.35) 175px,rgba(255,255,255,.95) 200px,rgba(255,255,255,.35) 225px,rgba(255,255,255,0) 420px,rgba(255,255,255,0) 420px),linear-gradient(180deg,#f4f6fa 0%,#cfd6e2 50%,#a7b1c3 100%)}
-.bg-rk.r3{background-image:linear-gradient(90deg,rgba(255,235,215,0) 0,rgba(255,235,215,0) 150px,rgba(255,235,215,.35) 175px,rgba(255,240,225,.95) 200px,rgba(255,235,215,.35) 225px,rgba(255,235,215,0) 420px,rgba(255,235,215,0) 420px),linear-gradient(180deg,#f4b27a 0%,#d5803f 50%,#a3561f 100%)}
+.bg-rk.r1{background-image:linear-gradient(90deg,rgba(255,250,225,0) 0,rgba(255,250,225,0) 150px,rgba(255,250,225,.35) 175px,rgba(255,252,235,.95) 200px,rgba(255,250,225,.35) 225px,rgba(255,250,225,0) 250px,rgba(255,250,225,0) 420px),linear-gradient(180deg,#ffe58a 0%,#f5c330 45%,#d99a12 100%)}
+.bg-rk.r2{background-image:linear-gradient(90deg,rgba(255,255,255,0) 0,rgba(255,255,255,0) 150px,rgba(255,255,255,.35) 175px,rgba(255,255,255,.95) 200px,rgba(255,255,255,.35) 225px,rgba(255,255,255,0) 250px,rgba(255,255,255,0) 420px),linear-gradient(180deg,#f4f6fa 0%,#cfd6e2 50%,#a7b1c3 100%)}
+.bg-rk.r3{background-image:linear-gradient(90deg,rgba(255,235,215,0) 0,rgba(255,235,215,0) 150px,rgba(255,235,215,.35) 175px,rgba(255,240,225,.95) 200px,rgba(255,235,215,.35) 225px,rgba(255,235,215,0) 250px,rgba(255,235,215,0) 420px),linear-gradient(180deg,#f4b27a 0%,#d5803f 50%,#a3561f 100%)}
 @keyframes bgRkShine{from{background-position:-210px 0,0 0}to{background-position:210px 0,0 0}}`;
   (document.head || document.documentElement).appendChild(st);
   const key = n => String(n || '').trim().toLowerCase();
