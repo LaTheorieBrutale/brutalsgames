@@ -3084,9 +3084,7 @@ function boardPoint(e) {
 function updateGhost(e) {
   const p = boardPoint(e);
   if (!p) { G.inside = false; ghost.visible = false; return; }
-  if (e.pointerType === 'touch') { // décalé « au-dessus » du doigt, selon l'orientation de la vue
-    const a = VIEW_ANG[viewSeat]; p.x -= Math.sin(a) * 0.9; p.z -= Math.cos(a) * 0.9;
-  }
+  // le mur se pose exactement sous le doigt (plus de décalage au-dessus)
   G.inside = p.x > -0.8 && p.x < 8.8 && p.z > -0.8 && p.z < 8.8;
   G.ax = clamp(Math.round(p.x - 0.5), 0, 7);
   G.az = clamp(Math.round(p.z - 0.5), 0, 7);
