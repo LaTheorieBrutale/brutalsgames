@@ -226,13 +226,13 @@ h1{margin:6px 0 3px;font-size:clamp(30px,3.4vw,46px);line-height:1.04;letter-spa
 /* podium : les 3 premiers mis en avant */
 .lb-pod{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:4px 0 14px}
 .lb-pod:empty{display:none}
-.pod{--c1:#fff2a8;--c2:#ffcf3f;--ink:#3a2600;position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;padding:12px 8px 11px;border-radius:18px;
-  border:1px solid color-mix(in srgb,var(--c2) 45%,transparent);background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--c2) 26%,transparent),transparent 70%),#30222c;
-  box-shadow:0 8px 22px #0000003a;animation:podIn .45s cubic-bezier(.2,.9,.3,1.2) both}
+.pod{--c1:#fff2a8;--c2:#ffcf3f;--ink:#3a2600;display:flex;flex-direction:column;align-items:stretch;gap:8px;min-width:0;animation:podIn .45s cubic-bezier(.2,.9,.3,1.2) both}
+.pod-card{display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;padding:14px 8px 12px;border-radius:18px;
+  border:1px solid color-mix(in srgb,var(--c2) 45%,transparent);background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--c2) 26%,transparent),transparent 70%),#30222c;box-shadow:0 8px 22px #0000003a}
 .pod.p2{--c1:#ffffff;--c2:#c9d0de;--ink:#22283a;animation-delay:.07s}
 .pod.p3{--c1:#ffc08a;--c2:#c9783a;--ink:#2e1606;animation-delay:.14s}
 @keyframes podIn{from{opacity:0;transform:translateY(10px) scale(.96)}}
-.pod-tag{padding:3px 11px;border-radius:999px;font-size:11.5px;font-weight:900;letter-spacing:.02em;white-space:nowrap;color:var(--ink);
+.pod-tag{text-align:center;padding:7px 10px;border-radius:999px;font-size:13px;font-weight:900;letter-spacing:.02em;white-space:nowrap;color:var(--ink);
   background:radial-gradient(circle at 35% 30%,var(--c1),var(--c2));box-shadow:0 2px 8px color-mix(in srgb,var(--c2) 45%,transparent)}
 .pod-av{position:relative;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;padding:4px;
   background:radial-gradient(circle at 35% 30%,var(--c1),var(--c2));box-shadow:0 0 0 3px #30222c,0 0 18px color-mix(in srgb,var(--c2) 55%,transparent)}
@@ -241,7 +241,7 @@ h1{margin:6px 0 3px;font-size:clamp(30px,3.4vw,46px);line-height:1.04;letter-spa
 .pod-av .lbav svg{transform:scale(1.08)}
 .pod-nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14.5px;font-weight:900}
 .pod-st{font-size:11.5px;color:#e2cad4;font-weight:700}
-@media(max-width:660px){.lb-pod{gap:7px}.pod{padding:10px 5px 9px}.pod-av{width:52px;height:52px}.pod-tag{font-size:10.5px;padding:3px 8px}.pod-nm{font-size:13px}}
+@media(max-width:660px){.lb-pod{gap:7px}.pod-card{padding:11px 5px 9px}.pod-av{width:52px;height:52px}.pod-tag{font-size:11px;padding:6px 6px}.pod-nm{font-size:13px}}
 .lbl{font-size:10px;color:#d4b7c4;letter-spacing:.1em;text-transform:uppercase;font-weight:800}
 .hist{display:flex;flex-direction:column;gap:5px;font-size:13px;margin-top:6px}
 .hist div{display:flex;align-items:center;gap:8px;color:#dac4d0;padding:6px 9px;border-radius:11px;background:#30222c;border:1px solid #ffffff10}
@@ -557,7 +557,7 @@ const lbAv = n => { const a = P.avatarOf(n); return a ? `<i class="lbav">${P.ava
 function render() {
   $('#lbTabs').innerHTML = GAMES.map(([k, l]) => `<button class="filter" type="button" data-tab="${k}" aria-pressed="${k === tab}">${k === 'all' ? t('all') : esc(t(l))}</button>`).join('');
   const rows = P.ranking(matches, tab === 'all' ? null : tab), me = P.name().toLowerCase();
-  $('#lbPod').innerHTML = rows.slice(0, 3).map((r, i) => `<div class="pod p${i + 1}${r.name.toLowerCase() === me ? ' me' : ''}"><span class="pod-tag">${t('pod' + (i + 1))}</span><span class="pod-av">${lbAv(r.name)}</span><span class="pod-nm">${esc(r.name)}</span><span class="pod-st">${t('podW', { n: r.w })} · ${Math.round(100 * r.w / r.g)}%</span></div>`).join('');
+  $('#lbPod').innerHTML = rows.slice(0, 3).map((r, i) => `<div class="pod p${i + 1}${r.name.toLowerCase() === me ? ' me' : ''}"><span class="pod-tag">${t('pod' + (i + 1))}</span><div class="pod-card"><span class="pod-av">${lbAv(r.name)}</span><span class="pod-nm">${esc(r.name)}</span><span class="pod-st">${t('podW', { n: r.w })} · ${Math.round(100 * r.w / r.g)}%</span></div></div>`).join('');
   $('#lbList').innerHTML = rows.length ? rows.slice(0, 30).map((r, i) => `<div class="lb-row${r.name.toLowerCase() === me ? ' me' : ''}"><span class="rank${i < 3 ? ' r' + (i + 1) : ''}">${i + 1}</span><span class="nm">${lbAv(r.name)}${esc(r.name)}${r.ai ? `<small>${t('aiTag')}</small>` : ''}</span><span>${r.w}</span><span>${r.g}</span><span>${Math.round(100 * r.w / r.g)}%</span></div>`).join('')
     : `<div class="empty">${t('lbEmpty')}</div>`;
   const fmt = new Intl.DateTimeFormat(t('locale'), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
