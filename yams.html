@@ -147,8 +147,9 @@ label,.lbl{font-size:12.5px;color:var(--muted);letter-spacing:.08em;text-transfo
 .dicerow{display:flex;gap:clamp(5px,2vw,14px);justify-content:center;padding:4px 0 6px}
 .die{position:relative;width:clamp(50px,15vw,78px);height:clamp(50px,15vw,78px);background:none;border:0;padding:0;cursor:pointer;transition:transform .15s}
 .die svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 0 rgba(0,0,0,.55))}
-.die.held::after{content:"";position:absolute;inset:-5px -5px -2px;border:3.5px solid var(--gold);border-radius:30%;box-shadow:0 0 12px rgba(255,207,63,.55),inset 0 0 10px rgba(255,207,63,.25);pointer-events:none;animation:heldIn .18s ease-out}
-.die.held::before{content:"";position:absolute;z-index:2;top:-10px;left:-10px;width:22px;height:22px;border-radius:50%;background:var(--gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3' fill='none' stroke='%232a1a00' stroke-width='2.6' stroke-linecap='round'/%3E%3Crect x='5.5' y='10.5' width='13' height='10' rx='2.5' fill='%232a1a00'/%3E%3Ccircle cx='12' cy='15.5' r='1.6' fill='%23ffcf3f'/%3E%3C/svg%3E") center/68% no-repeat;box-shadow:0 2px 6px rgba(0,0,0,.45);pointer-events:none;animation:heldIn .18s ease-out}
+.die .hring{opacity:0;transition:opacity .15s}
+.die.held .hring{opacity:1;filter:drop-shadow(0 0 3px rgba(255,207,63,.7))}
+.die.held::before{content:"";position:absolute;z-index:2;top:-11px;left:-9px;width:22px;height:22px;border-radius:50%;background:var(--gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3' fill='none' stroke='%232a1a00' stroke-width='2.6' stroke-linecap='round'/%3E%3Crect x='5.5' y='10.5' width='13' height='10' rx='2.5' fill='%232a1a00'/%3E%3Ccircle cx='12' cy='15.5' r='1.6' fill='%23ffcf3f'/%3E%3C/svg%3E") center/68% no-repeat;box-shadow:0 2px 6px rgba(0,0,0,.45);pointer-events:none;animation:heldIn .18s ease-out}
 @keyframes heldIn{from{opacity:0;transform:scale(.7)}}
 .die:disabled{cursor:default}
 .die .dbody{display:block;width:100%;height:100%;position:relative;z-index:1;isolation:isolate;transform-origin:50% 80%;will-change:transform}
@@ -437,7 +438,7 @@ $('#skinDefs').innerHTML = SKIN_IDS.map(id => { const [a, b] = SKINS[id].f;
   + '<radialGradient id="dieHi" cx="35%" cy="22%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset=".45" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
   + '<radialGradient id="pipHi" cx="38%" cy="32%" r="65%"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset=".35" stop-color="#fff" stop-opacity=".15"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></radialGradient>';
 // face en « squircle » (carré aux bords légèrement bombés, comme un vrai dé)
-const sq = (x, y, w, h) => `M${x + w / 2} ${y}C${x + w * .9} ${y} ${x + w} ${y + h * .1} ${x + w} ${y + h / 2}C${x + w} ${y + h * .9} ${x + w * .9} ${y + h} ${x + w / 2} ${y + h}C${x + w * .1} ${y + h} ${x} ${y + h * .9} ${x} ${y + h / 2}C${x} ${y + h * .1} ${x + w * .1} ${y} ${x + w / 2} ${y}Z`;
+const sq = (x, y, w, h, r = 15) => `M${x + r} ${y}H${x + w - r}Q${x + w} ${y} ${x + w} ${y + r}V${y + h - r}Q${x + w} ${y + h} ${x + w - r} ${y + h}H${x + r}Q${x} ${y + h} ${x} ${y + h - r}V${y + r}Q${x} ${y} ${x + r} ${y}Z`;
 const PIPS = { 1: [[50, 50]], 2: [[28, 28], [72, 72]], 3: [[26, 26], [50, 50], [74, 74]], 4: [[28, 28], [72, 28], [28, 72], [72, 72]], 5: [[27, 27], [73, 27], [50, 50], [27, 73], [73, 73]], 6: [[28, 24], [72, 24], [28, 50], [72, 50], [28, 76], [72, 76]] };
 function pip(sk, x, y, big) {
   const r = big ? 11 : 8.5, c = sk.p, st = sk.stroke ? ` stroke="${sk.stroke}" stroke-width="1.5"` : '';
@@ -454,7 +455,7 @@ function dieSVG(v, skinId) {
   if (sk.cracks) extra = '<path d="M10 40l14 6 6 14M90 64l-16-2-8 14M60 8l-4 12 10 6" stroke="#ffe08a" stroke-width="2.5" fill="none" opacity=".8"/>';
   // la face occupe y 3→84 (la tranche dépasse dessous) : on y place les points
   const pips = v ? PIPS[v].map(([x, y]) => pip(sk, 6 + (x - 4) * 88 / 92, 3 + (y - 4) * 81 / 92, v === 1)).join('') : '';
-  return `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="94" rx="40" ry="5" fill="rgba(0,0,0,.28)"/>`
+  return `<svg viewBox="0 0 100 100" style="overflow:visible"><ellipse cx="50" cy="94" rx="40" ry="5" fill="rgba(0,0,0,.28)"/><path class="hring" d="${sq(0.5, -2.5, 99, 102.5, 19)}" fill="none" stroke="#ffcf3f" stroke-width="4.5"/>`
     + `<path d="${sq(6, 12, 88, 82)}" fill="url(#s_${id})"/>`
     + `<path d="${sq(6, 3, 88, 81)}" fill="url(#g_${id})"/><path d="${sq(6, 3, 88, 81)}" fill="url(#dieHi)"/>`
     + `<path d="${sq(6, 3, 88, 81)}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.5"/>`
