@@ -906,7 +906,7 @@ function guestData(m) {
 
 /* ---------- Affichage de la partie ---------- */
 let justId = -1, justUntil = 0;
-let pickCat = null, ending = false, localHeld = null, heldKey = '', lastRoll = -1, lastLast = 0, lastTurnKey = '', localDeadline = 0, cmpPick = -1;
+let pickCat = null, ending = false, localHeld = null, heldKey = '', lastRoll = -1, lastLast = 0, lastTurnKey = '', localDeadline = 0, remSeen = null, cmpPick = -1;
 // icônes des cases : dés aux points colorés (haut), étiquettes (bas)
 const UPCOL = ['#e0483a', '#f08a1e', '#2a7ad8', '#3aa84a', '#9a3ad8', '#1ab0a8'];
 function upIcon(n) { return `<svg viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90" rx="20" fill="#fbf7ee" stroke="#0d0705" stroke-width="6"/>${PIPS[n].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${n === 1 ? 11 : 9}" fill="${UPCOL[n - 1]}"/>`).join('')}</svg>`; }
@@ -947,7 +947,7 @@ function render() {
   }
   if (!ending) renderRollZone(mine, cur);
   // (phrase d’aide retirée)
-  localDeadline = Date.now() + (V.rem || 0);
+  if (V !== remSeen) { remSeen = V; localDeadline = Date.now() + (V.rem || 0); }
   renderVersus(); tickRing(); renderGrid(mine);
   // ligne d'info : dernier coup joué
   if (V.last) { const L = V.last, who = L.seat === net.me ? t('youPlayed') : esc(t('hePlayed', { name: (V.seats[L.seat] || {}).n || '' })); $('#status').innerHTML = `${who} <b>${t(L.cat)}</b> ${t('forPts', { n: L.v })}`; }
