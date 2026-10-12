@@ -178,11 +178,14 @@ P.skinLive = cb => { P.fetchAvatars().then(() => cb && cb()); P.watchAvatars(cb)
 (() => {
   const st = document.createElement('style');
   st.textContent = `
-.bg-rk{display:inline;font-weight:inherit;background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;animation:bgRkShine 2.6s linear infinite;text-shadow:none!important;-webkit-text-stroke:0!important}
-.bg-rk.r1{background-image:linear-gradient(100deg,#b8860b 0%,#ffd84a 22%,#fff6c8 32%,#ffcf3f 44%,#c98a10 60%,#ffd84a 80%,#b8860b 100%);filter:drop-shadow(0 0 5px rgba(255,200,60,.55))}
-.bg-rk.r2{background-image:linear-gradient(100deg,#c3ccdc 0%,#eef2f8 22%,#ffffff 32%,#dfe4ee 44%,#aab4c6 60%,#eef2f8 80%,#c3ccdc 100%);filter:drop-shadow(0 0 6px rgba(225,235,255,.7))}
-.bg-rk.r3{background-image:linear-gradient(100deg,#8a4a1c 0%,#e0904a 22%,#ffd2a8 32%,#d27a36 44%,#9a5420 60%,#e0904a 80%,#8a4a1c 100%);filter:drop-shadow(0 0 5px rgba(230,140,70,.5))}
-@keyframes bgRkShine{from{background-position:100% 0}to{background-position:-150% 0}}`;
+.bg-rk{display:inline;font-weight:inherit;background-repeat:repeat-x;background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;text-shadow:none!important;-webkit-text-stroke:0!important;
+  animation:bgRkFlow 5s linear infinite,bgRkGlow 3.2s ease-in-out infinite}
+.bg-rk.r1{--g:255,200,60;background-image:linear-gradient(90deg,#d99a12 0%,#f3c235 12.5%,#ffe17a 25%,#fff4c4 37.5%,#ffe17a 50%,#f3c235 62.5%,#d99a12 75%,#e6ab1f 87.5%,#d99a12 100%)}
+.bg-rk.r2{--g:225,235,255;background-image:linear-gradient(90deg,#aeb8ca 0%,#cfd6e3 12.5%,#eef2f8 25%,#ffffff 37.5%,#eef2f8 50%,#cfd6e3 62.5%,#aeb8ca 75%,#bcc5d5 87.5%,#aeb8ca 100%)}
+.bg-rk.r3{--g:235,145,75;background-image:linear-gradient(90deg,#a85a24 0%,#c9733a 12.5%,#e8995a 25%,#ffcf9e 37.5%,#e8995a 50%,#c9733a 62.5%,#a85a24 75%,#b8662d 87.5%,#a85a24 100%)}
+/* le motif fait 2 largeurs et se répète : il avance d'exactement une période, la boucle ne se voit pas */
+@keyframes bgRkFlow{from{background-position:0% 0}to{background-position:200% 0}}
+@keyframes bgRkGlow{0%,100%{filter:drop-shadow(0 0 2px rgba(var(--g),.35))}50%{filter:drop-shadow(0 0 7px rgba(var(--g),.75))}}`;
   (document.head || document.documentElement).appendChild(st);
   const key = n => String(n || '').trim().toLowerCase();
   let top = {}; try { top = JSON.parse(P.get('bg-top3', '{}')) || {}; } catch (e) { top = {}; }
