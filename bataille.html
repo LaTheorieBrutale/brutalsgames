@@ -640,7 +640,7 @@ let S = null, V = null, botTimer = 0;
 const net = { relay: null, role: '', code: '', roster: [], conn: null, sess: '', gameNo: 0, me: 0, lobby: [], solo: false };
 function newGame() {
   clearTimeout(botTimer);
-  S = { phase: 'place', turn: 0, deadline: Date.now() + PLACE_MS, last: null, winner: -1, quit: false, id: (S ? S.id : 0) + 1, auto: [false, false],
+  S = { phase: 'place', turn: 0, deadline: Date.now() + PLACE_MS, last: null, winner: -1, quit: false, id: (S ? S.id : Math.floor(rnd() * 1e8)) + 1, auto: [false, false],
     seats: net.roster.map(r => ({ name: r.name, bot: !!r.bot, ships: null, ready: false, recv: new Array(NN).fill(0), shots: 0, hits: 0, gone: !!r.gone })) };
   S.seats.forEach(s => { if (s.bot) { s.ships = randomFleet().map((x, i) => ({ kind: KINDS[i], len: LENS[i], cells: x.cells })); s.ready = true; } });
   sync();
@@ -1159,17 +1159,18 @@ function refreshMarks(b) {
     M4.compose(V3.set(x, 0.06 + bob, z), Q, S3); B.barrels.setMatrixAt(k, M4);
     [-0.1, 0.1].forEach((o, j) => { const off = new THREE.Vector3(0, o, 0).applyQuaternion(Q); M4.compose(V3.set(x + off.x, 0.06 + bob + off.y, z + off.z), Q, S3); B.bands.setMatrixAt(k * 2 + j, M4); }); });
   B.barrels.instanceMatrix.needsUpdate = true; B.bands.instanceMatrix.needsUpdate = true;
+  B.barrels.visible = B.bands.visible = B.miss.length > 0;
   // débris calcinés sur la grille ennemie (pas sur ses propres navires, déjà visibles)
   const hits = b === 1 ? B.hit : []; B.debris.count = hits.length * 3;
   hits.forEach((h, k) => { const x = (h.i % N) - 4.5, z = Math.floor(h.i / N) - 4.5; for (let j = 0; j < 3; j++) { E.set(0, h.r + j * 1.1, Math.sin(tm * 1.5 + h.ph + j) * 0.12); Q.setFromEuler(E); M4.compose(V3.set(x + Math.cos(h.r + j * 2.1) * 0.18, 0.05 + Math.sin(tm * 2 + h.ph + j) * 0.03, z + Math.sin(h.r + j * 2.1) * 0.18), Q, S3); B.debris.setMatrixAt(k * 3 + j, M4); } });
-  B.debris.instanceMatrix.needsUpdate = true;
+  B.debris.instanceMatrix.needsUpdate = true; B.debris.visible = hits.length > 0;
 }
 function clearBoard(b) {
   const B = G3['b' + b]; B.marks.fill(0); B.miss = []; B.hit = []; B.sunkSeen = new Set();
   Object.values(B.shipObj).forEach(o => B.ships.remove(o)); B.shipObj = {};
   refreshMarks(b);
 }
-function resetFx() { G3.emit = []; G3.sinking = []; [G3.fire, G3.smoke, G3.spray].forEach(s => { s.p = []; }); G3.debP = []; G3.fx.forEach(f => f.end && f.end()); G3.fx = []; }
+function resetFx() { G3.emit = []; G3.sinking = []; [G3.fire, G3.smoke, G3.spray].forEach(s => { s.p = []; }); G3.debP = []; for (let n = 0; n < 5 && G3.fx.length; n++) { const cur = G3.fx; G3.fx = []; cur.forEach(f => f.end && f.end()); } G3.fx = []; }
 
 /* --- caméras et rendu (2 vues : grande grille + mini-flotte) --- */
 function camFor(b, w, h) {
@@ -1222,7 +1223,8 @@ function frame(dt) {
   G3.debP.forEach(d => { d.vy -= 9.5 * dt; d.x += d.vx * dt; d.y += d.vy * dt; d.z += d.vz * dt; if (d.y < 0.03) { d.y = 0.03; d.vy *= -0.25; d.vx *= 0.7; d.vz *= 0.7; } d.rx += dt * 6; E.set(d.rx, d.ry, 0); Q.setFromEuler(E); M4.compose(V3.set(d.x, d.y, d.z), Q, S3); G3.deb.setMatrixAt(n++, M4); });
   G3.deb.count = n; G3.deb.instanceMatrix.needsUpdate = true;
   // effets temporaires
-  G3.fx = G3.fx.filter(f => { f.age += dt; const k = Math.min(1, f.age / f.life); f.upd(k); if (k >= 1) { f.end && f.end(); return false; } return true; });
+  // (un effet qui se termine peut en lancer un autre, ex. le boulet → l'éclaboussure : on ne doit pas le perdre)
+  { const cur = G3.fx; G3.fx = []; const keep = cur.filter(f => { f.age += dt; const k = Math.min(1, f.age / f.life); f.upd(k); if (k >= 1) { f.end && f.end(); return false; } return true; }); G3.fx = keep.concat(G3.fx); }
   // décor qui flotte
   (G3.floaters || []).forEach(f => { f.m.position.y = f.y0 + Math.sin(tm * 1.3 + f.ph) * 0.04; f.m.rotation.z = f.rz + Math.sin(tm * 0.9 + f.ph) * 0.05; f.m.rotation.x = f.rx + Math.cos(tm * 0.8 + f.ph) * 0.04; });
   // navires qui coulent
@@ -1480,9 +1482,9 @@ function renderBattle() {
   if (fresh) {
     pending = false;
     const b = fb, byMe = L.by === me, hit = L.r !== 'm', sunk = L.r === 's';
-    sCannon();
+    sCannon(); const g0 = V.gid;
     const after = () => {
-      if (!G3.ok) return;
+      if (!G3.ok || !V || V.gid !== g0) return;
       const p = cellPos(b, L.i);
       if (hit) { explode(p, sunk); sHit(sunk); shakeView(b, sunk ? 0.5 : 0.28); addMark(b, L.i, 2, true); if (!byMe) vib([30, 40, 60]); setMoods(byMe ? 'smirk' : 'angry', byMe ? 'angry' : 'smirk'); }
       else { splash(p); sSplash(); addMark(b, L.i, 1, true); }
