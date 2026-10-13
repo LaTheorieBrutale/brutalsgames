@@ -470,10 +470,12 @@ const SKINS = {
   candy: { f: ['#ffe0f2', '#ff7ab8'], p: '#ffffff', e: '#0d0705', s: 'heart', stroke: '#c83a7a' },
   lava: { f: ['#ffb05a', '#c8361e'], p: '#2a0a00', e: '#0d0705', s: 'dot', cracks: 1 },
   ice: { f: ['#f0fdff', '#86cdea'], p: '#1f5f92', e: '#0d0705', s: 'dot', frost: 1 },
-  marblegold: { f: ['#fdfaf4', '#ddd5c6'], p: '#d9a030', e: '#0d0705', s: 'gold', marble: 1 },
-  cyber: { f: ['#3a2cff', '#7a14d8'], p: '#05050c', e: '#0d0705', s: 'cyber', cyber: 1 }
+  marblegold: { f: ['#fdfaf4', '#ddd5c6'], p: '#d9a030', e: '#0d0705', s: 'dot', img: 'marblegold' },
+  cyber: { f: ['#3a2cff', '#7a14d8'], p: '#05050c', e: '#0d0705', s: 'dot', img: 'cyber' }
 };
 const SKIN_IDS = Object.keys(SKINS);
+// les dés « photo » : on précharge les 6 faces pour qu'elles s'affichent tout de suite
+SKIN_IDS.forEach(id => { if (SKINS[id].img) for (let v = 1; v <= 6; v++) { const im = new Image(); im.src = `img/dice/${SKINS[id].img}_${v}.webp`; } });
 // couleurs : face claire en haut, tranche plus sombre en dessous
 const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16); const f = c => Math.max(0, Math.min(255, Math.round(c * k))); return '#' + [n >> 16 & 255, n >> 8 & 255, n & 255].map(f).map(v => v.toString(16).padStart(2, '0')).join(''); };
 const mix = (a, b, t) => { const A = parseInt(a.slice(1), 16), B = parseInt(b.slice(1), 16); return '#' + [16, 8, 0].map(sh => Math.round((A >> sh & 255) * (1 - t) + (B >> sh & 255) * t).toString(16).padStart(2, '0')).join(''); };
@@ -482,17 +484,6 @@ $('#skinDefs').innerHTML = SKIN_IDS.map(id => { const [a, b] = SKINS[id].f;
     + `<linearGradient id="s_${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(b, .78)}"/><stop offset="1" stop-color="${shade(b, .55)}"/></linearGradient>`; }).join('')
   + '<radialGradient id="dieHi" cx="35%" cy="22%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset=".45" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
   + '<radialGradient id="dieBevel" cx="50%" cy="46%" r="58%"><stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset=".86" stop-color="#000" stop-opacity=".12"/><stop offset="1" stop-color="#000" stop-opacity=".32"/></radialGradient>'
-  + '<radialGradient id="gpRim" cx="40%" cy="30%" r="75%"><stop offset="0" stop-color="#fff3c0"/><stop offset=".5" stop-color="#e6ac38"/><stop offset="1" stop-color="#8a5a12"/></radialGradient>'
-  + '<radialGradient id="gpIn" cx="55%" cy="62%" r="70%"><stop offset="0" stop-color="#ffe9a0"/><stop offset=".55" stop-color="#d89a2a"/><stop offset="1" stop-color="#7a4c0c"/></radialGradient>'
-  + '<radialGradient id="gpCone" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".25" stop-color="#fff" stop-opacity="0"/><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></radialGradient>'
-  + '<linearGradient id="mgEdge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe7a0"/><stop offset=".5" stop-color="#e0a83a" stop-opacity=".4"/><stop offset="1" stop-color="#ffcf60"/></linearGradient>'
-  + '<radialGradient id="cyA" cx="18%" cy="20%" r="55%"><stop offset="0" stop-color="#ff4fc8" stop-opacity=".95"/><stop offset="1" stop-color="#ff4fc8" stop-opacity="0"/></radialGradient>'
-  + '<radialGradient id="cyB" cx="82%" cy="78%" r="55%"><stop offset="0" stop-color="#2ad8ff" stop-opacity=".95"/><stop offset="1" stop-color="#2ad8ff" stop-opacity="0"/></radialGradient>'
-  + '<radialGradient id="cyC" cx="20%" cy="85%" r="40%"><stop offset="0" stop-color="#ff9a3c" stop-opacity=".8"/><stop offset="1" stop-color="#ff9a3c" stop-opacity="0"/></radialGradient>'
-  + '<linearGradient id="cyEdge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7ae0"/><stop offset=".35" stop-color="#7a5cff"/><stop offset=".65" stop-color="#3ae0ff"/><stop offset="1" stop-color="#ff8a4a"/></linearGradient>'
-  + '<radialGradient id="cyGlow" cx="50%" cy="50%" r="50%"><stop offset=".55" stop-color="#ff6ad0" stop-opacity=".55"/><stop offset="1" stop-color="#ff6ad0" stop-opacity="0"/></radialGradient>'
-  + '<linearGradient id="cyRim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb06a"/><stop offset=".5" stop-color="#ff5fd0"/><stop offset="1" stop-color="#8a6aff"/></linearGradient>'
-  + '<radialGradient id="cyHole" cx="45%" cy="40%" r="65%"><stop offset="0" stop-color="#000"/><stop offset=".7" stop-color="#0a0a18"/><stop offset="1" stop-color="#2a2a4a"/></radialGradient>'
   + '<linearGradient id="pipIn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset=".55" stop-color="#000" stop-opacity=".1"/><stop offset="1" stop-color="#fff" stop-opacity=".35"/></linearGradient>';
 // face en « squircle » (carré aux bords légèrement bombés, comme un vrai dé)
 const DIE_PATH = (() => { const n = 5.2, pts = [];
@@ -505,37 +496,16 @@ function pip(sk, x, y, big) {
   const r = big ? 11 : 8.5, c = sk.p, st = sk.stroke ? ` stroke="${sk.stroke}" stroke-width="1.5"` : '';
   if (sk.s === 'star') { const pts = []; for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * 0.45 : r * 1.1; pts.push((x + rr * Math.cos(a)).toFixed(1) + ',' + (y + rr * Math.sin(a)).toFixed(1)); } return `<polygon points="${pts.join(' ')}" fill="${c}"/>`; }
   if (sk.s === 'heart') { const s = r / 9; return `<path d="M${x} ${y + 8 * s} C${x - 12 * s} ${y} ${x - 8 * s} ${y - 9 * s} ${x} ${y - 4 * s} C${x + 8 * s} ${y - 9 * s} ${x + 12 * s} ${y} ${x} ${y + 8 * s}z" fill="${c}"${st}/>`; }
-  if (sk.s === 'gold') return `<circle cx="${x}" cy="${y + r * .12}" r="${r * 1.12}" fill="rgba(90,60,20,.35)"/><circle cx="${x}" cy="${y}" r="${r * 1.04}" fill="url(#gpRim)"/><circle cx="${x}" cy="${y}" r="${r * .82}" fill="url(#gpIn)"/><circle cx="${x}" cy="${y}" r="${r * .82}" fill="url(#gpCone)"/><ellipse cx="${x - r * .28}" cy="${y - r * .38}" rx="${r * .32}" ry="${r * .16}" fill="#fff" opacity=".75" transform="rotate(-25 ${x - r * .28} ${y - r * .38})"/>`;
-  if (sk.s === 'cyber') return `<circle cx="${x}" cy="${y}" r="${r * 1.38}" fill="url(#cyGlow)"/><circle cx="${x}" cy="${y}" r="${r * 1.08}" fill="none" stroke="url(#cyRim)" stroke-width="${r * .3}"/><circle cx="${x}" cy="${y}" r="${r * .95}" fill="url(#cyHole)"/><ellipse cx="${x + r * .2}" cy="${y + r * .45}" rx="${r * .42}" ry="${r * .16}" fill="#7ad8ff" opacity=".45"/>`;
   if (sk.s === 'skull') { const s = r / 9; return `<g><circle cx="${x}" cy="${y - 1.5 * s}" r="${8 * s}" fill="${c}"/><rect x="${x - 4.5 * s}" y="${y + 3 * s}" width="${9 * s}" height="${5 * s}" rx="${1.5 * s}" fill="${c}"/><circle cx="${x - 3 * s}" cy="${y - 2 * s}" r="${2.3 * s}" fill="${sk.f[0]}"/><circle cx="${x + 3 * s}" cy="${y - 2 * s}" r="${2.3 * s}" fill="${sk.f[0]}"/></g>`; }
   return `<circle cx="${x}" cy="${y + r * .1}" r="${r * 1.08}" fill="rgba(255,255,255,.5)"/><circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/><circle cx="${x}" cy="${y}" r="${r}" fill="url(#pipIn)"/><ellipse cx="${x + r * .1}" cy="${y + r * .5}" rx="${r * .45}" ry="${r * .2}" fill="#fff" opacity=".4"/>`;
 }
-// veines de marbre : tracés en zigzag générés une fois par face (toujours les mêmes pour une valeur donnée)
-const MARBLE = {};
-function marbleVeins(v) {
-  if (MARBLE[v]) return MARBLE[v];
-  let sd = v * 9301 + 49297; const R = () => (sd = (sd * 233280 + 49297) % 2147483647) / 2147483647;
-  const walk = (x, y, a, n, st) => { let d = `M${x.toFixed(1)} ${y.toFixed(1)}`; for (let k = 0; k < n; k++) { a += (R() - .5) * 1.1; const l = st * (.6 + R() * .8); x += Math.cos(a) * l; y += Math.sin(a) * l; d += `L${x.toFixed(1)} ${y.toFixed(1)}`; } return { d, x, y, a }; };
-  const paths = [];
-  for (let m = 0; m < 2; m++) {
-    const side = Math.floor(R() * 4), u = 10 + R() * 80;
-    const [x, y, a] = side === 0 ? [u, 2, Math.PI / 2] : side === 1 ? [98, u, Math.PI] : side === 2 ? [u, 98, -Math.PI / 2] : [2, u, 0];
-    const main = walk(x, y, a + (R() - .5) * .9, 16, 6.5); paths.push([main.d, 1]);
-    const b = walk(main.x * .5 + x * .5, main.y * .5 + y * .5, main.a + (R() < .5 ? 1 : -1) * (.7 + R() * .6), 6, 5); paths.push([b.d, .6]);
-  }
-  const g = paths.map(([d, w]) => `<path d="${d}" stroke="#8c8478" stroke-width="${7 * w}" opacity=".16"/><path d="${d}" stroke="#4a4038" stroke-width="${2.6 * w}" opacity=".55"/><path d="${d}" stroke="#14100c" stroke-width="${1.2 * w}" opacity=".9"/><path d="${d}" stroke="#b08a4a" stroke-width="${.8 * w}" opacity=".55" transform="translate(1.2 .8)"/>`).join('');
-  return (MARBLE[v] = `<g clip-path="url(#dieClip)" fill="none" stroke-linecap="round" stroke-linejoin="round">${g}</g><path d="${DIE_PATH}" fill="none" stroke="url(#mgEdge)" stroke-width="3.5" opacity=".9"/>`);
-}
 function dieSVG(v, skinId) {
   const id = SKINS[skinId] ? skinId : 'classic', sk = SKINS[id];
+  if (sk.img) return `<svg viewBox="0 0 100 100" style="overflow:visible"><ellipse cx="50" cy="95" rx="38" ry="4.5" fill="rgba(0,0,0,.3)"/><image href="img/dice/${sk.img}_${v || 6}.webp" x="4" y="4" width="92" height="92"/><path class="hring" d="${DIE_PATH}" fill="none" stroke="#ffcf3f" stroke-width="5"/></svg>`;
   let extra = '';
   if (sk.grain) extra = '<path d="M14 30c20 4 50-4 72 2M12 58c24 5 52-3 76 3M16 80c18 3 46-2 68 1" stroke="rgba(90,50,20,.35)" stroke-width="2" fill="none"/>';
   if (sk.stars) extra = '<g fill="#fff" opacity=".75"><circle cx="20" cy="68" r="1.4"/><circle cx="82" cy="40" r="1.2"/><circle cx="60" cy="86" r="1.3"/><circle cx="38" cy="14" r="1.1"/><circle cx="84" cy="80" r="1"/></g>';
   if (sk.frost) extra = '<g stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".85"><path d="M18 18l8 8M26 18l-8 8M22 15v14M15 22h14"/><path d="M78 76l6 6M84 76l-6 6M81 73v12M75 79h12"/></g><path d="M8 12c6 4 6 10 2 16M92 88c-6-4-5-10-1-15" stroke="#fff" stroke-width="2.5" fill="none" opacity=".6"/>';
-  if (sk.marble) extra = marbleVeins(v || 1);
-  if (sk.cyber) extra = `<path d="${DIE_PATH}" fill="url(#cyA)"/><path d="${DIE_PATH}" fill="url(#cyB)"/><path d="${DIE_PATH}" fill="url(#cyC)"/>`
-    + `<g clip-path="url(#dieClip)"><path d="M8 70C26 58 34 36 60 28S88 20 96 10" stroke="#ff5fd0" stroke-width="7" fill="none" opacity=".35" stroke-linecap="round"/><path d="M8 70C26 58 34 36 60 28S88 20 96 10" stroke="#ffd0f4" stroke-width="1.6" fill="none" opacity=".55" stroke-linecap="round"/></g>`
-    + `<path d="${DIE_PATH}" fill="none" stroke="url(#cyEdge)" stroke-width="4.5"/><path d="${DIE_PATH}" fill="none" stroke="#fff" stroke-width="1" opacity=".45" transform="translate(50 50) scale(.94) translate(-50 -50)"/>`;
   if (sk.cracks) extra = '<path d="M10 40l14 6 6 14M90 64l-16-2-8 14M60 8l-4 12 10 6" stroke="#ffe08a" stroke-width="2.5" fill="none" opacity=".8"/>';
   const pips = v ? PIPS[v].map(([x, y]) => pip(sk, 50 + (x - 50) * .86, 50 + (y - 50) * .86, v === 1)).join('') : '';
   // le contour jaune (dé gardé) suit exactement la silhouette du dé
