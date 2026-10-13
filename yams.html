@@ -474,7 +474,7 @@ const SKINS = {
 };
 const SKIN_IDS = Object.keys(SKINS);
 // les dés « photo » : on précharge les 6 faces pour qu'elles s'affichent tout de suite
-SKIN_IDS.forEach(id => { if (SKINS[id].img) for (let v = 1; v <= 6; v++) { const im = new Image(); im.src = `img/dice/${SKINS[id].img}_${v}.webp?v=2`; } });
+SKIN_IDS.forEach(id => { if (SKINS[id].img) for (let v = 1; v <= 6; v++) { const im = new Image(); im.src = `img/dice/${SKINS[id].img}_${v}.webp?v=3`; } });
 // couleurs : face claire en haut, tranche plus sombre en dessous
 const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16); const f = c => Math.max(0, Math.min(255, Math.round(c * k))); return '#' + [n >> 16 & 255, n >> 8 & 255, n & 255].map(f).map(v => v.toString(16).padStart(2, '0')).join(''); };
 const mix = (a, b, t) => { const A = parseInt(a.slice(1), 16), B = parseInt(b.slice(1), 16); return '#' + [16, 8, 0].map(sh => Math.round((A >> sh & 255) * (1 - t) + (B >> sh & 255) * t).toString(16).padStart(2, '0')).join(''); };
@@ -500,7 +500,7 @@ function pip(sk, x, y, big) {
 }
 function dieSVG(v, skinId) {
   const id = SKINS[skinId] ? skinId : 'classic', sk = SKINS[id];
-  if (sk.img) return `<svg viewBox="0 0 100 100" style="overflow:visible"><ellipse cx="50" cy="95" rx="38" ry="4.5" fill="rgba(0,0,0,.3)"/><image href="img/dice/${sk.img}_${v || 6}.webp?v=2" x="4" y="4" width="92" height="92"/><path class="hring" d="${DIE_PATH}" fill="none" stroke="#ffcf3f" stroke-width="5"/></svg>`;
+  if (sk.img) return `<svg viewBox="0 0 100 100" style="overflow:visible"><ellipse cx="50" cy="95" rx="38" ry="4.5" fill="rgba(0,0,0,.3)"/><image href="img/dice/${sk.img}_${v || 6}.webp?v=3" x="4" y="4" width="92" height="92"/><path class="hring" d="${DIE_PATH}" fill="none" stroke="#ffcf3f" stroke-width="5"/></svg>`;
   let extra = '';
   if (sk.grain) extra = '<path d="M14 30c20 4 50-4 72 2M12 58c24 5 52-3 76 3M16 80c18 3 46-2 68 1" stroke="rgba(90,50,20,.35)" stroke-width="2" fill="none"/>';
   if (sk.stars) extra = '<g fill="#fff" opacity=".75"><circle cx="20" cy="68" r="1.4"/><circle cx="82" cy="40" r="1.2"/><circle cx="60" cy="86" r="1.3"/><circle cx="38" cy="14" r="1.1"/><circle cx="84" cy="80" r="1"/></g>';
