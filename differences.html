@@ -678,7 +678,7 @@ function claim(i, s) {
   G.found[i] = s; G.foundAt[i] = elapsed();
   G.fx.push({ type: 'ring', i, t: 0 });
   if (s === G.me) { P.sfx('good'); try { navigator.vibrate && navigator.vibrate(12); } catch (err) {} }
-  else { P.sfx('other'); if (G.names.length > 1) toast(t('foundBy', { name: esc(G.names[s]) }), 'info'); }
+  else { P.sfx('other'); }
   delete G.pending[i];
   renderHud();
   const n = countOf(G.me), all = G.found.every(f => f >= 0);
@@ -701,7 +701,6 @@ function scheduleBot() {
     if (G.over || G.mode !== 'bot') return;
     G.botN++; G.botAt = elapsed(); renderHud(); P.sfx('other');
     if (G.botN >= n) { finish(1); return; }
-    toast(t('botFound', { n: G.botN, t: n }), 'info');
     scheduleBot();
   }, wait * 1000);
 }
