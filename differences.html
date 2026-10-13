@@ -687,12 +687,12 @@ function claim(i, s) {
   else if (all) finish(G.mode === 'bot' ? 0 : undefined);
   return true;
 }
-// Oscar trouve une différence en moyenne toutes les ~6-7 s (un peu plus lent pour la première, le temps d'observer)
+// Oscar trouve une différence en moyenne toutes les 10 s (facile), 15 s (normal), 25 s (difficile)
 function scheduleBot() {
   clearTimeout(G.botT);
   if (G.over) return;
-  const n = G.scene.diffs.length, mean = [6.8, 6.3, 7.2][G.level] * (G.vis ? 1.3 : 1);
-  const wait = mean * (0.55 + Math.random() * 0.9) + (G.botN === 0 ? 3 : 0);
+  const n = G.scene.diffs.length, mean = [10, 15, 25][G.level];
+  const wait = mean * (0.8 + Math.random() * 0.4);
   G.botT = setTimeout(() => {
     if (G.over || G.mode !== 'bot') return;
     G.botN++; G.botAt = elapsed(); renderHud(); P.sfx('other');
