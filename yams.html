@@ -296,6 +296,10 @@ body.ingame #chatBar{margin-left:52px;width:calc(100% - 52px)}
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="#fff" stroke="#0d0705" stroke-width="2"/><circle cx="8" cy="8" r="1.8" fill="#0d0705"/><circle cx="12" cy="12" r="1.8" fill="#0d0705"/><circle cx="16" cy="16" r="1.8" fill="#0d0705"/></svg>
         <span><b data-i18n="solo">Partie solo</b><small id="soloSub" data-i18n="soloSub">bats ton record</small></span>
       </button>
+      <button class="btn mode" id="mBot">
+        <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="13" rx="4" fill="#8ac4ff" stroke="#0d0705" stroke-width="2"/><path d="M12 6V3" stroke="#0d0705" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="2.6" r="1.4" fill="#ff6a6a" stroke="#0d0705" stroke-width="1.2"/><circle cx="9" cy="12" r="1.8" fill="#0d0705"/><circle cx="15" cy="12" r="1.8" fill="#0d0705"/><path d="M9 16h6" stroke="#0d0705" stroke-width="2" stroke-linecap="round"/></svg>
+        <span><b data-i18n="vsBot">Contre l’IA</b><small data-i18n="vsBotSub">affronte Lucky, le roi des dés</small></span>
+      </button>
       <button class="btn" id="bRules" data-i18n="howTo">Comment jouer ?</button>
     </div>
     <div class="frame panel"><div id="gchatHome"></div></div>
@@ -406,7 +410,7 @@ const d6 = () => 1 + Math.floor(rnd() * 6);
 
 /* ---------- Textes ---------- */
 P.addStrings({
-  fr: { games: 'Jeux', tagline: 'Lance, garde, et vise le Yam’s !', nick: 'Ton pseudo', myDice: 'Tes dés', online: 'Partie entre amis', onlineSub: 'en ligne, 2 à 8 joueurs', solo: 'Partie solo', soloSub: 'bats ton record', record: 'record : {n} points', howTo: 'Comment jouer ?',
+  fr: { games: 'Jeux', tagline: 'Lance, garde, et vise le Yam’s !', nick: 'Ton pseudo', myDice: 'Tes dés', online: 'Partie entre amis', onlineSub: 'en ligne, 2 à 8 joueurs', solo: 'Partie solo', soloSub: 'bats ton record', vsBot: 'Contre l’IA', vsBotSub: 'affronte Lucky, le roi des dés', record: 'record : {n} points', howTo: 'Comment jouer ?',
     create: 'Créer une partie', orJoin: 'ou rejoindre des amis', join: 'Rejoindre', gameCode: 'Code de la partie', copyCode: 'Copier le code', copied: 'Copié !', start: 'Lancer la partie', leave: 'Quitter', players: 'Joueurs',
     badCode: 'Entre le code à 5 caractères.', connecting: 'Connexion…', noGame: 'Aucune partie avec ce code.', netErr: 'Connexion impossible. Réessaie.', full: 'Partie complète ou déjà commencée.', hostLeft: 'L’hôte a quitté la partie.',
     waitHost: 'Tout le monde est là ? Lance la partie !', waitGuest: '<span class="dots">L’hôte va lancer la partie</span>', you: 'toi',
@@ -421,7 +425,7 @@ P.addStrings({
     music: 'Musique', musOn: 'Activée', musOff: 'Coupée', on: 'Activés', off: 'Coupés',
     changeDice: 'Changer de dés', sk_classic: 'Classique', sk_ruby: 'Rubis', sk_emerald: 'Émeraude', sk_sapphire: 'Saphir', sk_gold: 'Or', sk_wood: 'Bois', sk_bone: 'Os', sk_galaxy: 'Galaxie', sk_candy: 'Bonbon', sk_lava: 'Lave',
     rulesTxt: '<p>À ton tour, lance les <b>5 dés</b> jusqu’à <b>3 fois</b>. Entre deux lancers, touche les dés que tu veux garder.</p><p>Ensuite, inscris ton résultat dans <b>une case</b> de ta feuille (une seule fois chacune, 0 si ça ne colle pas). Haut : la somme des 1, des 2… jusqu’aux 6 (<b>bonus de 35</b> si tu fais 63 ou plus). Bas : brelan et carré (somme des dés), full 25, petite suite 30, grande suite 40, <b>Yam’s</b> (5 dés pareils) 50, chance (somme).</p><p>Chaque Yam’s en plus ajoute <b>+100</b> directement dans ta case Yam’s, à condition qu’elle soit déjà remplie avec 50 (pas barrée). Tu notes alors ce Yam’s dans une autre case.</p><p> Après 13 tours, le plus gros total gagne !</p><p>Choisis ton skin de dés : tout le monde les voit quand c’est ton tour.</p>' },
-  en: { games: 'Games', tagline: 'Roll, hold, and go for the Yahtzee!', nick: 'Your nickname', myDice: 'Your dice', online: 'Game with friends', onlineSub: 'online, 2 to 8 players', solo: 'Solo game', soloSub: 'beat your high score', record: 'best: {n} points', howTo: 'How to play?',
+  en: { games: 'Games', tagline: 'Roll, hold, and go for the Yahtzee!', nick: 'Your nickname', myDice: 'Your dice', online: 'Game with friends', onlineSub: 'online, 2 to 8 players', solo: 'Solo game', soloSub: 'beat your high score', vsBot: 'Against the AI', vsBotSub: 'take on Lucky, king of dice', record: 'best: {n} points', howTo: 'How to play?',
     create: 'Create a game', orJoin: 'or join friends', join: 'Join', gameCode: 'Game code', copyCode: 'Copy code', copied: 'Copied!', start: 'Start the game', leave: 'Leave', players: 'Players',
     badCode: 'Enter the 5-character code.', connecting: 'Connecting…', noGame: 'No game with this code.', netErr: 'Can’t connect. Try again.', full: 'Game full or already started.', hostLeft: 'The host left the game.',
     waitHost: 'Everyone here? Start the game!', waitGuest: '<span class="dots">The host will start the game</span>', you: 'you',
@@ -436,7 +440,7 @@ P.addStrings({
     music: 'Music', musOn: 'On', musOff: 'Off', on: 'On', off: 'Off',
     changeDice: 'Change dice', sk_classic: 'Classic', sk_ruby: 'Ruby', sk_emerald: 'Emerald', sk_sapphire: 'Sapphire', sk_gold: 'Gold', sk_wood: 'Wood', sk_bone: 'Bone', sk_galaxy: 'Galaxy', sk_candy: 'Candy', sk_lava: 'Lava',
     rulesTxt: '<p>On your turn, roll the <b>5 dice</b> up to <b>3 times</b>. Between rolls, tap the dice you want to keep.</p><p>Then write your result in <b>one box</b> of your sheet (each box once, 0 if it doesn’t fit). Upper: the sum of 1s, 2s… up to 6s (<b>35 bonus</b> at 63 or more). Lower: 3 and 4 of a kind (sum of dice), full house 25, small straight 30, large straight 40, <b>Yahtzee</b> (5 of a kind) 50, chance (sum).</p><p>Each extra Yahtzee adds <b>+100</b> straight into your Yahtzee box, as long as it already holds 50 (not crossed out). You then write that roll in another box.</p><p> After 13 turns, the highest total wins!</p><p>Pick your dice skin: everyone sees it on your turn.</p>' },
-  cs: { games: 'Hry', tagline: 'Hoď, podrž a jdi po Yamsu!', nick: 'Tvoje přezdívka', myDice: 'Tvoje kostky', online: 'Hra s kamarády', onlineSub: 'online, 2 až 8 hráčů', solo: 'Hra sólo', soloSub: 'překonej svůj rekord', record: 'rekord: {n} bodů', howTo: 'Jak hrát?',
+  cs: { games: 'Hry', tagline: 'Hoď, podrž a jdi po Yamsu!', nick: 'Tvoje přezdívka', myDice: 'Tvoje kostky', online: 'Hra s kamarády', onlineSub: 'online, 2 až 8 hráčů', solo: 'Hra sólo', soloSub: 'překonej svůj rekord', vsBot: 'Proti AI', vsBotSub: 'utkej se s Luckym, králem kostek', record: 'rekord: {n} bodů', howTo: 'Jak hrát?',
     create: 'Vytvořit hru', orJoin: 'nebo se připoj ke kamarádům', join: 'Připojit', gameCode: 'Kód hry', copyCode: 'Kopírovat kód', copied: 'Zkopírováno!', start: 'Spustit hru', leave: 'Odejít', players: 'Hráči',
     badCode: 'Zadej 5místný kód.', connecting: 'Připojování…', noGame: 'Hra s tímto kódem neexistuje.', netErr: 'Nelze se připojit. Zkus to znovu.', full: 'Hra je plná nebo už začala.', hostLeft: 'Hostitel opustil hru.',
     waitHost: 'Jsou všichni tady? Spusť hru!', waitGuest: '<span class="dots">Hostitel brzy spustí hru</span>', you: 'ty',
@@ -718,8 +722,9 @@ function totals(card) {
 let S = null, V = null;
 const net = { relay: null, role: '', code: '', roster: [], conn: null, sess: '', gameNo: 0, me: 0, lobby: [], solo: false };
 function newGame() {
+  botKey = ''; clearTimeout(botT);
   S = { phase: 'play', round: 1, turn: 0, dice: [0, 0, 0, 0, 0], held: [false, false, false, false, false], rolls: 0, rollId: 0, deadline: 0, last: null,
-    seats: net.roster.map(r => ({ name: r.name, skin: r.skin || 'classic', card: {}, gone: !!r.gone })) };
+    seats: net.roster.map(r => ({ name: r.name, skin: r.skin || 'classic', card: {}, gone: !!r.gone, bot: !!r.bot })) };
   startTurn(0);
 }
 function startTurn(i) {
@@ -763,12 +768,78 @@ function autoPlay() {
   let best = free[0], bv = -1; free.forEach(c => { const v = catScore(c, S.dice); if (v > bv) { bv = v; best = c; } });
   hostScore(S.turn, best);
 }
+/* ---------- IA « Lucky » ---------- */
+const BOT_NAME = 'Lucky';
+// valeur « moyenne » de chaque case : marquer au-dessus = bonne affaire, en dessous = gâchis
+const EXPV = { c1: 2.1, c2: 5.3, c3: 8.5, c4: 12, c5: 15.5, c6: 19, c3k: 17, c4k: 10, cfh: 18, css: 22, cls: 18, cy: 14, cch: 22 };
+function botValue(cat, d, card) {
+  let v = catScore(cat, d), adj = v - EXPV[cat];
+  if (UP.includes(cat)) {
+    const n = +cat[1], up = UP.reduce((a, k) => a + (card[k] || 0), 0), left = UP.filter(k => card[k] === undefined).length;
+    if (up < 63) { adj += (v - 3 * n) * 0.9; if (up + v >= 63) adj += 22; else if (left === 1) adj -= 4; }
+  }
+  if (cat === 'cy' && v) adj += 40;
+  if (cat === 'cch') adj -= 4;
+  if (v === 0) adj -= cat === 'cy' ? 2 : cat === 'c1' ? 0 : 3;
+  return adj;
+}
+function botBest(d, card) {
+  let best = null, bv = -1e9;
+  CATS.forEach(c => { if (card[c] !== undefined) return; const v = botValue(c, d, card); if (v > bv) { bv = v; best = c; } });
+  return { cat: best, v: bv };
+}
+// Quels dés garder ? On teste les 32 combinaisons et on simule le prochain lancer
+function botKeep(d, card, rollsLeft) {
+  const tries = rollsLeft >= 2 ? 50 : 70; let bestMask = 31, bestE = -1e9;
+  for (let mask = 0; mask < 32; mask++) {
+    let sum = 0;
+    for (let k = 0; k < tries; k++) {
+      const nd = d.map((v, i) => mask & (1 << i) ? v : 1 + Math.floor(Math.random() * 6));
+      let e = botBest(nd, card).v;
+      if (rollsLeft >= 2) { const c = counts(nd), mx = Math.max(...c); e += mx >= 3 ? 2 : 0; }
+      sum += e;
+    }
+    const e = sum / tries + (mask === 31 ? 0.3 : 0);
+    if (e > bestE) { bestE = e; bestMask = mask; }
+  }
+  return { mask: bestMask, stay: botBest(d, card).v };
+}
+let botT = 0, botKey = '';
+function botTick() {
+  clearTimeout(botT);
+  if (!S || S.phase !== 'play' || !S.seats[S.turn] || !S.seats[S.turn].bot) return;
+  const seat = S.turn, key = S.round + ':' + seat, still = () => S && S.phase === 'play' && S.turn === seat && S.round + ':' + S.turn === key;
+  const step = () => {
+    if (!still()) return;
+    if (!S.rolls) { hostRoll(seat, null); botT = setTimeout(step, ROLL_MS + 700 + Math.random() * 500); return; }
+    const card = S.seats[seat].card;
+    if (S.rolls < 3) {
+      const { mask, stay } = botKeep(S.dice, card, 3 - S.rolls);
+      if (mask === 31 && stay > -2) return botScore(seat, still);
+      const want = S.dice.map((_, i) => !!(mask & (1 << i)));
+      const diff = want.map((w, i) => w !== S.held[i] ? i : -1).filter(i => i >= 0);
+      let k = 0;
+      const holdNext = () => {
+        if (!still()) return;
+        if (k < diff.length) { const i = diff[k++]; hostHold(seat, i, want[i]); P.sfx('click'); botT = setTimeout(holdNext, 260 + Math.random() * 200); return; }
+        botT = setTimeout(() => { if (!still()) return; hostRoll(seat, want); botT = setTimeout(step, ROLL_MS + 700 + Math.random() * 500); }, 420);
+      };
+      botT = setTimeout(holdNext, 350);
+      return;
+    }
+    botScore(seat, still);
+  };
+  botT = setTimeout(step, 900 + Math.random() * 400);
+}
+function botScore(seat, still) {
+  botT = setTimeout(() => { if (!still()) return; const { cat } = botBest(S.dice, S.seats[seat].card); hostScore(seat, cat); }, 700 + Math.random() * 500);
+}
 function endGame() {
   S.phase = 'end'; S.deadline = 0; sync();
-  if (net.solo) { const tot = totals(S.seats[0].card).total, rec = +P.get('ym-best', '0'); if (tot > rec) { P.set('ym-best', String(tot)); S.newRecord = true; } return; }
+  if (net.solo && !net.vsBot) { const tot = totals(S.seats[0].card).total, rec = +P.get('ym-best', '0'); if (tot > rec) { P.set('ym-best', String(tot)); S.newRecord = true; } return; }
   const act = S.seats.filter(s => !s.gone); if (act.length < 2) return;
   const sc = act.map(s => totals(s.card).total), top = Math.max(...sc), names = act.map(s => s.name), wa = sc.map((v, i) => v === top ? i : -1).filter(i => i >= 0);
-  P.pushMatch({ id: `ym${net.code}${net.sess}${net.gameNo}`, t: Date.now(), p: names, w: wa[0], wa, b: names.map(() => false), g: 'ym' });
+  P.pushMatch({ id: net.vsBot ? 'ymbot-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6) : `ym${net.code}${net.sess}${net.gameNo}`, t: Date.now(), p: names, w: wa[0], wa, b: act.map(s => !!s.bot), g: 'ym' });
 }
 setInterval(() => { if (net.role === 'host' && S && S.phase === 'play' && S.deadline && Date.now() > S.deadline) autoPlay(); }, 500);
 function pub() {
@@ -777,6 +848,7 @@ function pub() {
 }
 function sync() {
   if (!S) return; V = pub(); render();
+  if (net.vsBot && S.phase === 'play' && S.seats[S.turn] && S.seats[S.turn].bot && botKey !== S.round + ':' + S.turn) { botKey = S.round + ':' + S.turn; botTick(); }
   const msg = { t: 'st', v: V }; net.roster.forEach(r => { if (r.conn && r.conn.open && !r.gone) r.conn.send(msg); });
 }
 function hostAct(seat, m) {
@@ -808,8 +880,15 @@ let pendingJoin = null;
 $('#mOnline').onclick = () => { P.unlockAudio(); if (!nameOk()) return; P.sfx('click'); show('online'); $('#onForm').hidden = false; $('#onWait').hidden = true; $('#onErr').textContent = ''; if (pendingJoin) { $('#inCode').value = pendingJoin; pendingJoin = null; $('#bJoin').click(); } };
 $('#mSolo').onclick = () => {
   P.unlockAudio(); if (!nameOk()) return; P.sfx('click'); leaveNet();
-  Object.assign(net, { role: 'host', solo: true, me: 0, code: 'solo', sess: Date.now().toString(36), roster: [{ name: P.name(), conn: null, lang: P.lang(), skin: mySkin }] });
-  net.gameNo++; show('game'); newGame();
+  Object.assign(net, { role: 'host', solo: true, vsBot: false, me: 0, code: 'solo', sess: Date.now().toString(36), roster: [{ name: P.name(), conn: null, lang: P.lang(), skin: mySkin }] });
+  net.gameNo++; show('game'); newGame(); renderChat();
+};
+$('#mBot').onclick = () => {
+  P.unlockAudio(); if (!nameOk()) return; P.sfx('click'); leaveNet();
+  const bs = SKIN_IDS.filter(k => k !== mySkin);
+  Object.assign(net, { role: 'host', solo: true, vsBot: true, me: 0, code: 'bot', sess: Date.now().toString(36),
+    roster: [{ name: P.name(), conn: null, lang: P.lang(), skin: mySkin }, { name: BOT_NAME, conn: null, bot: true, skin: bs[Math.floor(Math.random() * bs.length)] }] });
+  net.gameNo++; show('game'); newGame(); renderChat();
 };
 $('#onBack').onclick = () => { P.sfx('click'); leaveNet(); show('home'); };
 $('#bLeave').onclick = () => { P.sfx('click'); leaveNet(); $('#onForm').hidden = false; $('#onWait').hidden = true; };
@@ -1085,12 +1164,12 @@ function renderEnd() {
   show('end');
   const L = V.seats.map((s, i) => ({ s, i, tot: totals(s.card).total })).filter(o => !o.s.gone).sort((a, b) => b.tot - a.tot);
   const top = L.length ? L[0].tot : 0, win = L.filter(o => o.tot === top);
-  $('#endTitle').textContent = net.solo ? t('soloEnd', { n: top }) + (V.newRecord ? ' ' + t('newRecord') : '') : win.length > 1 ? t('tie') : t('winner', { name: win[0] ? win[0].s.n : '?', n: top });
+  $('#endTitle').textContent = net.solo && !net.vsBot ? t('soloEnd', { n: top }) + (V.newRecord ? ' ' + t('newRecord') : '') : win.length > 1 ? t('tie') : t('winner', { name: win[0] ? win[0].s.n : '?', n: top });
   $('#ranks').innerHTML = L.map((o, k) => `<div class="pl">${k < 3 ? ['🥇', '🥈', '🥉'][k] : '#' + (k + 1)} ${dieSVG(6, o.s.skin)}<span>${esc(o.s.n)}</span><b>${o.tot}</b></div>`).join('');
   const guest = net.role !== 'host';
   $('#bAgain').hidden = guest; $('#endWait').textContent = guest ? t('hostAgain') : ''; $('#bMenu').hidden = !net.relay;
   const k = net.gameNo + ':' + net.sess;
-  if (endKey !== k) { endKey = k; const won = (win.some(o => o.i === net.me) && !net.solo) || V.newRecord; P.sfx(won ? 'win' : 'lose'); if (won) P.confetti($('#confetti')); }
+  if (endKey !== k) { endKey = k; const won = (win.some(o => o.i === net.me) && !(net.solo && !net.vsBot)) || V.newRecord; P.sfx(won ? 'win' : 'lose'); if (won) P.confetti($('#confetti')); }
 }
 $('#bAgain').onclick = () => { P.sfx('click'); P.stopConfetti(); if (net.solo) { net.gameNo++; show('game'); net.roster[0].skin = mySkin; newGame(); } else if (net.role === 'host') $('#bStart').click(); };
 $('#bHome').onclick = () => { P.sfx('click'); P.stopConfetti(); clearTimeout(window.__endT); leaveNet(); S = null; V = null; show('home'); renderSoloSub(); };
