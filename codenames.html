@@ -310,10 +310,10 @@ body.ingame .action{padding-left:58px}
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="shared.js?v=20261013b"></script>
-<script src="skins.js?v=20261013b"></script>
-<script src="chat.js?v=20261013b"></script>
-<script src="party.js?v=20261013b" data-game="cn"></script>
+<script src="shared.js?v=20261014a"></script>
+<script src="skins.js?v=20261014a"></script>
+<script src="chat.js?v=20261014a"></script>
+<script src="party.js?v=20261014a" data-game="cn"></script>
 <script src="words.js"></script>
 <script>
 (() => {
@@ -736,6 +736,7 @@ $('#bQuit').onclick = () => {
 
 /* ---------- Fin ---------- */
 function renderEnd() {
+  $('#bMenu').hidden = !net.relay; // « Retour au salon » n'a de sens qu'en ligne
   show('end');
   const me = V.players[net.me] || {}, won = me.team === V.winner;
   const tt = $('#endTitle'); tt.textContent = t(V.winner === 'r' ? 'winRed' : 'winBlue'); tt.className = 'banner ' + V.winner;

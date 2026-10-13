@@ -360,10 +360,10 @@ body.ingame #game .rc-form{padding-left:50px}
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="shared.js?v=20261013b"></script>
-<script src="skins.js?v=20261013b"></script>
-<script src="chat.js?v=20261013b"></script>
-<script src="party.js?v=20261013b" data-game="dr"></script>
+<script src="shared.js?v=20261014a"></script>
+<script src="skins.js?v=20261014a"></script>
+<script src="chat.js?v=20261014a"></script>
+<script src="party.js?v=20261014a" data-game="dr"></script>
 <script src="words.js"></script>
 <script>
 (() => {
@@ -1263,6 +1263,7 @@ $('#bQuit').onclick = () => {
 /* ---------- Podium ---------- */
 let endKey = '';
 function renderEnd() {
+  $('#bMenu').hidden = !net.relay; // « Retour au salon » n'a de sens qu'en ligne
   show('end');
   const L = V.players.map((p, i) => ({ p, i })).filter(o => !o.p.gone).sort((a, b) => b.p.sc - a.p.sc);
   const top = L.length ? L[0].p.sc : 0, winners = L.filter(o => o.p.sc === top && top > 0);

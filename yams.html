@@ -396,10 +396,10 @@ body.ingame #chatBar{margin-left:52px;width:calc(100% - 52px)}
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="shared.js?v=20261013b"></script>
-<script src="skins.js?v=20261013b"></script>
-<script src="chat.js?v=20261013b"></script>
-<script src="party.js?v=20261013b" data-game="ym"></script>
+<script src="shared.js?v=20261014a"></script>
+<script src="skins.js?v=20261014a"></script>
+<script src="chat.js?v=20261014a"></script>
+<script src="party.js?v=20261014a" data-game="ym"></script>
 <script>
 (() => {
 'use strict';
@@ -1171,6 +1171,7 @@ $('#bQuit').onclick = () => {
 /* ---------- Fin ---------- */
 let endKey = '';
 function renderEnd() {
+  $('#bMenu').hidden = !net.relay; // « Retour au salon » n'a de sens qu'en ligne
   show('end');
   const L = V.seats.map((s, i) => ({ s, i, tot: totals(s.card).total })).filter(o => !o.s.gone).sort((a, b) => b.tot - a.tot);
   const top = L.length ? L[0].tot : 0, win = L.filter(o => o.tot === top);

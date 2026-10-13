@@ -309,7 +309,7 @@ body.ingame .action{padding-left:58px}
       <div class="endlist" id="endList"></div>
       <button class="btn wide yellow" id="bAgain" data-i18n="again">Nouvelle mission</button>
       <p class="wait-txt" id="endWait"></p>
-      <button class="btn" id="bMenu" data-i18n="menu">Menu</button>
+      <button class="btn" id="bMenu" data-i18n="lobbyBack">Retour au salon</button>
       <button class="btn" id="bHome" data-i18n="menuBack">Retour au menu</button>
     </div>
   </div>
@@ -337,10 +337,10 @@ body.ingame .action{padding-left:58px}
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="shared.js?v=20261013b"></script>
-<script src="skins.js?v=20261013b"></script>
-<script src="chat.js?v=20261013b"></script>
-<script src="party.js?v=20261013b" data-game="uc"></script>
+<script src="shared.js?v=20261014a"></script>
+<script src="skins.js?v=20261014a"></script>
+<script src="chat.js?v=20261014a"></script>
+<script src="party.js?v=20261014a" data-game="uc"></script>
 <script>
 (() => {
 'use strict';
@@ -1358,6 +1358,7 @@ $('#bQuit').onclick = () => {
 
 /* ---------- Fin de mission ---------- */
 function renderEnd() {
+  $('#bMenu').hidden = !(V && V.mode === 'online' && net.relay); // « Retour au salon » n'a de sens qu'en ligne
   closeOv(); show('end'); music.level(1);
   const w = winnersOf({ players: V.players.map(p => ({ role: p.r })), winner: V.winner }), me = meSeat(), won = V.mode === 'local' || w.includes(me);
   const tt = $('#endTitle'); tt.textContent = t(V.winner === 'civ' ? 'winCiv' : V.winner === 'mw' ? 'winMw' : 'winImp');
