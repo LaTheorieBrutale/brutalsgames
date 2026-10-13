@@ -459,19 +459,17 @@ P.addStrings({
 
 /* ---------- Skins de dés ---------- */
 const SKINS = {
-  classic: { f: ['#ffffff', '#e4ded2'], p: '#1c1620', e: '#0d0705', s: 'dot' },
-  ruby: { f: ['#ff8a96', '#c8202f'], p: '#ffffff', e: '#0d0705', s: 'dot' },
-  emerald: { f: ['#8af0b4', '#1f9a5a'], p: '#ffffff', e: '#0d0705', s: 'dot' },
-  sapphire: { f: ['#8ac4ff', '#1f4fb8'], p: '#ffffff', e: '#0d0705', s: 'dot' },
-  gold: { f: ['#fff3b8', '#e0a020'], p: '#6a4200', e: '#0d0705', s: 'star' },
-  wood: { f: ['#e2b07a', '#9a6232'], p: '#3a2210', e: '#0d0705', s: 'dot', grain: 1 },
-  bone: { f: ['#f6ead0', '#c8b48a'], p: '#3a1a1a', e: '#0d0705', s: 'skull' },
-  galaxy: { f: ['#6a4ab0', '#1a0f3a'], p: '#ffe08a', e: '#0d0705', s: 'star', stars: 1 },
-  candy: { f: ['#ffe0f2', '#ff7ab8'], p: '#ffffff', e: '#0d0705', s: 'heart', stroke: '#c83a7a' },
-  lava: { f: ['#ffb05a', '#c8361e'], p: '#2a0a00', e: '#0d0705', s: 'dot', cracks: 1 },
-  ice: { f: ['#f0fdff', '#86cdea'], p: '#1f5f92', e: '#0d0705', s: 'dot', frost: 1 },
-  marblegold: { f: ['#fdfaf4', '#ddd5c6'], p: '#d9a030', e: '#0d0705', s: 'dot', img: 'marblegold' },
-  cyber: { f: ['#3a2cff', '#7a14d8'], p: '#05050c', e: '#0d0705', s: 'dot', img: 'cyber' }
+  classic: { f: ['#ffffff', '#e4ded2'], p: '#1c1620', img: 'classic' },
+  ruby: { f: ['#ff8a96', '#c8202f'], p: '#ffffff', img: 'ruby' },
+  emerald: { f: ['#8af0b4', '#1f9a5a'], p: '#ffffff', img: 'emerald' },
+  sapphire: { f: ['#8ac4ff', '#1f4fb8'], p: '#ffffff', img: 'sapphire' },
+  ice: { f: ['#f0fdff', '#86cdea'], p: '#1f5f92', img: 'ice' },
+  gold: { f: ['#fff3b8', '#e0a020'], p: '#6a4200', img: 'gold' },
+  wood: { f: ['#e2b07a', '#9a6232'], p: '#3a2210', img: 'wood' },
+  candy: { f: ['#ffe0f2', '#ff7ab8'], p: '#ffffff', img: 'candy' },
+  lava: { f: ['#ffb05a', '#c8361e'], p: '#2a0a00', img: 'lava' },
+  marblegold: { f: ['#fdfaf4', '#ddd5c6'], p: '#d9a030', img: 'marblegold' },
+  cyber: { f: ['#3a2cff', '#7a14d8'], p: '#05050c', img: 'cyber' }
 };
 const SKIN_IDS = Object.keys(SKINS);
 // les dés « photo » : on précharge les 6 faces pour qu'elles s'affichent tout de suite
