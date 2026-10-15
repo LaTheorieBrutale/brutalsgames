@@ -27,6 +27,14 @@ const BGT = window.BGT = (() => {
     if (!r.ok) throw new Error(r.status);
     const j = await r.json(); return { out: (j.responseData && j.responseData.translatedText) || '', src: sl };
   }
+  // Traductions PARTAGÉES : la première traduction d'une phrase est rangée en ligne, et tout le monde réutilise
+  // la même (sinon deux amis français pouvaient voir deux traductions différentes du même message).
+  const DB = 'https://quoridor-7b9d9-default-rtdb.europe-west1.firebasedatabase.app/rooms/tr/';
+  const hkey = (tl, text) => { let h1 = 0x811c9dc5, h2 = 0x01000193; const s = tl + '|' + text; for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); h1 = Math.imul(h1 ^ c, 16777619) >>> 0; h2 = Math.imul(h2 ^ c, 2246822519) >>> 0; } return h1.toString(36) + h2.toString(36) + s.length.toString(36); };
+  async function shGet(tl, text) {
+    try { const r = await fetch(DB + hkey(tl, text) + '.json', { cache: 'no-store' }); if (!r.ok) return undefined; const j = await r.json(); return j && j.t === text ? j : undefined; } catch (e) { return undefined; }
+  }
+  function shPut(tl, text, v, by) { try { fetch(DB + hkey(tl, text) + '.json', { method: 'PUT', body: JSON.stringify({ t: text, v: v || '', by, ts: Date.now() }) }).catch(() => {}); } catch (e) {} }
   // au plus 4 traductions en même temps (sinon des dizaines de requêtes partent d'un coup à l'ouverture)
   let active = 0; const waiting = [];
   const slot = () => new Promise(res => { if (active < 4) { active++; res(); } else waiting.push(res); });
@@ -38,11 +46,20 @@ const BGT = window.BGT = (() => {
     if (cache.has(key)) return Promise.resolve(cache.get(key));
     if (pending.has(key)) return pending.get(key);
     const job = (async () => {
-      let res = null;
-      await slot();
-      try { res = await gtx(text, tl, sl); } catch (e) { try { res = await mym(text, tl, sl); } catch (e2) { res = null; } } finally { release(); }
-      const v = res && res.out && res.src !== tl && !same(res.out, text) ? res.out : null;
-      cache.set(key, v); pending.delete(key); if (res) save(); return v;
+      let res = null, v = null, shared = await shGet(tl, text);
+      if (shared) v = shared.v || null;
+      else {
+        await slot();
+        try { res = await gtx(text, tl, sl); res.by = 'g'; }
+        catch (e) {
+          // Google indisponible ici : un ami l'a peut-être déjà traduite, on regarde avant d'utiliser le plan B
+          await new Promise(r => setTimeout(r, 900)); shared = await shGet(tl, text);
+          if (!shared) { try { res = await mym(text, tl, sl); res.by = 'm'; } catch (e2) { res = null; } }
+        } finally { release(); }
+        if (shared) v = shared.v || null;
+        else if (res) { v = res.out && res.src !== tl && !same(res.out, text) ? res.out : null; shPut(tl, text, v, res.by); }
+      }
+      cache.set(key, v); pending.delete(key); if (res || shared) save(); return v;
     })();
     pending.set(key, job); return job;
   }
