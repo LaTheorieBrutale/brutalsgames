@@ -539,11 +539,11 @@ document.addEventListener('visibilitychange', () => { const c = P.audio(); if (!
 /* ---------- Traduction du chat ---------- */
 function trHtml(text, src, mine) {
   const tl = P.lang();
-  if (mine || !src || src === tl || !window.BGT) return esc(text);
+  if (mine || !window.BGT) return esc(text);
   // pendant le dessin, on ne traduit pas les réponses courtes (sinon la traduction pourrait souffler le mot)
   if (V && V.phase === 'draw' && text.trim().split(/\s+/).length < 3) return esc(text);
-  const v = BGT.peek(text, tl, src);
-  if (v === undefined) { BGT.want(text, tl, src, renderChat); return esc(text); }
+  const v = BGT.peek(text, tl, 'auto');
+  if (v === undefined) { BGT.want(text, tl, 'auto', renderChat); return esc(text); }
   return v ? `<span class="tr" data-orig="${esc(text)}" title="${esc(t('translated'))}">${esc(v)}</span>` : esc(text);
 }
 document.addEventListener('click', e => { const el = e.target.closest('.tr'); if (el) { e.stopPropagation(); toast('🌐 ' + esc(el.dataset.orig)); } }, true);
@@ -923,10 +923,11 @@ function telSend(auto) {
   render();
 }
 // texte d'un autre joueur, traduit dans ma langue si besoin
-function telTxt(txt, l, again) {
+// la langue d'écriture est détectée automatiquement (un ami peut écrire en anglais avec le site réglé en français)
+function telTxt(txt, l, again, mine) {
   if (!txt) return `<i style="opacity:.7">${esc(t('telNothing'))}</i>`;
-  const tl = P.lang(); if (!l || l === tl || !window.BGT) return esc(txt);
-  const v = BGT.peek(txt, tl, l); if (v === undefined) { BGT.want(txt, tl, l, again); return esc(txt); }
+  const tl = P.lang(); if (mine || !window.BGT) return esc(txt);
+  const v = BGT.peek(txt, tl, 'auto'); if (v === undefined) { BGT.want(txt, tl, 'auto', again); return esc(txt); }
   return v ? `<span class="tr" data-orig="${esc(txt)}" title="${esc(t('translated'))}">${esc(v)}</span>` : esc(txt);
 }
 // rejoue un dessin trait par trait dans une toile (≈ 2,5 s)
@@ -956,11 +957,11 @@ function pickVoice(l) {
   const vs = VOICE.ok ? speechSynthesis.getVoices() : [], tag = VLANG[l] || 'fr-FR', base = tag.slice(0, 2);
   return vs.find(v => v.lang === tag && /google|natural|premium|enhanced/i.test(v.name)) || vs.find(v => v.lang === tag) || vs.find(v => (v.lang || '').toLowerCase().startsWith(base)) || null;
 }
-function telSpeak(txt, l) {
+function telSpeak(txt, l, tr) {
   if (!VOICE.ok || !VOICE.on || !txt || !P.soundOn()) return;
   // dans ma langue : traduction si elle est prête, sinon la phrase d'origine dans sa langue
   const tl = P.lang(); let say = txt, sl = l || tl;
-  if (l && l !== tl && window.BGT) { const v = BGT.peek(txt, tl, l); if (v) { say = v; sl = tl; } }
+  if (tr) { say = tr; sl = tl; }
   try {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(say); u.lang = VLANG[sl] || 'fr-FR';
@@ -988,7 +989,9 @@ function renderTel() {
   $('#scores').innerHTML = V.players.map((p, i) => ({ p, i })).filter(o => !o.p.gone && o.p.in).map(o => `<div class="pl${V.phase === 'tel' && o.p.d ? ' done' : ''}${o.i === me ? ' me' : ''}">${avatar(o.i)}<span>${esc(o.p.n)}${V.phase === 'tel' ? (o.p.d ? ' ✅' : ' ✏️') : ''}</span></div>`).join('');
   const OV = $('#ov'), WB = $('#wordbar');
   if (V.phase === 'tel') {
-    const key = V.tn + ':' + (mine ? (TK.sent ? 's' : 'a') : 'x');
+    const ptx = TK.prev && TK.prev.txt, ptr = ptx && window.BGT ? BGT.peek(ptx, P.lang(), 'auto') : '';
+    // la clé change aussi quand la traduction de la phrase à dessiner arrive (sinon elle ne s'affichait jamais)
+    const key = V.tn + ':' + (mine ? (TK.sent ? 's' : 'a') : 'x') + ':' + (ptr === undefined ? '?' : ptr || '');
     if (!inGame) { $('#hWho').textContent = ''; OV.innerHTML = `<div class="tel-ill">⏳</div><h3>${t('telSpect')}</h3>`; OV.hidden = false; WB.innerHTML = ''; }
     else if (!mine) { OV.innerHTML = `<h3 class="dots">…</h3>`; OV.hidden = false; }
     else if (TK.sent) {
@@ -1016,9 +1019,20 @@ function renderTel() {
       if (!e || list.querySelector(`[data-ei="${ei}"]`)) return;
       const d = document.createElement('div'); d.className = 'ae ' + e.k; d.dataset.ei = ei;
       const who = t(e.k === 'd' ? 'telWhoD' : e.k === 'g' ? 'telWhoG' : 'telWho', { name: nm(e.s) });
-      d.innerHTML = `<div class="who">${avatar(e.s)}<span>${esc(who)}</span></div>` + (e.k === 'd' ? '<canvas width="1000" height="750"></canvas>' : `<div class="txt">${telTxt(e.txt, e.l, () => {})}</div>`);
+      const mine = e.s === net.me;
+      d.innerHTML = `<div class="who">${avatar(e.s)}<span>${esc(who)}</span></div>` + (e.k === 'd' ? '<canvas width="1000" height="750"></canvas>' : `<div class="txt">${telTxt(e.txt, e.l, null, mine)}</div>`);
       list.appendChild(d);
-      if (e.k === 'd') replay(d.querySelector('canvas'), e.ops || [], 2600); else telSpeak(e.txt, e.l);
+      if (e.k === 'd') replay(d.querySelector('canvas'), e.ops || [], 2600);
+      else if (mine || !window.BGT || !e.txt) telSpeak(e.txt, e.l);
+      else {
+        // on attend la traduction (au plus ~1,5 s) pour l'afficher et la lire dans ma langue
+        let spoken = false; const say = tr => { if (spoken) return; spoken = true; telSpeak(e.txt, e.l, tr); };
+        const tm = setTimeout(() => say(null), 1500);
+        BGT.translate(e.txt, P.lang(), 'auto').then(v => {
+          if (v) { const el = d.querySelector('.txt'); if (el) el.innerHTML = `<span class="tr" data-orig="${esc(e.txt)}" title="${esc(t('translated'))}">${esc(v)}</span>`; }
+          clearTimeout(tm); say(v);
+        }, () => { clearTimeout(tm); say(null); });
+      }
       setTimeout(() => { list.scrollTop = list.scrollHeight; }, 30);
     });
     const host = net.role === 'host';
